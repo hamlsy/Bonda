@@ -8,4 +8,6 @@ import java.util.List;
 public interface RiskEventEvidenceRepository extends JpaRepository<RiskEventEvidence, Long> {
 
     List<RiskEventEvidence> findAllByRiskEventIdOrderByIdAsc(Long riskEventId);
+
+    boolean existsByRiskEventId(Long riskEventId);
 }

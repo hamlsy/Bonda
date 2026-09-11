@@ -21,4 +21,6 @@ public interface IssuerRiskSnapshotRepository extends JpaRepository<IssuerRiskSn
     );
 
     List<IssuerRiskSnapshot> findAllByIssuerIdOrderBySnapshotDateAscIdAsc(Long issuerId);
+
+    Optional<IssuerRiskSnapshot> findFirstByIssuerIdOrderBySnapshotDateDescIdDesc(Long issuerId);
 }
