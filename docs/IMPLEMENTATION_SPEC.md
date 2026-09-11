@@ -57,6 +57,14 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - Canonical fingerprint는 `issuerId + eventType + eventDate + amount + disclosureVersionId`의 SHA-256이다. 동일 fingerprint가 있으면 새 Canonical을 만들지 않고 Candidate를 기존 Event에 `VERIFIED`로 연결한다.
 - 검증 API는 이미 처리된 Candidate에 대해 기존 결과를 반환한다. 시스템 예외는 검증 실패로 간주하지 않으며 transaction rollback으로 `PENDING` 상태를 보존한다.
 
+## Financial and issuer risk snapshots
+
+- `FinancialSnapshot`은 MVP에서 연결 재무제표만 허용하고 `(issuerId, period, statementScope)`로 중복을 막는다. `totalDebt`는 `shortTermDebt + longTermDebt`로 계산하며 같은 기간의 다른 값은 충돌로 처리한다.
+- 증감률은 이전 값이 없거나 0이면 nullable로 유지한다. 현금·부채 잔액은 음수를 허용하지 않고, 영업현금흐름과 영업이익은 음수를 허용해 절댓값 기준 악화율과 양수→음수 전환을 계산한다.
+- `RISK_POLICY_V1`은 `NORMAL`, `WATCH`, `CAUTION`만 사용한다. 모든 threshold는 `RiskThresholds`에 모으고 최근 180일의 Canonical Event만 반영한다.
+- `IssuerRiskSnapshot`은 `(issuerId, snapshotDate, ruleVersion)`이 unique이며 source input fingerprint와 category별 reason/source ID trace를 저장한다. Snapshot date는 최신 재무 기준일과 최신 Canonical Event 유효일 중 늦은 날짜다.
+- `RiskChange`는 직전 Snapshot과 실제로 달라진 category만 저장한다. `(currentSnapshotId, category)` unique와 input fingerprint 재사용으로 Snapshot/Change 재계산을 idempotent하게 유지한다.
+
 ## REST API
 
 - `GET /api/health`
@@ -71,6 +79,8 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `POST /api/admin/disclosures/collect?issuerId={issuerId}`
 - `POST /api/admin/analysis/{disclosureVersionId}`
 - `POST /api/admin/candidates/{candidateId}/validate`
+- `POST /api/admin/issuers/{issuerId}/financial-snapshots`
+- `POST /api/admin/issuers/{issuerId}/risk/recalculate`
 
 ## Database
 
@@ -82,4 +92,4 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## 제외 범위
 
-Risk Snapshot/Change, Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
+Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.

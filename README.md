@@ -50,9 +50,11 @@ AI extraction은 기본적으로 비활성화되어 local fake extractor를 사�
 
 생성된 Candidate는 `POST /api/admin/candidates/{candidateId}/validate`로 검증합니다. 원문 evidence, 금액, 발행사와 Event별 최소 조건을 통과한 Candidate만 Canonical Risk Event로 승격됩니다.
 
+연결 기준 재무정보는 `POST /api/admin/issuers/{issuerId}/financial-snapshots`로 저장하고, `POST /api/admin/issuers/{issuerId}/risk/recalculate`로 deterministic Risk Snapshot과 RiskChange를 계산할 수 있습니다.
+
 ## 프로젝트 상태
 
-현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction과 deterministic Candidate 검증을 제공합니다. 검증된 Candidate만 evidence를 포함한 Canonical Risk Event로 승격합니다.
+현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction, deterministic Candidate 검증과 발행사 Risk Snapshot/Change 계산을 제공합니다. AI는 Event 추출에만 사용하며 Risk State는 재무 feature와 검증된 Canonical Event를 코드 정책으로 계산합니다.
 
 ## 문서
 
