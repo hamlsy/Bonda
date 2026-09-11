@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bonda}
+    username: ${DB_USERNAME:bonda}
+    password: ${DB_PASSWORD}
+  flyway:
+    enabled: true

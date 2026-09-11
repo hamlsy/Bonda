@@ -1,0 +1,9 @@
+{
+  "profile": "product-minimal",
+  "sourceRoots": ["frontend/src"],
+  "locale": "ko-KR",
+  "ownership": {
+    "Select/Listbox": "native",
+    "Date": "native"
+  }
+}

@@ -1,0 +1,25 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+**/application-secret.yml
+**/application-*.local.yml
+
+# Frontend
+**/node_modules/
+frontend/dist/
+*.tsbuildinfo
+
+# Backend
+backend/.gradle/
+backend/build/
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: bonda
+  profiles:
+    default: local
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+
+server:
+  port: ${PORT:8080}
+
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+
+bonda:
+  dart:
+    base-url: https://opendart.fss.or.kr
+    api-key: ${DART_API_KEY:}
+    lookback-days: ${DART_LOOKBACK_DAYS:7}
+    page-size: ${DART_PAGE_SIZE:100}
+    max-pages: ${DART_MAX_PAGES:10}
+    max-document-bytes: ${DART_MAX_DOCUMENT_BYTES:10485760}
+    connect-timeout: ${DART_CONNECT_TIMEOUT:5s}
+    read-timeout: ${DART_READ_TIMEOUT:20s}
+    collection:
+      enabled: ${DART_COLLECTION_ENABLED:false}
+      cron: "${DART_COLLECTION_CRON:0 0 6 * * *}"
+      zone: ${DART_COLLECTION_ZONE:Asia/Seoul}
