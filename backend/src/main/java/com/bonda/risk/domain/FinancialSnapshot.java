@@ -21,7 +21,7 @@ import java.util.Objects;
     name = "financial_snapshot",
     uniqueConstraints = @UniqueConstraint(
         name = "uq_financial_snapshot_period_scope",
-        columnNames = {"issuer_id", "period", "statement_scope"}
+        columnNames = {"issuer_id", "reporting_period", "statement_scope"}
     )
 )
 public class FinancialSnapshot {
@@ -33,7 +33,7 @@ public class FinancialSnapshot {
     @Column(name = "issuer_id", nullable = false)
     private Long issuerId;
 
-    @Column(nullable = false, length = 20)
+    @Column(name = "reporting_period", nullable = false, length = 20)
     private String period;
 
     @Column(name = "statement_date", nullable = false)

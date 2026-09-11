@@ -38,11 +38,7 @@ public class RiskPolicy {
         FinancialFeatures features = current == null
             ? new FinancialFeatures(null, null, null, null, null, null, null, false, false)
             : FinancialFeatures.calculate(current, previous);
-        LocalDate cutoff = snapshotDate.minusDays(thresholds.eventLookbackDays());
-        List<EventSignal> events = eventSignals.stream()
-            .filter(event -> !event.effectiveDate().isAfter(snapshotDate))
-            .filter(event -> !event.effectiveDate().isBefore(cutoff))
-            .toList();
+        List<EventSignal> events = relevantEvents(snapshotDate, eventSignals);
 
         Map<RiskCategory, MutableDecision> decisions = new EnumMap<>(RiskCategory.class);
         for (RiskCategory category : RiskCategory.values()) {
@@ -56,6 +52,14 @@ public class RiskPolicy {
 
         List<RiskDecision> result = decisions.values().stream().map(MutableDecision::freeze).toList();
         return new PolicyResult(features, result, RULE_VERSION);
+    }
+
+    public List<EventSignal> relevantEvents(LocalDate snapshotDate, List<EventSignal> eventSignals) {
+        LocalDate cutoff = snapshotDate.minusDays(thresholds.eventLookbackDays());
+        return eventSignals.stream()
+            .filter(event -> !event.effectiveDate().isAfter(snapshotDate))
+            .filter(event -> !event.effectiveDate().isBefore(cutoff))
+            .toList();
     }
 
     private void applyLiquidity(

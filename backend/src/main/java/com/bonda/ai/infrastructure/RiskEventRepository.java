@@ -13,4 +13,6 @@ public interface RiskEventRepository extends JpaRepository<RiskEvent, Long> {
     Optional<RiskEvent> findByEventFingerprint(String eventFingerprint);
 
     List<RiskEvent> findAllByDisclosureVersionIdOrderByIdAsc(Long disclosureVersionId);
+
+    List<RiskEvent> findAllByIssuerIdOrderByEventDateAscIdAsc(Long issuerId);
 }
