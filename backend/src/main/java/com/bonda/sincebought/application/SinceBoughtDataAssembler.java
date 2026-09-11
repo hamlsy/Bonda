@@ -154,7 +154,7 @@ public class SinceBoughtDataAssembler {
                 change.getDetectedAt().atZone(PRODUCT_ZONE).toLocalDate(),
                 TimelineType.RISK_CHANGE,
                 categoryName(change) + " 상태가 바뀌었어요",
-                change.getPreviousState() + " → " + change.getCurrentState(),
+                stateName(change.getPreviousState()) + " → " + stateName(change.getCurrentState()),
                 change.getCurrentState(),
                 null,
                 change.getId(),
@@ -196,8 +196,16 @@ public class SinceBoughtDataAssembler {
         if (event.getAmount() == null) {
             return "검증된 공시 원문에서 확인된 변화입니다.";
         }
-        return event.getAmount().stripTrailingZeros().toPlainString() + " "
-            + (event.getCurrency() == null ? "" : event.getCurrency());
+        if ("KRW".equals(event.getCurrency())) {
+            BigDecimal hundredMillionWon = new BigDecimal("100000000");
+            BigDecimal[] divided = event.getAmount().divideAndRemainder(hundredMillionWon);
+            if (divided[1].signum() == 0) {
+                return divided[0].stripTrailingZeros().toPlainString() + "억원";
+            }
+            return event.getAmount().stripTrailingZeros().toPlainString() + "원";
+        }
+        return event.getAmount().stripTrailingZeros().toPlainString()
+            + (event.getCurrency() == null ? "" : " " + event.getCurrency());
     }
 
     private String categoryName(RiskChange change) {
@@ -207,6 +215,14 @@ public class SinceBoughtDataAssembler {
             case LEVERAGE -> "부채 부담";
             case EARNINGS -> "수익성";
             case CREDIT -> "신용";
+        };
+    }
+
+    private String stateName(RiskState state) {
+        return switch (state) {
+            case NORMAL -> "정상";
+            case WATCH -> "관찰";
+            case CAUTION -> "주의";
         };
     }
 

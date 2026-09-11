@@ -64,6 +64,8 @@ class SinceBoughtDataAssemblerTest {
 
         RiskEvent before = riskEvent(10L, LocalDate.of(2026, 3, 1));
         RiskEvent after = riskEvent(11L, LocalDate.of(2026, 4, 19));
+        when(after.getAmount()).thenReturn(new BigDecimal("80000000000"));
+        when(after.getCurrency()).thenReturn("KRW");
         when(events.findAllByIssuerIdOrderByEventDateAscIdAsc(3L)).thenReturn(List.of(before, after));
         when(evidence.existsByRiskEventId(11L)).thenReturn(true);
         RiskChange riskChange = mock(RiskChange.class);
@@ -106,6 +108,8 @@ class SinceBoughtDataAssemblerTest {
                 SinceBoughtDataAssembler.TimelineType.RISK_CHANGE
             );
         assertThat(result.timeline().get(1).evidenceAvailable()).isTrue();
+        assertThat(result.timeline().get(1).summary()).isEqualTo("800억원");
+        assertThat(result.timeline().get(3).summary()).isEqualTo("정상 → 관찰");
         verify(changes).findAllByIssuerIdAndDetectedAtGreaterThanEqualOrderByDetectedAtAscIdAsc(
             3L,
             Instant.parse("2026-03-11T15:00:00Z")
