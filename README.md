@@ -52,9 +52,11 @@ AI extraction은 기본적으로 비활성화되어 local fake extractor를 사�
 
 연결 기준 재무정보는 `POST /api/admin/issuers/{issuerId}/financial-snapshots`로 저장하고, `POST /api/admin/issuers/{issuerId}/risk/recalculate`로 deterministic Risk Snapshot과 RiskChange를 계산할 수 있습니다.
 
+보유 채권의 `GET /api/holdings/{holdingId}/since-bought`에서 매수 이후 검증된 Event, RiskChange, 재무 변화를 확인할 수 있습니다. Event의 원문 근거는 `GET /api/risk-events/{riskEventId}`로 조회합니다. 변화 설명은 같은 AI 설정을 재사용하지만 검증 데이터만 입력하며, 동일 상태에서는 캐시를 사용합니다.
+
 ## 프로젝트 상태
 
-현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction, deterministic Candidate 검증과 발행사 Risk Snapshot/Change 계산을 제공합니다. AI는 Event 추출에만 사용하며 Risk State는 재무 feature와 검증된 Canonical Event를 코드 정책으로 계산합니다.
+현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction, deterministic Candidate 검증, 발행사 Risk Snapshot/Change 계산과 Since I Bought Timeline을 제공합니다. AI는 Event 추출과 검증 데이터의 짧은 변화 설명에만 사용하며 Risk State는 재무 feature와 검증된 Canonical Event를 코드 정책으로 계산합니다.
 
 ## 문서
 

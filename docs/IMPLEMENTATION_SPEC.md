@@ -65,6 +65,14 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `IssuerRiskSnapshot`은 `(issuerId, snapshotDate, ruleVersion)`이 unique이며 source input fingerprint와 category별 reason/source ID trace를 저장한다. Snapshot date는 최신 재무 기준일과 최신 Canonical Event 유효일 중 늦은 날짜다.
 - `RiskChange`는 직전 Snapshot과 실제로 달라진 category만 저장한다. `(currentSnapshotId, category)` unique와 input fingerprint 재사용으로 Snapshot/Change 재계산을 idempotent하게 유지한다.
 
+## Since I Bought
+
+- Holding의 `purchaseDate`를 포함한 이후 Canonical `RiskEvent`와 RiskChange만 조회하고, 매수 시점을 Timeline 시작점으로 포함한다. 날짜가 없는 Event를 임의로 배치하지 않는다.
+- 재무 기준점은 매수일 이전의 가장 가까운 Snapshot, 현재 값은 최신 Snapshot을 사용한다. 10% 이상 변화 또는 부호 전환만 최대 4개까지 deterministic하게 표시한다.
+- Cross-document explanation은 Canonical Event, RiskChange, 선택한 재무 Snapshot과 현재 Risk State만 입력으로 사용한다. 새 Event 또는 Change가 없으면 호출하지 않는다.
+- 설명 cache fingerprint는 Holding, 모델·prompt version, 전체 Event/Change ID, 재무 기준점과 현재 Risk Snapshot identity를 포함한다. 같은 입력은 저장된 설명을 재사용한다.
+- `SINCE_BOUGHT_EXPLANATION_V1`은 3~5문장의 보수적인 한국어 설명만 허용하고 Risk State 결정, 인과 단정, 부도 예측과 투자 추천을 금지한다.
+
 ## REST API
 
 - `GET /api/health`
@@ -81,6 +89,8 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `POST /api/admin/candidates/{candidateId}/validate`
 - `POST /api/admin/issuers/{issuerId}/financial-snapshots`
 - `POST /api/admin/issuers/{issuerId}/risk/recalculate`
+- `GET /api/holdings/{holdingId}/since-bought`
+- `GET /api/risk-events/{riskEventId}`
 
 ## Database
 
@@ -88,8 +98,8 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## Frontend scope
 
-현재 화면은 Bond 목록 조회와 Holding/Watchlist 등록 연결을 확인하는 최소 제품 UI다. 본격적인 visual redesign은 별도 단계에서 제공 목업과 Loopy loop를 기준으로 진행한다.
+Bond 목록과 Holding/Watchlist 등록 화면을 유지한다. Holding별 Since I Bought 화면은 현재 Risk State, 날짜순 Timeline, 원문 Evidence, 보수적인 변화 설명과 재무 기준점 비교를 mobile-first로 제공한다.
 
 ## 제외 범위
 
-Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
+알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.

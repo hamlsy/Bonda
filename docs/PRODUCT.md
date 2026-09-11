@@ -18,8 +18,8 @@ Bonda는 개인투자자가 보유하거나 관심 있는 회사채의 발행기
 
 ## 현재 단계
 
-Issuer, Bond, Holding, Watchlist를 첫 core domain으로 제공한다. MVP에서는 회원을 구분하지 않는 1인 포트폴리오로 동작한다. 등록된 발행기업의 DART 공시를 증분 수집하고, 원문이 달라진 정정공시는 과거 원문을 보존한 새 Version으로 기록한다. 수집 원문은 section과 table 의미를 보존한 텍스트로 정규화하고, deterministic pre-filter로 AI 분석 대상 여부와 대상 section을 기록한다. `ANALYZE` 문서는 구조화된 AI extraction을 거쳐 `CandidateRiskEvent`로 저장하며, 원문 evidence·금액·발행사·Event별 조건을 deterministic rule로 검증한 Candidate만 Canonical `RiskEvent`와 evidence로 승격한다. 연결 기준 재무 Snapshot과 최근 Canonical Event는 versioned Risk Policy로 계산되어 발행사별 시점 Risk State와 category별 RiskChange를 만든다.
+Issuer, Bond, Holding, Watchlist를 첫 core domain으로 제공한다. MVP에서는 회원을 구분하지 않는 1인 포트폴리오로 동작한다. 등록된 발행기업의 DART 공시를 증분 수집하고, 원문이 달라진 정정공시는 과거 원문을 보존한 새 Version으로 기록한다. 수집 원문은 section과 table 의미를 보존한 텍스트로 정규화하고, deterministic pre-filter로 AI 분석 대상 여부와 대상 section을 기록한다. `ANALYZE` 문서는 구조화된 AI extraction을 거쳐 `CandidateRiskEvent`로 저장하며, 원문 evidence·금액·발행사·Event별 조건을 deterministic rule로 검증한 Candidate만 Canonical `RiskEvent`와 evidence로 승격한다. 연결 기준 재무 Snapshot과 최근 Canonical Event는 versioned Risk Policy로 계산되어 발행사별 시점 Risk State와 category별 RiskChange를 만든다. Since I Bought는 Holding의 매수일 이후 Canonical Event, RiskChange와 의미 있는 재무 변화를 하나의 Timeline으로 보여주고, 검증 데이터만 사용한 짧은 AI 설명을 캐시해 제공한다.
 
 ## 제외 범위
 
-Since I Bought, Alert, Historical Replay, 운영용 Admin Dashboard는 아직 구현하지 않는다.
+Alert, Historical Replay, 운영용 Admin Dashboard는 아직 구현하지 않는다.
