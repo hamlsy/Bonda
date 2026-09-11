@@ -37,3 +37,85 @@ export type CreateHolding = {
   purchaseDate: string;
   purchaseAmount: string;
 };
+
+export type RiskState = "NORMAL" | "WATCH" | "CAUTION";
+
+export type TimelineType = "PURCHASE" | "RISK_EVENT" | "RISK_CHANGE" | "FINANCIAL_CHANGE";
+
+export type SinceBoughtTimelineItem = {
+  date: string;
+  type: TimelineType;
+  title: string;
+  summary: string;
+  severity: RiskState | null;
+  riskEventId: number | null;
+  riskChangeId: number | null;
+  evidenceAvailable: boolean;
+};
+
+export type FinancialChange = {
+  metric: string;
+  label: string;
+  baselineValue: number;
+  currentValue: number;
+  changeRate: number | null;
+  direction: "INCREASE" | "DECREASE";
+  summary: string;
+};
+
+export type CurrentRiskState = {
+  snapshotId: number;
+  snapshotDate: string;
+  liquidity: RiskState;
+  cashFlow: RiskState;
+  leverage: RiskState;
+  earnings: RiskState;
+  credit: RiskState;
+  ruleVersion: string;
+};
+
+export type SinceBoughtResponse = {
+  holding: {
+    id: number;
+    bondId: number;
+    bondName: string;
+    issuerId: number;
+    issuerName: string;
+    purchaseDate: string;
+    purchaseAmount: number;
+  };
+  currentRiskState: CurrentRiskState | null;
+  timeline: SinceBoughtTimelineItem[];
+  financialChanges: FinancialChange[];
+  financialContext: {
+    baseline: { id: number; period: string; statementDate: string } | null;
+    current: { id: number; period: string; statementDate: string } | null;
+  };
+  explanation: {
+    status: "AVAILABLE" | "NOT_NEEDED" | "FAILED";
+    summary: string | null;
+    relatedEventIds: number[];
+    relatedRiskChangeIds: number[];
+    reused: boolean;
+    model: string | null;
+    promptVersion: string | null;
+  };
+  updatedAt: string;
+};
+
+export type RiskEventDetail = {
+  id: number;
+  eventType: string;
+  eventDate: string | null;
+  amount: number | null;
+  currency: string | null;
+  disclosureTitle: string;
+  publishedAt: string;
+  sourceReceiptNo: string;
+  evidence: Array<{
+    id: number;
+    section: string | null;
+    evidenceText: string;
+    sourceUrl: string | null;
+  }>;
+};

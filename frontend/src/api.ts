@@ -1,4 +1,11 @@
-import type { Bond, CreateHolding, Holding, WatchlistEntry } from "./types";
+import type {
+  Bond,
+  CreateHolding,
+  Holding,
+  RiskEventDetail,
+  SinceBoughtResponse,
+  WatchlistEntry,
+} from "./types";
 
 const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
@@ -53,4 +60,12 @@ export function createWatchlist(bondId: number) {
     method: "POST",
     body: JSON.stringify({ bondId }),
   });
+}
+
+export function getSinceBought(holdingId: number, signal?: AbortSignal) {
+  return request<SinceBoughtResponse>(`/api/holdings/${holdingId}/since-bought`, { signal });
+}
+
+export function getRiskEvent(riskEventId: number, signal?: AbortSignal) {
+  return request<RiskEventDetail>(`/api/risk-events/${riskEventId}`, { signal });
 }

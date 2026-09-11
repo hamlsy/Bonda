@@ -13,6 +13,8 @@ colors:
   signal: "#D6EA73"
   control: "#82958E"
   error: "#A13D2D"
+  watch: "#8A6500"
+  caution: "#934536"
 typography:
   display:
     fontFamily: "Georgia, 'Times New Roman', serif"
@@ -54,7 +56,7 @@ components:
 
 ## Colors
 
-`ink`, `paper`, `surface`를 기본 정보 계층에 사용한다. `primary`는 브랜드와 현재 상태에, `signal`은 monitoring 신호선에 제한한다. 위험 색상은 실제 risk 상태가 정의되는 후속 단계에서 별도로 결정한다.
+`ink`, `paper`, `surface`를 기본 정보 계층에 사용한다. `primary`는 브랜드와 NORMAL 상태에, `signal`은 monitoring 신호선에 제한한다. WATCH는 절제된 황갈색, CAUTION은 탁한 적갈색을 사용하되 색만으로 상태를 전달하지 않는다.
 
 ## Typography
 
@@ -85,6 +87,8 @@ components:
 ### Navigation and data display
 
 현재 단일 화면에서 작은 bounded bond 목록을 모두 표시한다. 채권 행은 카드 대신 divider 기반 목록으로 구성하고 신용등급·금리·만기를 먼저 읽을 수 있게 한다.
+
+Since I Bought 화면은 날짜순 세로 signal line을 대표 시각요소로 사용한다. 매수 이후 변화 수, 현재 상태, timeline, 검증 근거 순서로 읽히게 하며 AI 설명은 보조 rail에 둔다.
 
 ### Forms and overlays
 

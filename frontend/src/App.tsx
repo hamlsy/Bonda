@@ -8,6 +8,7 @@ import {
   getHoldings,
   getWatchlist,
 } from "./api";
+import SinceBoughtPage from "./SinceBoughtPage";
 import type { Bond, Holding, WatchlistEntry } from "./types";
 
 type PageState = "loading" | "ready" | "error";
@@ -207,7 +208,8 @@ function PortfolioPage() {
               ) : (
                 <ul className="bond-list">
                   {bonds.map((bond) => {
-                    const holdingCount = holdings.filter((holding) => holding.bond.id === bond.id).length;
+                    const bondHoldings = holdings.filter((holding) => holding.bond.id === bond.id);
+                    const holdingCount = bondHoldings.length;
                     const isWatched = watchedBondIds.has(bond.id);
                     return (
                       <li key={bond.id}>
@@ -221,11 +223,18 @@ function PortfolioPage() {
                           <div><dt>표면금리</dt><dd>{bond.couponRate.toFixed(2)}%</dd></div>
                           <div><dt>만기</dt><dd>{formatDate(bond.maturityDate)}</dd></div>
                         </dl>
-                        <p className="bond-state">
-                          {holdingCount > 0 ? `보유 ${holdingCount}건` : "미보유"}
-                          <span aria-hidden="true">·</span>
-                          {isWatched ? "관심 등록" : "관심 미등록"}
-                        </p>
+                        <div className="bond-state">
+                          <p>
+                            {holdingCount > 0 ? `보유 ${holdingCount}건` : "미보유"}
+                            <span aria-hidden="true">·</span>
+                            {isWatched ? "관심 등록" : "관심 미등록"}
+                          </p>
+                          {bondHoldings.map((holding) => (
+                            <Link key={holding.id} to={`/holdings/${holding.id}/since-bought`}>
+                              매수 이후 보기 <span aria-hidden="true">→</span>
+                            </Link>
+                          ))}
+                        </div>
                       </li>
                     );
                   })}
@@ -361,6 +370,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<PortfolioPage />} />
+      <Route path="/holdings/:holdingId/since-bought" element={<SinceBoughtPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
