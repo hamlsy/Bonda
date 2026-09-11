@@ -179,6 +179,9 @@ public class RiskAnalysisService {
         String evidenceText,
         String extractionReason,
         String status,
+        String validationReason,
+        String validationRuleVersion,
+        Long canonicalRiskEventId,
         Instant createdAt
     ) {
         static CandidateResult from(CandidateRiskEvent candidate) {
@@ -192,6 +195,9 @@ public class RiskAnalysisService {
                 candidate.getEvidenceText(),
                 candidate.getExtractionReason(),
                 candidate.getStatus().name(),
+                candidate.getValidationReason(),
+                candidate.getValidationRuleVersion(),
+                candidate.getCanonicalRiskEventId(),
                 candidate.getCreatedAt()
             );
         }

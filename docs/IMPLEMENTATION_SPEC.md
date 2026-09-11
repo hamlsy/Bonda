@@ -48,7 +48,14 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `RISK_EXTRACTION_V1` prompt와 strict JSON schema는 6개 Event Type만 허용한다: `DEBT_INCREASE`, `CASH_DECREASE`, `OPERATING_LOSS`, `CREDIT_RATING_CHANGE`, `GUARANTEE_INCREASE`, `LIQUIDITY_WARNING`.
 - target section이 있으면 해당 section을 우선 전달하고 입력 길이를 제한한다. 동일 `documentHash + model + promptVersion`의 성공 실행은 재사용한다.
 - `AnalysisRun`은 상태, token, latency, retry, nullable estimated USD cost와 오류를 기록한다. 일시적 timeout/429/5xx만 최대 3회 재시도한다.
-- 추출 결과는 fingerprint로 실행 내 중복을 줄인 뒤 상태가 `PENDING`인 `CandidateRiskEvent`로 저장한다. 이 단계에서는 검증하거나 Canonical Event로 승격하지 않는다.
+- 추출 결과는 fingerprint로 실행 내 중복을 줄인 뒤 상태가 `PENDING`인 `CandidateRiskEvent`로 저장한다.
+
+## Candidate validation and canonical events
+
+- `RISK_VALIDATION_V1`은 Candidate의 issuer/source 연결, 원문 evidence 포함 여부, 원·천원·백만원·억원 금액의 정확 일치, 명시된 event date와 Event Type별 최소 사실 조건을 deterministic하게 검증한다.
+- 검증 실패는 모든 사유를 기록하고 Candidate를 `REJECTED`로 변경한다. 검증 성공은 Candidate를 `VERIFIED`로 변경하면서 Canonical `RiskEvent`와 최소 한 건의 `RiskEventEvidence`를 같은 transaction에서 생성한다.
+- Canonical fingerprint는 `issuerId + eventType + eventDate + amount + disclosureVersionId`의 SHA-256이다. 동일 fingerprint가 있으면 새 Canonical을 만들지 않고 Candidate를 기존 Event에 `VERIFIED`로 연결한다.
+- 검증 API는 이미 처리된 Candidate에 대해 기존 결과를 반환한다. 시스템 예외는 검증 실패로 간주하지 않으며 transaction rollback으로 `PENDING` 상태를 보존한다.
 
 ## REST API
 
@@ -63,6 +70,7 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `DELETE /api/watchlist/{watchlistId}`
 - `POST /api/admin/disclosures/collect?issuerId={issuerId}`
 - `POST /api/admin/analysis/{disclosureVersionId}`
+- `POST /api/admin/candidates/{candidateId}/validate`
 
 ## Database
 
@@ -74,4 +82,4 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## 제외 범위
 
-Candidate Validation, Canonical Risk Event, Risk Snapshot/Change, Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
+Risk Snapshot/Change, Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.

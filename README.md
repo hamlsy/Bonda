@@ -48,9 +48,11 @@ DART 수집은 `DART_API_KEY`와 숫자 8자리 `Issuer.corpCode`가 필요합�
 
 AI extraction은 기본적으로 비활성화되어 local fake extractor를 사용합니다. `ANALYZE`인 공시 Version은 `POST /api/admin/analysis/{disclosureVersionId}`로 확인할 수 있습니다. 실제 OpenAI-compatible 호출은 `BONDA_AI_ENABLED=true`, `OPENAI_API_KEY`, 필요 시 `BONDA_AI_MODEL`을 설정합니다.
 
+생성된 Candidate는 `POST /api/admin/candidates/{candidateId}/validate`로 검증합니다. 원문 evidence, 금액, 발행사와 Event별 최소 조건을 통과한 Candidate만 Canonical Risk Event로 승격됩니다.
+
 ## 프로젝트 상태
 
-현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter와 구조화 AI extraction을 제공합니다. AI 결과는 검증 전 `CandidateRiskEvent`로만 저장하며 Canonical Risk Event는 아직 생성하지 않습니다.
+현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction과 deterministic Candidate 검증을 제공합니다. 검증된 Candidate만 evidence를 포함한 Canonical Risk Event로 승격합니다.
 
 ## 문서
 

@@ -65,6 +65,18 @@ public class CandidateRiskEvent {
     @Column(nullable = false, unique = true, length = 64)
     private String fingerprint;
 
+    @Column(name = "validation_reason", columnDefinition = "TEXT")
+    private String validationReason;
+
+    @Column(name = "validation_rule_version", length = 50)
+    private String validationRuleVersion;
+
+    @Column(name = "validated_at")
+    private Instant validatedAt;
+
+    @Column(name = "canonical_risk_event_id")
+    private Long canonicalRiskEventId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -138,6 +150,37 @@ public class CandidateRiskEvent {
         createdAt = Instant.now();
     }
 
+    public void verify(
+        Long canonicalRiskEventId,
+        String validationReason,
+        String validationRuleVersion,
+        Instant validatedAt
+    ) {
+        requirePending();
+        this.status = Status.VERIFIED;
+        this.canonicalRiskEventId = Objects.requireNonNull(
+            canonicalRiskEventId,
+            "canonicalRiskEventId must not be null"
+        );
+        this.validationReason = requireText(validationReason, "validationReason");
+        this.validationRuleVersion = requireText(validationRuleVersion, "validationRuleVersion");
+        this.validatedAt = Objects.requireNonNull(validatedAt, "validatedAt must not be null");
+    }
+
+    public void reject(String validationReason, String validationRuleVersion, Instant validatedAt) {
+        requirePending();
+        this.status = Status.REJECTED;
+        this.validationReason = requireText(validationReason, "validationReason");
+        this.validationRuleVersion = requireText(validationRuleVersion, "validationRuleVersion");
+        this.validatedAt = Objects.requireNonNull(validatedAt, "validatedAt must not be null");
+    }
+
+    private void requirePending() {
+        if (status != Status.PENDING) {
+            throw new IllegalStateException("CandidateRiskEvent status must be PENDING but was " + status);
+        }
+    }
+
     private static String fingerprint(
         Long issuerId,
         Long disclosureVersionId,
@@ -171,7 +214,10 @@ public class CandidateRiskEvent {
     }
 
     public enum Status {
-        PENDING
+        PENDING,
+        VERIFIED,
+        REJECTED,
+        SUPERSEDED
     }
 
     public Long getId() {
@@ -224,6 +270,22 @@ public class CandidateRiskEvent {
 
     public String getFingerprint() {
         return fingerprint;
+    }
+
+    public String getValidationReason() {
+        return validationReason;
+    }
+
+    public String getValidationRuleVersion() {
+        return validationRuleVersion;
+    }
+
+    public Instant getValidatedAt() {
+        return validatedAt;
+    }
+
+    public Long getCanonicalRiskEventId() {
+        return canonicalRiskEventId;
     }
 
     public Instant getCreatedAt() {
