@@ -39,7 +39,16 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `documentHash`는 `SHA-256(normalizedContent)`를 사용한다. 기존 normalization hash로 저장된 Version도 전환 중 중복 판정에 함께 사용한다.
 - `PRE_FILTER_V1`은 title, section, risk keyword, 변화·정량 문맥과 문서 길이를 조합해 `ANALYZE` 또는 `SKIP`을 결정한다.
 - 판정, matched rule/keyword, target section, 판정 시각과 rule version은 `DisclosureVersion`에 저장한다. migration 이전 Version의 pre-filter 필드는 미평가 상태로 nullable을 유지한다.
-- 이 단계에서는 LLM을 호출하거나 Risk Event를 생성하지 않는다.
+- pre-filter 결과가 `ANALYZE`인 Version만 AI extraction 입력이 된다.
+
+## AI extraction
+
+- `RiskEventExtractor` port와 OpenAI-compatible Responses API adapter를 분리한다. 기본 비활성화 상태에서는 `fake-local-v1` extractor가 외부 호출 없이 동작한다.
+- 실제 adapter의 모델은 `BONDA_AI_MODEL` 한 곳에서 설정하며 기본값은 비용 민감형 `gpt-5.6-luna`다. API key는 `OPENAI_API_KEY` 환경변수만 사용한다.
+- `RISK_EXTRACTION_V1` prompt와 strict JSON schema는 6개 Event Type만 허용한다: `DEBT_INCREASE`, `CASH_DECREASE`, `OPERATING_LOSS`, `CREDIT_RATING_CHANGE`, `GUARANTEE_INCREASE`, `LIQUIDITY_WARNING`.
+- target section이 있으면 해당 section을 우선 전달하고 입력 길이를 제한한다. 동일 `documentHash + model + promptVersion`의 성공 실행은 재사용한다.
+- `AnalysisRun`은 상태, token, latency, retry, nullable estimated USD cost와 오류를 기록한다. 일시적 timeout/429/5xx만 최대 3회 재시도한다.
+- 추출 결과는 fingerprint로 실행 내 중복을 줄인 뒤 상태가 `PENDING`인 `CandidateRiskEvent`로 저장한다. 이 단계에서는 검증하거나 Canonical Event로 승격하지 않는다.
 
 ## REST API
 
@@ -53,10 +62,11 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `GET /api/watchlist`
 - `DELETE /api/watchlist/{watchlistId}`
 - `POST /api/admin/disclosures/collect?issuerId={issuerId}`
+- `POST /api/admin/analysis/{disclosureVersionId}`
 
 ## Database
 
-PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 seed는 이름과 코드에 `[데모]` 또는 `DEMO`를 명시한다. DART API Key는 `DART_API_KEY` 환경변수로만 주입한다.
+PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 seed는 이름과 코드에 `[데모]` 또는 `DEMO`를 명시한다. DART와 AI API key는 각각 `DART_API_KEY`, `OPENAI_API_KEY` 환경변수로만 주입한다.
 
 ## Frontend scope
 
@@ -64,4 +74,4 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## 제외 범위
 
-LLM 기반 extraction, Risk Event/Snapshot/Change, Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
+Candidate Validation, Canonical Risk Event, Risk Snapshot/Change, Since I Bought, 알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
