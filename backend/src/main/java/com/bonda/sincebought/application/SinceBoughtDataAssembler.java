@@ -87,7 +87,7 @@ public class SinceBoughtDataAssembler {
             .findAllByIssuerIdOrderByStatementDateDescIdDesc(issuer.getId());
         FinancialSnapshot currentFinancial = financials.isEmpty() ? null : financials.getFirst();
         FinancialSnapshot baselineFinancial = financials.stream()
-            .filter(snapshot -> !snapshot.getStatementDate().isAfter(holding.getPurchaseDate()))
+            .filter(snapshot -> snapshot.getStatementDate().isBefore(holding.getPurchaseDate()))
             .findFirst()
             .orElse(null);
         List<FinancialChangeCalculator.FinancialChange> financialChanges = financialChangeCalculator.calculate(

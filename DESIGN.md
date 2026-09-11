@@ -3,27 +3,27 @@ version: alpha
 name: "Bonda"
 description: "채권 증서의 신뢰감과 지속 모니터링 신호를 결합한 한국어 금융 제품 UI"
 colors:
-  ink: "#14231F"
-  muted: "#62716C"
+  ink: "#0B1714"
+  muted: "#66736F"
   paper: "#FFFFFF"
-  surface: "#F3F7F5"
-  line: "#CCD9D4"
-  primary: "#0D654E"
-  primary-dark: "#084B3A"
-  signal: "#D6EA73"
-  control: "#82958E"
-  error: "#A13D2D"
-  watch: "#8A6500"
-  caution: "#934536"
+  surface: "#F6F9F8"
+  line: "#DCE5E2"
+  primary: "#08785C"
+  primary-dark: "#04513F"
+  signal: "#49B99B"
+  control: "#AEBDB8"
+  error: "#C63F35"
+  watch: "#C66C18"
+  caution: "#DF453C"
 typography:
   display:
-    fontFamily: "Georgia, 'Times New Roman', serif"
+    fontFamily: "'Arial Black', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif"
   sans:
-    fontFamily: "ui-sans-serif, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif"
+    fontFamily: "Inter, Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif"
 rounded:
   sm: "0.375rem"
   DEFAULT: "0.75rem"
-  lg: "1.25rem"
+  lg: "1rem"
 spacing:
   compact: "0.5rem"
   content: "1.25rem"
@@ -40,7 +40,7 @@ components:
 
 ### Creative North Star
 
-인쇄된 채권 증서의 절제된 타이포그래피 위에 얇은 실시간 신호선이 지나가는 장면을 기준으로 한다.
+소비자 금융 앱의 명료한 굵은 활자 위로 얇은 실시간 신호선이 지나가며, 매수 이후의 시간을 하나의 이야기로 연결하는 장면을 기준으로 한다.
 
 ### Product context and register
 
@@ -49,7 +49,7 @@ components:
 - **Locale and language policy:** 초기 UI는 한국어(`ko-KR`)이며 기술 식별자만 영문을 허용한다.
 - **Usage scene:** 데스크톱과 모바일에서 짧고 반복적으로 확인하는 제품 화면.
 - **Register:** 기능 명확성을 우선하는 product UI.
-- **Memorable signature:** 주요 구획을 가로지르는 얇은 monitoring signal line.
+- **Memorable signature:** Hero의 유기적인 Change Line이 Since I Bought Timeline의 점과 연결선으로 이어지는 구조.
 - **Restraint:** 금융 정보와 위험 상태 영역은 장식보다 가독성과 근거 구분을 우선한다.
 - **Anti-references:** 투자 수익을 과장하는 네온 trading UI, 장식적인 카드가 반복되는 범용 SaaS landing page.
 - **Token ownership/runtime mapping:** 이 문서가 시각 토큰의 기준이며 `frontend/src/styles.css`의 `:root` 변수가 이를 직접 구현한다.
@@ -60,11 +60,11 @@ components:
 
 ## Typography
 
-영문 서비스명과 짧은 표식에는 `display`, 한국어 본문과 제어에는 `sans`를 사용한다. 데이터 숫자는 tabular numerals를 사용하며 본문은 최소 16px를 유지한다.
+Hero, 서비스명과 채권명에는 무거운 산세리프 `display`, 한국어 본문과 제어에는 `sans`를 사용한다. 세리프는 사용하지 않는다. 데이터 숫자는 tabular numerals를 사용하며 본문은 최소 16px를 유지한다.
 
 ## Layout
 
-본문 최대 폭은 1120px이며 넓은 화면에서는 설명과 현재 기반 상태를 두 열로 배치한다. 좁은 화면에서는 한 열로 전환하고 20px 이상의 바깥 여백을 유지한다.
+본문 최대 폭은 1360px이며 넓은 화면에서도 1열 흐름을 중심으로 하되 Bond Summary와 Alert처럼 관계가 분명한 영역만 두 열로 배치한다. 좁은 화면에서는 한 열로 전환하고 16px 이상의 바깥 여백을 유지한다. Desktop Timeline은 가로 흐름, mobile Timeline은 같은 순서를 보존한 세로 흐름을 사용한다.
 
 ## Elevation & Depth
 
@@ -88,7 +88,9 @@ components:
 
 현재 단일 화면에서 작은 bounded bond 목록을 모두 표시한다. 채권 행은 카드 대신 divider 기반 목록으로 구성하고 신용등급·금리·만기를 먼저 읽을 수 있게 한다.
 
-Since I Bought 화면은 날짜순 세로 signal line을 대표 시각요소로 사용한다. 매수 이후 변화 수, 현재 상태, timeline, 검증 근거 순서로 읽히게 하며 AI 설명은 보조 rail에 둔다.
+Since I Bought 화면은 날짜순 signal line을 대표 시각요소로 사용한다. Desktop은 가로 시간축, mobile은 세로 시간축이며 매수 이후 변화 수, 현재 상태, timeline, 검증 근거 순서로 읽히게 한다. Bonda 해석은 Evidence와 구분된 낮은 우선순위 surface에 둔다.
+
+My Bonds 화면은 unread 변화가 있는 Holding을 먼저 정렬하고 왼쪽 signal line과 짧은 상태 문구로 표시한다. Alert는 독립 카드 대신 시간순 divider 목록으로 제공하며, Event Alert는 Evidence로, RiskChange Alert는 Since I Bought로 이동한다. badge는 severity와 unread 상태에만 제한한다.
 
 ### Forms and overlays
 

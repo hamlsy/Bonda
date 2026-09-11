@@ -7,6 +7,11 @@ import java.util.Optional;
 
 public interface AnalysisRunRepository extends JpaRepository<AnalysisRun, Long> {
 
+    Optional<AnalysisRun> findFirstByDisclosureVersionIdAndStatusOrderByIdDesc(
+        Long disclosureVersionId,
+        AnalysisRun.Status status
+    );
+
     Optional<AnalysisRun> findFirstByDocumentHashAndModelAndPromptVersionAndStatusOrderByIdDesc(
         String documentHash,
         String model,

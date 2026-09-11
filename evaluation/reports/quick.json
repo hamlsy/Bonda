@@ -1,0 +1,458 @@
+{
+  "dataset": "evaluation\\fixtures\\quick-risk-events.jsonl",
+  "mode": "QUICK",
+  "results": [
+    {
+      "method": "keyword",
+      "status": "MEASURED",
+      "documents": 11,
+      "groundTruthEvents": 7,
+      "predictions": 8,
+      "truePositives": 4,
+      "falsePositives": 4,
+      "falseNegatives": 3,
+      "precision": 0.5,
+      "recall": 0.5714285714285714,
+      "f1": 0.5333333333333333,
+      "eventTypeAccuracy": 0.36363636363636365,
+      "amountAccuracy": 0.0,
+      "eventDateAccuracy": 0.0,
+      "evidenceAccuracy": 1.0,
+      "averageLatencyMs": 0.032309090909091426,
+      "llmCalls": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "estimatedCost": 0.0,
+      "averageCost": 0.0,
+      "cacheHits": 0,
+      "llmCallRatio": 0.0,
+      "preFilterRecall": 0.42857142857142855,
+      "preFilterSkipRatio": 0.36363636363636365,
+      "errors": [
+        {
+          "documentId": "fixture-001",
+          "title": "단기차입금 증가결정",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "AMOUNT_PARSE_FAILURE",
+          "expected": {
+            "eventType": "DEBT_INCREASE",
+            "eventDate": "2026-01-10",
+            "amount": 80000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+          },
+          "actual": {
+            "eventType": "DEBT_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+          },
+          "evidence": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+        },
+        {
+          "documentId": "fixture-001",
+          "title": "단기차입금 증가결정",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "DEBT_INCREASE",
+            "eventDate": "2026-01-10",
+            "amount": 80000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+          },
+          "actual": {
+            "eventType": "DEBT_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+          },
+          "evidence": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+        },
+        {
+          "documentId": "fixture-002",
+          "title": "채무보증 결정",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "AMOUNT_PARSE_FAILURE",
+          "expected": {
+            "eventType": "GUARANTEE_INCREASE",
+            "eventDate": "2026-02-03",
+            "amount": 12000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+          },
+          "actual": {
+            "eventType": "GUARANTEE_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+          },
+          "evidence": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+        },
+        {
+          "documentId": "fixture-002",
+          "title": "채무보증 결정",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "GUARANTEE_INCREASE",
+            "eventDate": "2026-02-03",
+            "amount": 12000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+          },
+          "actual": {
+            "eventType": "GUARANTEE_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+          },
+          "evidence": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+        },
+        {
+          "documentId": "fixture-003",
+          "title": "신용평가 결과",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "CREDIT_RATING_CHANGE",
+            "eventDate": "2026-03-05",
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 3월 5일 회사채 신용등급이 A+에서 A로 하향되었습니다."
+          },
+          "actual": {
+            "eventType": "CREDIT_RATING_CHANGE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 3월 5일 회사채 신용등급이 A+에서 A로 하향되었습니다."
+          },
+          "evidence": "2026년 3월 5일 회사채 신용등급이 A+에서 A로 하향되었습니다."
+        },
+        {
+          "documentId": "fixture-004",
+          "title": "정기보고서",
+          "kind": "FALSE_POSITIVE",
+          "pipelineStage": "BASELINE",
+          "category": "KEYWORD_AMBIGUITY",
+          "expected": null,
+          "actual": {
+            "eventType": "DEBT_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "회사는 단기차입 약정 한도를 유지하고 있으며 당기 중 차입금 증가는 없었습니다."
+          },
+          "evidence": "회사는 단기차입 약정 한도를 유지하고 있으며 당기 중 차입금 증가는 없었습니다."
+        },
+        {
+          "documentId": "fixture-005",
+          "title": "영업실적 안내",
+          "kind": "FALSE_POSITIVE",
+          "pipelineStage": "BASELINE",
+          "category": "KEYWORD_AMBIGUITY",
+          "expected": null,
+          "actual": {
+            "eventType": "OPERATING_LOSS",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "영업이익은 전년 대비 감소했지만 영업손실은 발생하지 않았습니다."
+          },
+          "evidence": "영업이익은 전년 대비 감소했지만 영업손실은 발생하지 않았습니다."
+        },
+        {
+          "documentId": "fixture-006",
+          "title": "지급보증 현황",
+          "kind": "FALSE_POSITIVE",
+          "pipelineStage": "BASELINE",
+          "category": "KEYWORD_AMBIGUITY",
+          "expected": null,
+          "actual": {
+            "eventType": "GUARANTEE_INCREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "기존 지급보증 50억원은 전기와 동일하며 신규 제공은 없습니다."
+          },
+          "evidence": "기존 지급보증 50억원은 전기와 동일하며 신규 제공은 없습니다."
+        },
+        {
+          "documentId": "fixture-007",
+          "title": "현금흐름 관련 안내",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "AMOUNT_PARSE_FAILURE",
+          "expected": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": "2026-07-01",
+            "amount": 3000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 7월 1일 가용 유동자금이 전기보다 30억원 줄었습니다."
+          },
+          "actual": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 7월 1일 가용 유동자금이 전기보다"
+          },
+          "evidence": "2026년 7월 1일 가용 유동자금이 전기보다"
+        },
+        {
+          "documentId": "fixture-007",
+          "title": "현금흐름 관련 안내",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": "2026-07-01",
+            "amount": 3000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 7월 1일 가용 유동자금이 전기보다 30억원 줄었습니다."
+          },
+          "actual": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 7월 1일 가용 유동자금이 전기보다"
+          },
+          "evidence": "2026년 7월 1일 가용 유동자금이 전기보다"
+        },
+        {
+          "documentId": "fixture-008",
+          "title": "경영 현황",
+          "kind": "FALSE_NEGATIVE",
+          "pipelineStage": "BASELINE",
+          "category": "MISSING_CONTEXT",
+          "expected": {
+            "eventType": "OPERATING_LOSS",
+            "eventDate": "2026-08-08",
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 8월 8일 주요 거래처 이탈로 영업수지가 적자로 전환됐습니다."
+          },
+          "actual": null,
+          "evidence": "2026년 8월 8일 주요 거래처 이탈로 영업수지가 적자로 전환됐습니다."
+        },
+        {
+          "documentId": "fixture-009",
+          "title": "자금 사정 안내",
+          "kind": "FALSE_NEGATIVE",
+          "pipelineStage": "BASELINE",
+          "category": "MISSING_CONTEXT",
+          "expected": {
+            "eventType": "LIQUIDITY_WARNING",
+            "eventDate": "2026-09-01",
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 9월 1일 만기 도래 채무의 지급이 지연되고 있습니다."
+          },
+          "actual": null,
+          "evidence": "2026년 9월 1일 만기 도래 채무의 지급이 지연되고 있습니다."
+        },
+        {
+          "documentId": "fixture-010",
+          "title": "일반 현황",
+          "kind": "FALSE_POSITIVE",
+          "pipelineStage": "BASELINE",
+          "category": "KEYWORD_AMBIGUITY",
+          "expected": null,
+          "actual": {
+            "eventType": "CREDIT_RATING_CHANGE",
+            "eventDate": null,
+            "amount": null,
+            "currency": null,
+            "evidenceText": "신용등급 평가기관과 정기 미팅을 진행했으며 등급 변경은 없었습니다."
+          },
+          "evidence": "신용등급 평가기관과 정기 미팅을 진행했으며 등급 변경은 없었습니다."
+        },
+        {
+          "documentId": "fixture-011",
+          "title": "자금 운용 현황",
+          "kind": "FALSE_NEGATIVE",
+          "pipelineStage": "BASELINE",
+          "category": "MISSING_CONTEXT",
+          "expected": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": "2026-09-11",
+            "amount": 2000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 9월 11일 즉시 사용할 수 있는 보유 현금이 전기보다 20억원 줄었습니다."
+          },
+          "actual": null,
+          "evidence": "2026년 9월 11일 즉시 사용할 수 있는 보유 현금이 전기보다 20억원 줄었습니다."
+        }
+      ],
+      "correctExamples": [
+        {
+          "documentId": "fixture-001",
+          "title": "단기차입금 증가결정",
+          "eventType": "DEBT_INCREASE",
+          "evidence": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+        },
+        {
+          "documentId": "fixture-002",
+          "title": "채무보증 결정",
+          "eventType": "GUARANTEE_INCREASE",
+          "evidence": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+        },
+        {
+          "documentId": "fixture-003",
+          "title": "신용평가 결과",
+          "eventType": "CREDIT_RATING_CHANGE",
+          "evidence": "2026년 3월 5일 회사채 신용등급이 A+에서 A로 하향되었습니다."
+        }
+      ]
+    },
+    {
+      "method": "regex",
+      "status": "MEASURED",
+      "documents": 11,
+      "groundTruthEvents": 7,
+      "predictions": 5,
+      "truePositives": 5,
+      "falsePositives": 0,
+      "falseNegatives": 2,
+      "precision": 1.0,
+      "recall": 0.7142857142857143,
+      "f1": 0.8333333333333333,
+      "eventTypeAccuracy": 0.7142857142857143,
+      "amountAccuracy": 1.0,
+      "eventDateAccuracy": 0.6,
+      "evidenceAccuracy": 1.0,
+      "averageLatencyMs": 0.046136363636363094,
+      "llmCalls": 0,
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "estimatedCost": 0.0,
+      "averageCost": 0.0,
+      "cacheHits": 0,
+      "llmCallRatio": 0.0,
+      "preFilterRecall": 0.42857142857142855,
+      "preFilterSkipRatio": 0.36363636363636365,
+      "errors": [
+        {
+          "documentId": "fixture-007",
+          "title": "현금흐름 관련 안내",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": "2026-07-01",
+            "amount": 3000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 7월 1일 가용 유동자금이 전기보다 30억원 줄었습니다."
+          },
+          "actual": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": null,
+            "amount": 3000000000.0,
+            "currency": "KRW",
+            "evidenceText": "가용 유동자금이 전기보다 30억원 줄었"
+          },
+          "evidence": "가용 유동자금이 전기보다 30억원 줄었"
+        },
+        {
+          "documentId": "fixture-008",
+          "title": "경영 현황",
+          "kind": "FALSE_NEGATIVE",
+          "pipelineStage": "BASELINE",
+          "category": "MISSING_CONTEXT",
+          "expected": {
+            "eventType": "OPERATING_LOSS",
+            "eventDate": "2026-08-08",
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 8월 8일 주요 거래처 이탈로 영업수지가 적자로 전환됐습니다."
+          },
+          "actual": null,
+          "evidence": "2026년 8월 8일 주요 거래처 이탈로 영업수지가 적자로 전환됐습니다."
+        },
+        {
+          "documentId": "fixture-009",
+          "title": "자금 사정 안내",
+          "kind": "FALSE_NEGATIVE",
+          "pipelineStage": "BASELINE",
+          "category": "MISSING_CONTEXT",
+          "expected": {
+            "eventType": "LIQUIDITY_WARNING",
+            "eventDate": "2026-09-01",
+            "amount": null,
+            "currency": null,
+            "evidenceText": "2026년 9월 1일 만기 도래 채무의 지급이 지연되고 있습니다."
+          },
+          "actual": null,
+          "evidence": "2026년 9월 1일 만기 도래 채무의 지급이 지연되고 있습니다."
+        },
+        {
+          "documentId": "fixture-011",
+          "title": "자금 운용 현황",
+          "kind": "EXTRACTION_ERROR",
+          "pipelineStage": "BASELINE",
+          "category": "DATE_PARSE_FAILURE",
+          "expected": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": "2026-09-11",
+            "amount": 2000000000.0,
+            "currency": "KRW",
+            "evidenceText": "2026년 9월 11일 즉시 사용할 수 있는 보유 현금이 전기보다 20억원 줄었습니다."
+          },
+          "actual": {
+            "eventType": "CASH_DECREASE",
+            "eventDate": null,
+            "amount": 2000000000.0,
+            "currency": "KRW",
+            "evidenceText": "현금이 전기보다 20억원 줄었"
+          },
+          "evidence": "현금이 전기보다 20억원 줄었"
+        }
+      ],
+      "correctExamples": [
+        {
+          "documentId": "fixture-001",
+          "title": "단기차입금 증가결정",
+          "eventType": "DEBT_INCREASE",
+          "evidence": "2026년 1월 10일 운영자금 확보를 위해 단기차입금이 800억원 증가했습니다."
+        },
+        {
+          "documentId": "fixture-002",
+          "title": "채무보증 결정",
+          "eventType": "GUARANTEE_INCREASE",
+          "evidence": "2026년 2월 3일 종속회사에 대한 채무보증 120억원을 신규 제공하기로 결정했습니다."
+        },
+        {
+          "documentId": "fixture-003",
+          "title": "신용평가 결과",
+          "eventType": "CREDIT_RATING_CHANGE",
+          "evidence": "2026년 3월 5일 회사채 신용등급이 A+에서 A로 하향되었습니다."
+        }
+      ]
+    },
+    {
+      "method": "llm",
+      "status": "NOT_MEASURED",
+      "reason": "cache miss requires disclosureVersionId and a running backend"
+    },
+    {
+      "method": "hybrid",
+      "status": "NOT_MEASURED",
+      "reason": "cache miss requires disclosureVersionId and a running backend",
+      "preFilterRecall": 0.42857142857142855,
+      "preFilterSkipRatio": 0.36363636363636365
+    }
+  ]
+}

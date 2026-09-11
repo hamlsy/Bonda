@@ -39,6 +39,9 @@ public class FinancialSnapshot {
     @Column(name = "statement_date", nullable = false)
     private LocalDate statementDate;
 
+    @Column(name = "published_on", nullable = false)
+    private LocalDate publishedOn;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "statement_scope", nullable = false, length = 20)
     private StatementScope statementScope;
@@ -77,6 +80,7 @@ public class FinancialSnapshot {
         Long issuerId,
         String period,
         LocalDate statementDate,
+        LocalDate publishedOn,
         BigDecimal cash,
         BigDecimal shortTermDebt,
         BigDecimal longTermDebt,
@@ -88,6 +92,10 @@ public class FinancialSnapshot {
         this.issuerId = Objects.requireNonNull(issuerId, "issuerId must not be null");
         this.period = requireText(period, "period");
         this.statementDate = Objects.requireNonNull(statementDate, "statementDate must not be null");
+        this.publishedOn = Objects.requireNonNull(publishedOn, "publishedOn must not be null");
+        if (publishedOn.isBefore(statementDate)) {
+            throw new IllegalArgumentException("publishedOn must not be before statementDate");
+        }
         this.statementScope = StatementScope.CONSOLIDATED;
         this.cash = requireNonNegative(cash, "cash");
         this.shortTermDebt = requireNonNegative(shortTermDebt, "shortTermDebt");
@@ -111,10 +119,30 @@ public class FinancialSnapshot {
         BigDecimal totalAssets,
         BigDecimal totalLiabilities
     ) {
+        return create(
+            issuerId, period, statementDate, statementDate, cash, shortTermDebt, longTermDebt,
+            operatingCashFlow, operatingProfit, totalAssets, totalLiabilities
+        );
+    }
+
+    public static FinancialSnapshot create(
+        Long issuerId,
+        String period,
+        LocalDate statementDate,
+        LocalDate publishedOn,
+        BigDecimal cash,
+        BigDecimal shortTermDebt,
+        BigDecimal longTermDebt,
+        BigDecimal operatingCashFlow,
+        BigDecimal operatingProfit,
+        BigDecimal totalAssets,
+        BigDecimal totalLiabilities
+    ) {
         return new FinancialSnapshot(
             issuerId,
             period,
             statementDate,
+            publishedOn,
             cash,
             shortTermDebt,
             longTermDebt,
@@ -129,6 +157,7 @@ public class FinancialSnapshot {
         return issuerId.equals(other.issuerId)
             && period.equals(other.period)
             && statementDate.equals(other.statementDate)
+            && publishedOn.equals(other.publishedOn)
             && statementScope == other.statementScope
             && equalNumber(cash, other.cash)
             && equalNumber(shortTermDebt, other.shortTermDebt)
@@ -179,6 +208,7 @@ public class FinancialSnapshot {
     public Long getIssuerId() { return issuerId; }
     public String getPeriod() { return period; }
     public LocalDate getStatementDate() { return statementDate; }
+    public LocalDate getPublishedOn() { return publishedOn; }
     public StatementScope getStatementScope() { return statementScope; }
     public BigDecimal getCash() { return cash; }
     public BigDecimal getShortTermDebt() { return shortTermDebt; }

@@ -4,6 +4,9 @@ import type {
   Holding,
   RiskEventDetail,
   SinceBoughtResponse,
+  AlertItem,
+  MyBondSummary,
+  HistoricalReplayResponse,
   WatchlistEntry,
 } from "./types";
 
@@ -44,6 +47,19 @@ export function getHoldings(signal?: AbortSignal) {
   return request<Holding[]>("/api/holdings", { signal });
 }
 
+export function getMyBonds(signal?: AbortSignal) {
+  return request<MyBondSummary[]>("/api/holdings/summary", { signal });
+}
+
+export function getAlerts(signal?: AbortSignal, unreadOnly = false, limit = 20) {
+  const query = new URLSearchParams({ unreadOnly: String(unreadOnly), limit: String(limit) });
+  return request<AlertItem[]>(`/api/alerts?${query}`, { signal });
+}
+
+export function markAlertRead(alertId: number) {
+  return request<AlertItem>(`/api/alerts/${alertId}/read`, { method: "PATCH" });
+}
+
 export function getWatchlist(signal?: AbortSignal) {
   return request<WatchlistEntry[]>("/api/watchlist", { signal });
 }
@@ -68,4 +84,12 @@ export function getSinceBought(holdingId: number, signal?: AbortSignal) {
 
 export function getRiskEvent(riskEventId: number, signal?: AbortSignal) {
   return request<RiskEventDetail>(`/api/risk-events/${riskEventId}`, { signal });
+}
+
+export function runHistoricalReplay(issuerId: number, cutoffDate: string, signal?: AbortSignal) {
+  return request<HistoricalReplayResponse>("/api/admin/replay", {
+    method: "POST",
+    body: JSON.stringify({ issuerId, cutoffDate }),
+    signal,
+  });
 }

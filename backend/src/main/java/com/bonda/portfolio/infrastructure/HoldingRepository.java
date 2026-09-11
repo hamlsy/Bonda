@@ -8,4 +8,6 @@ import java.util.List;
 public interface HoldingRepository extends JpaRepository<Holding, Long> {
 
     List<Holding> findAllByOrderByCreatedAtDesc();
+
+    List<Holding> findAllByBondIdOrderByIdAsc(Long bondId);
 }

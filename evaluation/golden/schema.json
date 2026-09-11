@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Bonda Risk Event Golden Document",
+  "type": "object",
+  "required": ["schemaVersion", "datasetKind", "documentId", "documentHash", "issuer", "title", "publishedAt", "normalizedText", "preFilterDecision", "eventExists", "events", "annotation"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "datasetKind": {"enum": ["DART_HUMAN_LABELED", "SYNTHETIC_FIXTURE"]},
+    "documentId": {"type": "string", "minLength": 1},
+    "disclosureVersionId": {"type": ["integer", "null"], "minimum": 1},
+    "documentHash": {"type": "string", "minLength": 1},
+    "issuer": {"type": "string", "minLength": 1},
+    "title": {"type": "string", "minLength": 1},
+    "publishedAt": {"type": "string", "format": "date-time"},
+    "sourceUrl": {"type": ["string", "null"]},
+    "normalizedText": {"type": "string", "minLength": 1},
+    "preFilterDecision": {"enum": ["ANALYZE", "SKIP"]},
+    "eventExists": {"type": "boolean"},
+    "events": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["eventType", "eventDate", "amount", "currency", "evidenceText"],
+        "properties": {
+          "eventType": {"enum": ["DEBT_INCREASE", "CASH_DECREASE", "OPERATING_LOSS", "CREDIT_RATING_CHANGE", "GUARANTEE_INCREASE", "LIQUIDITY_WARNING"]},
+          "eventDate": {"type": ["string", "null"], "format": "date"},
+          "amount": {"type": ["number", "null"], "minimum": 0},
+          "currency": {"type": ["string", "null"]},
+          "evidenceText": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "required": ["annotator", "reviewStatus", "notes"],
+      "properties": {
+        "annotator": {"type": "string", "minLength": 1},
+        "reviewStatus": {"enum": ["DRAFT", "REVIEWED"]},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

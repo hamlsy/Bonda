@@ -59,7 +59,7 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 
 ## Financial and issuer risk snapshots
 
-- `FinancialSnapshot`은 MVP에서 연결 재무제표만 허용하고 `(issuerId, period, statementScope)`로 중복을 막는다. `totalDebt`는 `shortTermDebt + longTermDebt`로 계산하며 같은 기간의 다른 값은 충돌로 처리한다.
+- `FinancialSnapshot`은 MVP에서 연결 재무제표만 허용하고 `(issuerId, period, statementScope)`로 중복을 막는다. `publishedOn`은 replay의 정보 가용 시점을 나타낸다. 입력에서 누락되면 ingestion 날짜(미래 statement라면 statement 날짜)를 사용하며, 기존 행도 생성일보다 앞선 날짜로 소급하지 않는다. `totalDebt`는 `shortTermDebt + longTermDebt`로 계산하며 같은 기간의 다른 값은 충돌로 처리한다.
 - 증감률은 이전 값이 없거나 0이면 nullable로 유지한다. 현금·부채 잔액은 음수를 허용하지 않고, 영업현금흐름과 영업이익은 음수를 허용해 절댓값 기준 악화율과 양수→음수 전환을 계산한다.
 - `RISK_POLICY_V1`은 `NORMAL`, `WATCH`, `CAUTION`만 사용한다. 모든 threshold는 `RiskThresholds`에 모으고 최근 180일의 Canonical Event만 반영한다.
 - `IssuerRiskSnapshot`은 `(issuerId, snapshotDate, ruleVersion)`이 unique이며 source input fingerprint와 category별 reason/source ID trace를 저장한다. Snapshot date는 최신 재무 기준일과 최신 Canonical Event 유효일 중 늦은 날짜다.
@@ -72,6 +72,33 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - Cross-document explanation은 Canonical Event, RiskChange, 선택한 재무 Snapshot과 현재 Risk State만 입력으로 사용한다. 새 Event 또는 Change가 없으면 호출하지 않는다.
 - 설명 cache fingerprint는 Holding, 모델·prompt version, 전체 Event/Change ID, 재무 기준점과 현재 Risk Snapshot identity를 포함한다. 같은 입력은 저장된 설명을 재사용한다.
 - `SINCE_BOUGHT_EXPLANATION_V1`은 3~5문장의 보수적인 한국어 설명만 허용하고 Risk State 결정, 인과 단정, 부도 예측과 투자 추천을 금지한다.
+
+## Alert and monitoring
+
+- Alert는 검증된 Canonical `RiskEvent` 또는 deterministic `RiskChange`만 source로 사용하고 AI에게 생성 여부나 severity를 맡기지 않는다.
+- `AlertPolicy`는 CAUTION 전환을 `IMPORTANT`, WATCH 전환을 `WATCH`, 정상 방향 전환을 `INFO`로 분류한다. Event 단독 알림은 `LIQUIDITY_WARNING`, `CREDIT_RATING_CHANGE`만 허용하고 `IMPORTANT`를 만들지 않는다.
+- RiskChange가 생성된 실행에서는 RiskChange Alert를 우선하고 같은 Event의 단독 Alert를 추가하지 않는다.
+- Alert는 Issuer의 모든 Bond를 통해 Holding과 Watchlist에 연결한다. Holding에는 매수일 이후 source만 연결하며 target마다 stable fingerprint를 저장한다. DB unique constraint가 validation/recalculation 재실행 중복을 막는다.
+- Candidate validation과 Risk recalculation의 기존 transaction은 유지한다. `MonitoringService`가 검증, 재계산, 짧은 Alert 생성 transaction을 순서대로 orchestration한다.
+- 읽음 처리는 idempotent하며 최초 `readAt`을 보존한다.
+- My Bonds summary는 Holding별 최신 IssuerRiskSnapshot, 매수 이후 최신 RiskChange와 Canonical Event 수, unread Alert 수와 최근 Alert를 조합하고 unread 항목을 우선 정렬한다.
+
+## Historical Replay
+
+- `issuerId + cutoffDate` 입력으로 cutoff의 Asia/Seoul 일 종료 시점까지 공개된 Disclosure만 조회한다.
+- Disclosure마다 cutoff까지 공개된 Version 중 `publishedAt`, `versionNumber` 순 최신 하나만 선택한다. 현재 latestVersion을 과거 시점에 재사용하지 않는다.
+- Canonical Event는 선택된 Version에 연결되고 `eventDate <= cutoffDate`인 항목만 사용한다. eventDate가 없으면 source Version 공개일을 effective date로 사용한다.
+- FinancialSnapshot은 `statementDate <= cutoffDate`와 `publishedOn <= cutoffDate`를 모두 만족해야 한다.
+- 현재 `RISK_POLICY_V1`을 cutoff date 기준으로 순수 계산하고 source 공개 시점별 상태 변화를 재현한다. Replay service는 read-only transaction이며 IssuerRiskSnapshot, RiskChange, Alert를 저장하지 않는다.
+- 결과 fingerprint는 issuer, cutoff, rule version, 선택 Version/Event/Financial ID로 만들며 실행 시각과 successful AnalysisRun의 model/promptVersion을 metadata에 포함한다.
+
+## Evaluation
+
+- `evaluation/golden/risk-events.jsonl`은 실제 DART 원문을 사람이 검토한 `REVIEWED` label만 허용한다. synthetic sample은 `evaluation/fixtures`에 분리한다.
+- 동일 document 안에서 eventType이 같은 prediction과 GT를 one-to-one matching한다. amount는 1% tolerance, date는 exact, evidence는 normalized substring 또는 token Jaccard 0.5를 사용한다.
+- Keyword와 Regex baseline, production analysis endpoint를 사용하는 LLM, pre-filter가 ANALYZE인 문서만 호출하는 Hybrid를 비교한다.
+- LLM cache key는 `documentHash + model + promptVersion`이며 cache miss는 `disclosureVersionId`와 실행 중인 backend가 있을 때만 호출한다. 조건이 없으면 `NOT_MEASURED`로 기록한다.
+- report는 Precision, Recall, F1, Event Type/Amount/Date/Evidence Accuracy, pre-filter recall/skip ratio, calls/token/cost/latency와 FP/FN stage를 Markdown/JSON으로 생성한다.
 
 ## REST API
 
@@ -91,6 +118,10 @@ Holding은 여러 매수 건을 허용한다. Watchlist는 동일 채권의 중�
 - `POST /api/admin/issuers/{issuerId}/risk/recalculate`
 - `GET /api/holdings/{holdingId}/since-bought`
 - `GET /api/risk-events/{riskEventId}`
+- `GET /api/alerts?unreadOnly={boolean}&limit={number}`
+- `PATCH /api/alerts/{alertId}/read`
+- `GET /api/holdings/summary`
+- `POST /api/admin/replay`
 
 ## Database
 
@@ -98,8 +129,8 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## Frontend scope
 
-Bond 목록과 Holding/Watchlist 등록 화면을 유지한다. Holding별 Since I Bought 화면은 현재 Risk State, 날짜순 Timeline, 원문 Evidence, 보수적인 변화 설명과 재무 기준점 비교를 mobile-first로 제공한다.
+My Bonds 화면은 변화가 있는 Holding과 unread Alert를 먼저 보여주며, Holding별 Since I Bought 또는 Risk Event Evidence로 명확히 이동한다. Holding/Watchlist 등록과 Since I Bought의 현재 Risk State, 날짜순 Timeline, 원문 Evidence, 보수적인 변화 설명, 재무 기준점 비교를 mobile-first로 유지한다.
 
 ## 제외 범위
 
-알림, 과거 전체 재생과 운영용 관리자 화면은 구현하지 않는다.
+Push/Email/SMS, Evaluation Dashboard와 AI 추천 화면은 구현하지 않는다.

@@ -2,6 +2,7 @@ package com.bonda.risk.presentation;
 
 import com.bonda.risk.application.FinancialSnapshotService;
 import com.bonda.risk.application.RiskRecalculationService;
+import com.bonda.alert.application.MonitoringService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -22,14 +23,14 @@ import java.time.LocalDate;
 public class RiskAdminController {
 
     private final FinancialSnapshotService financialSnapshotService;
-    private final RiskRecalculationService recalculationService;
+    private final MonitoringService monitoringService;
 
     public RiskAdminController(
         FinancialSnapshotService financialSnapshotService,
-        RiskRecalculationService recalculationService
+        MonitoringService monitoringService
     ) {
         this.financialSnapshotService = financialSnapshotService;
-        this.recalculationService = recalculationService;
+        this.monitoringService = monitoringService;
     }
 
     @PostMapping("/financial-snapshots")
@@ -49,7 +50,7 @@ public class RiskAdminController {
     public ResponseEntity<RiskRecalculationService.RecalculationResult> recalculate(
         @PathVariable Long issuerId
     ) {
-        return ResponseEntity.ok(recalculationService.recalculate(issuerId));
+        return ResponseEntity.ok(monitoringService.recalculateAndMonitor(issuerId));
     }
 
     public record FinancialSnapshotRequest(
@@ -61,7 +62,8 @@ public class RiskAdminController {
         @NotNull BigDecimal operatingCashFlow,
         @NotNull BigDecimal operatingProfit,
         @DecimalMin("0") BigDecimal totalAssets,
-        @DecimalMin("0") BigDecimal totalLiabilities
+        @DecimalMin("0") BigDecimal totalLiabilities,
+        LocalDate publishedOn
     ) {
         FinancialSnapshotService.SaveCommand toCommand() {
             return new FinancialSnapshotService.SaveCommand(
@@ -73,7 +75,8 @@ public class RiskAdminController {
                 operatingCashFlow,
                 operatingProfit,
                 totalAssets,
-                totalLiabilities
+                totalLiabilities,
+                publishedOn
             );
         }
     }
@@ -83,6 +86,7 @@ public class RiskAdminController {
         Long issuerId,
         String period,
         LocalDate statementDate,
+        LocalDate publishedOn,
         String statementScope,
         BigDecimal totalDebt,
         boolean reused
@@ -94,6 +98,7 @@ public class RiskAdminController {
                 snapshot.getIssuerId(),
                 snapshot.getPeriod(),
                 snapshot.getStatementDate(),
+                snapshot.getPublishedOn(),
                 snapshot.getStatementScope().name(),
                 snapshot.getTotalDebt(),
                 result.reused()

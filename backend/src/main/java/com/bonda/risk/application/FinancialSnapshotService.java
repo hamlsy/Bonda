@@ -10,9 +10,12 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
 public class FinancialSnapshotService {
+
+    private static final ZoneId PRODUCT_ZONE = ZoneId.of("Asia/Seoul");
 
     private final FinancialSnapshotRepository repository;
     private final IssuerRepository issuerRepository;
@@ -27,10 +30,14 @@ public class FinancialSnapshotService {
         if (!issuerRepository.existsById(issuerId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Issuer not found");
         }
+        LocalDate publishedOn = command.publishedOn() != null
+            ? command.publishedOn()
+            : latestOf(command.statementDate(), LocalDate.now(PRODUCT_ZONE));
         FinancialSnapshot proposed = FinancialSnapshot.create(
             issuerId,
             command.period(),
             command.statementDate(),
+            publishedOn,
             command.cash(),
             command.shortTermDebt(),
             command.longTermDebt(),
@@ -56,6 +63,10 @@ public class FinancialSnapshotService {
         return new SaveResult(repository.save(proposed), false);
     }
 
+    private LocalDate latestOf(LocalDate first, LocalDate second) {
+        return first.isAfter(second) ? first : second;
+    }
+
     public record SaveCommand(
         String period,
         LocalDate statementDate,
@@ -65,8 +76,25 @@ public class FinancialSnapshotService {
         BigDecimal operatingCashFlow,
         BigDecimal operatingProfit,
         BigDecimal totalAssets,
-        BigDecimal totalLiabilities
+        BigDecimal totalLiabilities,
+        LocalDate publishedOn
     ) {
+        public SaveCommand(
+            String period,
+            LocalDate statementDate,
+            BigDecimal cash,
+            BigDecimal shortTermDebt,
+            BigDecimal longTermDebt,
+            BigDecimal operatingCashFlow,
+            BigDecimal operatingProfit,
+            BigDecimal totalAssets,
+            BigDecimal totalLiabilities
+        ) {
+            this(
+                period, statementDate, cash, shortTermDebt, longTermDebt, operatingCashFlow,
+                operatingProfit, totalAssets, totalLiabilities, null
+            );
+        }
     }
 
     public record SaveResult(FinancialSnapshot snapshot, boolean reused) {

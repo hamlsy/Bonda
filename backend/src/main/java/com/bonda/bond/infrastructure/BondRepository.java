@@ -8,4 +8,6 @@ import java.util.List;
 public interface BondRepository extends JpaRepository<Bond, Long> {
 
     List<Bond> findAllByOrderByMaturityDateAsc();
+
+    List<Bond> findAllByIssuerIdOrderByIdAsc(Long issuerId);
 }

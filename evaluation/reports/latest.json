@@ -1,0 +1,26 @@
+{
+  "dataset": "evaluation\\golden\\risk-events.jsonl",
+  "mode": "FULL",
+  "results": [
+    {
+      "method": "keyword",
+      "status": "NOT_MEASURED",
+      "reason": "dataset is empty"
+    },
+    {
+      "method": "regex",
+      "status": "NOT_MEASURED",
+      "reason": "dataset is empty"
+    },
+    {
+      "method": "llm",
+      "status": "NOT_MEASURED",
+      "reason": "dataset is empty"
+    },
+    {
+      "method": "hybrid",
+      "status": "NOT_MEASURED",
+      "reason": "dataset is empty"
+    }
+  ]
+}

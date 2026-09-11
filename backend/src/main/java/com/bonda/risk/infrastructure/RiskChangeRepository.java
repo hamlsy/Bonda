@@ -18,4 +18,9 @@ public interface RiskChangeRepository extends JpaRepository<RiskChange, Long> {
         Long issuerId,
         Instant detectedAt
     );
+
+    Optional<RiskChange> findFirstByIssuerIdAndDetectedAtGreaterThanEqualOrderByDetectedAtDescIdDesc(
+        Long issuerId,
+        Instant detectedAt
+    );
 }

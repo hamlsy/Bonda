@@ -10,7 +10,7 @@ Bonda(본다)는 개인투자자가 보유하거나 관심 있는 회사채의 �
 bonda/
 ├── frontend/    # React + TypeScript + Vite
 ├── backend/     # Java 21 + Spring Boot + Gradle
-├── evaluation/  # 향후 평가 기준과 결과
+├── evaluation/  # Golden Dataset, baseline, evaluation report
 ├── docs/        # 프로젝트 문서
 │   ├── PRODUCT.md
 │   └── IMPLEMENTATION_SPEC.md
@@ -54,9 +54,15 @@ AI extraction은 기본적으로 비활성화되어 local fake extractor를 사�
 
 보유 채권의 `GET /api/holdings/{holdingId}/since-bought`에서 매수 이후 검증된 Event, RiskChange, 재무 변화를 확인할 수 있습니다. Event의 원문 근거는 `GET /api/risk-events/{riskEventId}`로 조회합니다. 변화 설명은 같은 AI 설정을 재사용하지만 검증 데이터만 입력하며, 동일 상태에서는 캐시를 사용합니다.
 
+검증 API와 Risk 재계산 API는 Monitoring orchestration을 통해 관련 Holding/Watchlist의 Alert를 생성합니다. `GET /api/alerts`, `PATCH /api/alerts/{alertId}/read`, `GET /api/holdings/summary`로 최근 변화와 읽음 상태, My Bonds 요약을 확인할 수 있습니다. Alert 판단과 severity는 AI가 아닌 deterministic 정책으로 계산합니다.
+
+`POST /api/admin/replay`에 `issuerId`, `cutoffDate`를 전달하면 해당 시점까지 공개된 Version, Event와 재무정보만으로 Risk State와 Timeline을 재현합니다. Replay는 현재 Risk Snapshot, Change, Alert를 저장하거나 수정하지 않습니다.
+
+Evaluation은 `python evaluation/scripts/evaluate.py --dataset evaluation/golden/risk-events.jsonl --methods keyword,regex,llm,hybrid`로 실행합니다. 개발 fixture는 `evaluation/fixtures`, 실제 human-labeled DART 정답은 `evaluation/golden`에 분리하며 같은 model/prompt 실행은 cache를 재사용합니다.
+
 ## 프로젝트 상태
 
-현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction, deterministic Candidate 검증, 발행사 Risk Snapshot/Change 계산과 Since I Bought Timeline을 제공합니다. AI는 Event 추출과 검증 데이터의 짧은 변화 설명에만 사용하며 Risk State는 재무 feature와 검증된 Canonical Event를 코드 정책으로 계산합니다.
+현재는 Issuer, Bond, Holding, Watchlist, DART 공시 수집·정규화·pre-filter, 구조화 AI extraction, deterministic Candidate 검증, 발행사 Risk Snapshot/Change 계산, Since I Bought Timeline, Alert 기반 My Bonds monitoring과 read-only Historical Replay를 제공합니다. Evaluation harness는 baseline과 production LLM의 정확도·비용·latency를 같은 Golden schema로 비교합니다. AI는 Event 추출과 검증 데이터의 짧은 변화 설명에만 사용하며 Risk State, Alert와 evaluation metric은 코드 정책으로 계산합니다.
 
 ## 문서
 

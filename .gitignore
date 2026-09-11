@@ -23,3 +23,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Evaluation runtime artifacts
+**/__pycache__/
+*.pyc
+evaluation/cache/*.jsonl
