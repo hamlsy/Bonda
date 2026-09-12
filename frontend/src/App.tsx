@@ -1,5 +1,5 @@
-import { FormEvent, MouseEvent as ReactMouseEvent, useEffect, useRef, useState } from "react";
-import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { Link, Navigate, Route, Routes } from "react-router-dom";
 import {
   ApiError,
   createHolding,
@@ -14,7 +14,6 @@ import RiskEventPage from "./RiskEventPage";
 import SinceBoughtPage from "./SinceBoughtPage";
 import HistoricalReplayPage from "./HistoricalReplayPage";
 import { AppHeader, MobileNav } from "./Navigation";
-import SignalLine from "./SignalLine";
 import type { AlertItem, Bond, MyBondSummary, RiskState, WatchlistEntry } from "./types";
 
 type PageState = "loading" | "ready" | "error";
@@ -55,6 +54,14 @@ function formatDateTime(value: string) {
   }).format(new Date(value));
 }
 
+function formatShortDate(value: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(value.includes("T") ? value : `${value}T00:00:00+09:00`));
+}
+
 function getLocalToday() {
   const now = new Date();
   const year = now.getFullYear();
@@ -70,7 +77,6 @@ function alertTarget(alert: AlertItem) {
 }
 
 function PortfolioPage() {
-  const navigate = useNavigate();
   const [bonds, setBonds] = useState<Bond[]>([]);
   const [myBonds, setMyBonds] = useState<MyBondSummary[]>([]);
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
@@ -120,13 +126,18 @@ function PortfolioPage() {
     return () => controller.abort();
   }, []);
 
-  async function handleAlertOpen(event: ReactMouseEvent<HTMLAnchorElement>, alert: AlertItem) {
-    event.preventDefault();
+  useEffect(() => {
+    if (pageState !== "ready" || !window.location.hash) return;
+    const targetId = decodeURIComponent(window.location.hash.slice(1));
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [pageState]);
+
+  async function handleAlertRead(alert: AlertItem) {
     if (pendingAlertId !== null) return;
-    if (alert.isRead) {
-      navigate(alertTarget(alert));
-      return;
-    }
+    if (alert.isRead) return;
     setPendingAlertId(alert.alertId);
     setAlertError("");
     try {
@@ -135,9 +146,8 @@ function PortfolioPage() {
       setMyBonds((current) => current.map((item) => item.holdingId === updated.holdingId
         ? { ...item, unreadAlertCount: Math.max(0, item.unreadAlertCount - 1) }
         : item));
-      navigate(alertTarget(updated));
     } catch {
-      setAlertError("알림을 읽음 처리하지 못했습니다. 다시 눌러 주세요.");
+      setAlertError("상세 화면은 열었지만 읽음 상태를 저장하지 못했습니다.");
     } finally {
       setPendingAlertId(null);
     }
@@ -207,56 +217,61 @@ function PortfolioPage() {
 
   const watchedBondIds = new Set(watchlist.map((entry) => entry.bond.id));
   const unreadCount = alerts.filter((alert) => !alert.isRead).length;
+  const attentionCount = myBonds.filter((holding) => holding.currentRiskState && holding.currentRiskState.overall !== "NORMAL").length;
+  const firstUnreadHolding = myBonds.find((holding) => holding.unreadAlertCount > 0);
   const today = getLocalToday();
-  const introSummary = pageState === "loading"
-    ? "보유 채권의 새로운 변화를 확인하고 있습니다."
+  const overviewTitle = pageState === "loading"
+    ? "내 채권의 변화를 확인하고 있습니다."
     : pageState === "error"
-      ? "현재 변화 정보를 확인할 수 없습니다. 잠시 후 다시 시도해 주세요."
+      ? "지금은 변화를 불러올 수 없습니다."
       : unreadCount > 0
-        ? `확인하지 않은 변화 ${unreadCount}개가 있습니다.`
-        : "아직 새롭게 확인된 변화가 없어요. 등록한 채권을 계속 확인하고 있습니다.";
+        ? `확인할 변화가 ${unreadCount}개 있습니다.`
+        : "새롭게 확인된 변화가 없습니다.";
+  const overviewSummary = pageState === "ready"
+    ? myBonds.length > 0
+      ? `보유 채권 ${myBonds.length}건의 발행기업을 계속 확인하고 있습니다.`
+      : "채권과 매수일을 등록하면 그 이후의 변화를 확인할 수 있습니다."
+    : pageState === "error"
+      ? "연결 상태를 확인한 뒤 다시 시도해 주세요."
+      : "공시와 위험 상태를 최신 순서로 불러오는 중입니다.";
+  const overviewAction = myBonds.length === 0
+    ? { href: "#watchlist", label: "채권 등록하기" }
+    : firstUnreadHolding
+      ? { href: `#holding-${firstUnreadHolding.holdingId}`, label: "새 변화부터 보기" }
+      : { href: "#my-bonds", label: "내 채권 보기" };
 
   return (
     <div className="app-shell monitoring-shell">
       <AppHeader status={pageState === "error" ? "연결 확인 필요" : unreadCount > 0 ? `새 알림 ${unreadCount}개` : "모니터링 중"} />
       <main>
-        <section className="monitoring-hero" aria-labelledby="page-title">
-          <div className="monitoring-hero-copy">
-            <p className="eyebrow">MY BONDS, SINCE I BOUGHT</p>
-            <h1 id="page-title">내가 산 채권,<br />그 뒤 회사에 무슨 일이 있었는지<br /><em>Bonda</em>가 계속 보고 있습니다.</h1>
-            <p>{introSummary}</p>
-            <div className="hero-actions">
-              <a className="primary-cta" href="#my-bonds">내 채권 둘러보기 <span aria-hidden="true">→</span></a>
-              <a className="secondary-cta" href="#watchlist">채권 등록하기</a>
-            </div>
-            <dl className="hero-stats">
-              <div><dt>보유 채권</dt><dd>{pageState === "ready" ? `${myBonds.length}개` : "—"}</dd></div>
-              <div><dt>관심 채권</dt><dd>{pageState === "ready" ? `${watchlist.length}개` : "—"}</dd></div>
-              <div><dt>새 변화</dt><dd>{pageState === "ready" ? `${unreadCount}개` : "—"}</dd></div>
-            </dl>
+        <section className={`portfolio-overview overview-${pageState}`} aria-labelledby="page-title">
+          <div className="portfolio-overview-copy">
+            <p className="portfolio-context"><span aria-hidden="true" />내 채권 모니터링</p>
+            <h1 id="page-title">{overviewTitle}</h1>
+            <p className="portfolio-summary">{overviewSummary}</p>
+            {pageState === "ready" && (
+              <a className="primary-cta" href={overviewAction.href}>{overviewAction.label}<span aria-hidden="true">→</span></a>
+            )}
+            {pageState === "error" && (
+              <button type="button" className="secondary-button" onClick={() => void loadPortfolio()}>다시 불러오기</button>
+            )}
           </div>
-          <div className="monitoring-hero-visual">
-            <p>시간이 흐를수록,<br />더 명확한 신호로</p>
-            <SignalLine />
-          </div>
+          <dl className="portfolio-facts" aria-label="포트폴리오 요약">
+            <div><dt>보유</dt><dd>{pageState === "ready" ? myBonds.length : "—"}<span>건</span></dd></div>
+            <div><dt>관찰·주의</dt><dd>{pageState === "ready" ? attentionCount : "—"}<span>건</span></dd></div>
+            <div><dt>관심</dt><dd>{pageState === "ready" ? watchlist.length : "—"}<span>건</span></dd></div>
+          </dl>
         </section>
 
         {pageState === "loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true"><span className="spinner" aria-hidden="true" /><p>보유 채권의 변화를 확인하고 있습니다.</p></section>
         )}
-        {pageState === "error" && (
-          <section className="state-panel error-panel" role="alert">
-            <div><h2>모니터링 정보를 불러오지 못했습니다</h2><p>연결 상태를 확인한 뒤 다시 시도해 주세요.</p></div>
-            <button type="button" className="secondary-button" onClick={() => void loadPortfolio()}>다시 불러오기</button>
-          </section>
-        )}
-
         {pageState === "ready" && (
           <>
             <div className="monitoring-grid">
             <section id="my-bonds" className="my-bonds-section" aria-labelledby="my-bonds-title">
               <div className="section-heading">
-                <div><p className="section-label">CHANGE FIRST</p><h2 id="my-bonds-title">내 채권</h2></div>
+                <div><h2 id="my-bonds-title">내 채권</h2><p className="section-description">새 변화가 있는 채권부터 보여드립니다.</p></div>
                 <p><strong>{myBonds.length}</strong>건 보유</p>
               </div>
               {myBonds.length === 0 ? (
@@ -266,33 +281,39 @@ function PortfolioPage() {
                   {myBonds.map((holding) => {
                     const bond = bonds.find((item) => item.id === holding.bondId);
                     return (
-                    <li key={holding.holdingId} className={holding.unreadAlertCount > 0 ? "has-unread" : ""}>
-                      <div className="holding-monitor-main">
-                        <div className="holding-monitor-title"><p>{holding.issuerName}</p><h3><Link to={`/holdings/${holding.holdingId}/since-bought`}>{holding.bondName}</Link></h3></div>
-                        <div className="holding-signal">
-                          {holding.unreadAlertCount > 0 && <span className="unread-count">읽지 않은 변화 {holding.unreadAlertCount}</span>}
-                          {holding.currentRiskState
-                            ? <span className={`state-tag state-${holding.currentRiskState.overall.toLowerCase()}`}>{stateLabels[holding.currentRiskState.overall]}</span>
-                            : <span className="state-missing">상태 계산 전</span>}
+                    <li id={`holding-${holding.holdingId}`} key={holding.holdingId} className={holding.unreadAlertCount > 0 ? "has-unread" : ""}>
+                      <Link className="holding-row-link" to={`/holdings/${holding.holdingId}/since-bought`} aria-label={`${holding.bondName} 매수 이후 변화 보기`}>
+                        <div className="holding-monitor-main">
+                          <div className="holding-monitor-title"><p>{holding.issuerName}</p><h3>{holding.bondName}</h3></div>
+                          <div className="holding-signal">
+                            {holding.unreadAlertCount > 0 && <span className="unread-count">새 변화 {holding.unreadAlertCount}</span>}
+                            {holding.currentRiskState
+                              ? <span className={`state-tag state-${holding.currentRiskState.overall.toLowerCase()}`}>{stateLabels[holding.currentRiskState.overall]}</span>
+                              : <span className="state-missing">상태 계산 전</span>}
+                          </div>
                         </div>
-                      </div>
-                      <div className="holding-change-copy">
-                        {holding.latestRiskChange ? (
-                          <p><strong>{categoryLabels[holding.latestRiskChange.category]}</strong> {stateLabels[holding.latestRiskChange.previousState]} → {stateLabels[holding.latestRiskChange.currentState]}</p>
-                        ) : <p>매수 이후 Risk State 변화가 아직 없습니다.</p>}
-                        {holding.latestAlert && <small>{holding.latestAlert.message}</small>}
-                      </div>
-                      <dl className="holding-metrics">
-                        <div><dt>표면금리</dt><dd>{bond ? `${bond.couponRate.toFixed(3)}%` : "—"}</dd></div>
-                        <div><dt>신용등급</dt><dd>{bond?.creditRating ?? "—"}</dd></div>
-                        <div><dt>만기일</dt><dd>{bond ? formatDate(bond.maturityDate) : "—"}</dd></div>
-                        <div><dt>매수금액</dt><dd>{formatMoney(holding.purchaseAmount)}</dd></div>
-                      </dl>
-                      <div className="holding-monitor-footer">
-                        <span>{formatDate(holding.purchaseDate)} 매수</span>
-                        <span>검증 Event {holding.newEventCount}개</span>
-                        <Link to={`/holdings/${holding.holdingId}/since-bought`}>Since I Bought <span aria-hidden="true">→</span></Link>
-                      </div>
+                        <div className="holding-change-copy">
+                          {holding.latestRiskChange ? (
+                            <p><strong>{categoryLabels[holding.latestRiskChange.category]}</strong> {stateLabels[holding.latestRiskChange.previousState]} → {stateLabels[holding.latestRiskChange.currentState]}</p>
+                          ) : <p>매수 이후 위험 상태 변화가 없습니다.</p>}
+                          {holding.latestAlert && <small>최근 알림 · {holding.latestAlert.message}</small>}
+                        </div>
+                        <div className="holding-change-spine" aria-label={`매수일 ${formatDate(holding.purchaseDate)}${holding.latestActivityAt ? `, 최근 변화 ${formatDateTime(holding.latestActivityAt)}` : ""}`}>
+                          <div><span className="spine-node" aria-hidden="true" /><time dateTime={holding.purchaseDate}>{formatShortDate(holding.purchaseDate)}</time><small>매수</small></div>
+                          <span className="spine-track" aria-hidden="true" />
+                          <div className={holding.latestActivityAt ? "is-current" : "is-quiet"}><span className="spine-node" aria-hidden="true" />{holding.latestActivityAt ? <time dateTime={holding.latestActivityAt}>{formatShortDate(holding.latestActivityAt)}</time> : <span>현재</span>}<small>{holding.latestActivityAt ? "최근 변화" : "계속 확인 중"}</small></div>
+                        </div>
+                        <dl className="holding-metrics">
+                          <div><dt>신용등급</dt><dd>{bond?.creditRating ?? "—"}</dd></div>
+                          <div><dt>표면금리</dt><dd>{bond ? `${bond.couponRate.toFixed(3)}%` : "—"}</dd></div>
+                          <div><dt>만기일</dt><dd>{bond ? formatDate(bond.maturityDate) : "—"}</dd></div>
+                          <div><dt>매수금액</dt><dd>{formatMoney(holding.purchaseAmount)}</dd></div>
+                        </dl>
+                        <div className="holding-monitor-footer">
+                          <span>검증된 변화 {holding.newEventCount}건</span>
+                          <span className="holding-row-action">매수 이후 변화 보기 <span aria-hidden="true">→</span></span>
+                        </div>
+                      </Link>
                     </li>
                   )})}
                 </ol>
@@ -301,7 +322,7 @@ function PortfolioPage() {
 
             <section id="alerts" className="alerts-section" aria-labelledby="alerts-title">
               <div className="section-heading">
-                <div><p className="section-label">RECENT ALERTS</p><h2 id="alerts-title">최근 알림</h2></div>
+                <div><h2 id="alerts-title">최근 알림</h2><p className="section-description">검증된 변화만 알립니다.</p></div>
                 <p>{unreadCount > 0 ? `${unreadCount}개 안 읽음` : "모두 확인함"}</p>
               </div>
               {alertError && <p className="alert-action-error" role="alert">{alertError}</p>}
@@ -319,7 +340,7 @@ function PortfolioPage() {
                       <p className="alert-bond-name">{alert.bondName}</p>
                       <h3>{alert.title}</h3>
                       <p>{alert.message}</p>
-                      <Link to={alertTarget(alert)} onClick={(event) => void handleAlertOpen(event, alert)} aria-busy={pendingAlertId === alert.alertId}>
+                      <Link to={alertTarget(alert)} onClick={() => void handleAlertRead(alert)} aria-busy={pendingAlertId === alert.alertId}>
                         {pendingAlertId === alert.alertId ? "읽음 처리 중…" : alert.targetType === "RISK_EVENT" ? "원문 근거 보기 →" : "변화 자세히 보기 →"}
                       </Link>
                     </li>
@@ -363,7 +384,7 @@ function PortfolioPage() {
         )}
       </main>
       <MobileNav />
-      <footer><p>Bonda monitors change. Decisions remain yours.</p></footer>
+      <footer><p>검증된 변화만 보여드립니다.</p></footer>
     </div>
   );
 }

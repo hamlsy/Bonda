@@ -29,14 +29,12 @@ export function MobileNav() {
   const isHome = location.pathname === "/" && location.hash === "";
   const isSince = location.pathname.includes("/since-bought") || location.hash === "#my-bonds";
   const isEvidence = location.pathname.includes("/risk-events/") || location.hash === "#alerts";
-  const isReplay = location.pathname === "/admin/replay";
 
   return (
     <nav className="mobile-nav" aria-label="모바일 주요 메뉴">
-      <Link to="/" aria-current={isHome ? "page" : undefined}><span aria-hidden="true">⌂</span>홈</Link>
-      <Link to="/#my-bonds" aria-current={isSince ? "page" : undefined}><span aria-hidden="true">▤</span>내 채권</Link>
-      <Link to="/#alerts" aria-current={isEvidence ? "page" : undefined}><span aria-hidden="true">●</span>알림</Link>
-      <Link to="/admin/replay" aria-current={isReplay ? "page" : undefined}><span aria-hidden="true">↺</span>재현</Link>
+      <Link to="/" aria-current={isHome ? "page" : undefined}>홈</Link>
+      <Link to="/#my-bonds" aria-current={isSince ? "page" : undefined}>내 채권</Link>
+      <Link to="/#alerts" aria-current={isEvidence ? "page" : undefined}>알림</Link>
     </nav>
   );
 }
