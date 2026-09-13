@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@source "../mock/bonda_mock_onboarding/src";
+@source "../mock/bonda_mock_main/src";
+

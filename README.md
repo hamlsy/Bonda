@@ -69,7 +69,6 @@ Evaluation은 `python evaluation/scripts/evaluate.py --dataset evaluation/golden
 - [제품 정의](./docs/PRODUCT.md)
 - [구현 명세](./docs/IMPLEMENTATION_SPEC.md)
 - [문서 안내](./docs/README.md)
-- [디자인 기준](./DESIGN.md)
 
 ## License
 
