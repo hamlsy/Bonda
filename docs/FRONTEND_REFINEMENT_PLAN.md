@@ -301,3 +301,35 @@ Codex의 고질적인 `기능은 되지만 generic한 화면`을 막기 위해 �
 - 320px, keyboard, 200% 확대에서 같은 일을 끝낼 수 있는가?
 - API 실패나 미연동 상태를 성공처럼 보이게 하지 않는가?
 - before/after 비교에서 정보 손실 없이 장식과 인지 부담이 줄었는가?
+
+## 2026-09-13 실행 결과
+
+완료된 vertical slice:
+
+1. mock 화면을 `/monitoring`과 `/`의 실제 렌더링 기준으로 채택했다.
+2. `/monitoring`에서 데모와 실제 기능을 구분하고, 존재하지 않는 AI API의 실패를
+   성공으로 표시하던 fallback을 제거했다.
+3. gradient, 장식 emoji, 일반 카드 shadow, 과도한 radius와 색 면적을 줄이고
+   indigo는 선택·주요 행동, emerald는 계산, amber/rose는 위험 상태에 제한했다.
+4. 10–11px 보조 글자를 렌더링 단계에서 12px 이상으로 보정하고, 전역 button
+   규칙과 Tailwind utility가 충돌하던 cascade layer 문제를 해결했다.
+5. 모바일 header, 검색, 필터, 목록, 상세 탭의 가로 overflow를 제거했다.
+6. 검색 초기화, 0건 상태 복구, native button 채권 row, tab ARIA와 화살표키,
+   native dialog, Escape, focus 복귀, 인라인 form error를 구현했다.
+7. 랜딩의 과장된 실시간·24시간·100% 문구를 데모/연동 예정 문구로 바꾸고
+   메인 화면과 같은 shape·색상 기준으로 정리했다.
+8. `npm run check:ui`에 과장 신뢰 문구, 장식 gradient·emoji, clickable div의
+   재유입을 막는 정적 guardrail을 추가했다.
+
+검증 결과는 루트의 `design-qa.md`에 기록한다.
+
+후속 개발 항목:
+
+- 실제 bond/holding/watchlist/risk-event API를 동일 view model adapter에 route별로
+  연결한다.
+- 연결 slice마다 loading, stale, partial error, retry, mutation pending 상태를 먼저
+  추가한다.
+- 인증, 결제, 카카오 알림, 외부 시장가격, 실제 AI 분석은 backend 계약이 생기기
+  전까지 `데모` 또는 `예정` 표기를 유지한다.
+- 보존된 since-bought, risk-event, replay route는 API slice와 함께 현재 shell로
+  하나씩 옮긴다.
