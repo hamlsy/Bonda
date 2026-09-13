@@ -101,10 +101,10 @@ export const HowItWorksSection: React.FC<HowItWorksSectionProps> = ({
               3
             </div>
             <h3 className="text-lg font-bold text-[#0b1c30] mb-2">
-              카톡 & 이메일로 24시간 안심 리포트
+              카톡 & 이메일 알림 설정
             </h3>
             <p className="text-sm text-[#464555] leading-relaxed mb-6">
-              평상시엔 주간 안심 다이제스트를, 비상 징후 발견 시 실시간 긴급 분석 브리핑을 모바일로 보내드립니다.
+              주간 다이제스트와 위험 신호 알림이 전달될 흐름을 미리 확인합니다. 실제 발송 기능은 연결 예정입니다.
             </p>
             <div
               onClick={onOpenKakaoSample}

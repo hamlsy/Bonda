@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({
               onClick={onOpenAlerts}
               className="text-left text-xs sm:text-sm text-slate-500 hover:text-indigo-600 transition-colors"
             >
-              실시간 신용변동 경보
+              신용변동 알림 (준비 중)
             </button>
             <button
               type="button"

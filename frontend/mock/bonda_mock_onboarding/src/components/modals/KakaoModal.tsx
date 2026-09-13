@@ -25,7 +25,7 @@ export const KakaoModal: React.FC<KakaoModalProps> = ({
               톡
             </div>
             <div>
-              <h3 className="text-sm font-bold leading-tight">카카오 알림톡 실시간 미리보기</h3>
+              <h3 className="text-sm font-bold leading-tight">카카오 알림톡 화면 미리보기</h3>
               <p className="text-[11px] text-[#3c1e1e]/80">Bonda 안심 채권 리포트 채널</p>
             </div>
           </div>

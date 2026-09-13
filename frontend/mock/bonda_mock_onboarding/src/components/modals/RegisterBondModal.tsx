@@ -205,7 +205,7 @@ export const RegisterBondModal: React.FC<RegisterBondModalProps> = ({
               type="submit"
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md transition-all active:scale-[0.98]"
             >
-              무료로 24시간 감시 시작하기
+              데모 관심종목 추가
             </button>
           </div>
         </form>

@@ -47,7 +47,7 @@ export const DartModal: React.FC<DartModalProps> = ({ bond, onClose }) => {
           </div>
           <div className="flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
             <ShieldCheck size={14} />
-            <span>위변조 검증 통과 (100% 원문 일치)</span>
+            <span>샘플 원문 · 실제 문서 대조 전</span>
           </div>
         </div>
 

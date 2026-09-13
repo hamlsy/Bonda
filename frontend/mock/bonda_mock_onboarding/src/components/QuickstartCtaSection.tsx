@@ -20,7 +20,7 @@ export const QuickstartCtaSection: React.FC<QuickstartCtaSectionProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const bondName = inputValue.trim() || '롯데케미칼 59-1';
-    setFeedback(`🎉 [성공] '${bondName}'이(가) 온보딩 관심종목으로 등록되었습니다!`);
+    setFeedback(`'${bondName}' 데모 등록 화면을 준비했습니다.`);
     setTimeout(() => {
       onStartMonitoring(bondName);
       setFeedback(null);
@@ -35,24 +35,21 @@ export const QuickstartCtaSection: React.FC<QuickstartCtaSectionProps> = ({
   return (
     <section className="w-full py-20 bg-[#f8f9ff]" id="onboarding-quickstart">
       <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
-        <div className="rounded-3xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-purple-800 p-8 sm:p-12 text-white shadow-xl shadow-indigo-950/15 relative overflow-hidden">
-          {/* Decorative Ambient Rings */}
-          <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-white/10 blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 rounded-full bg-emerald-400/20 blur-2xl pointer-events-none" />
+        <div className="rounded-xl bg-slate-900 p-8 sm:p-12 text-white border border-slate-800 relative overflow-hidden">
 
           <div className="relative z-10 flex flex-col items-center text-center">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm text-white text-xs font-semibold mb-6 border border-white/20">
               <ShieldCheck size={14} className="text-emerald-300" />
-              <span>신용카드 등록 없음 · 3초 간편 시작</span>
+              <span>샘플 데이터 · 브라우저에서만 유지</span>
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight mb-4 tracking-tight">
-              회사채 투자, 이제 불안해하며<br />
-              만기를 기다리지 마세요.
+              관심 종목으로 리포트 흐름을<br />
+              먼저 확인해 보세요.
             </h2>
 
             <p className="text-sm sm:text-base text-indigo-100/90 max-w-xl mx-auto mb-8 leading-relaxed">
-              지금 보유 중인 채권 1개만 등록해도, 오늘 밤 DART에 올라온 최신 보고서까지 AI가 즉시 정밀 분석해 드립니다.
+              종목명을 입력하면 등록 화면과 샘플 리포트를 확인할 수 있습니다. 실제 공시 감시와 알림은 연결 예정입니다.
             </p>
 
             {/* Quick Interactive Input Form */}
@@ -76,7 +73,7 @@ export const QuickstartCtaSection: React.FC<QuickstartCtaSectionProps> = ({
                   type="submit"
                   className="w-full sm:w-auto px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-sm transition-all whitespace-nowrap active:scale-[0.98]"
                 >
-                  지금 무료 모니터링 시작
+                  데모 등록 계속하기
                 </button>
               </div>
 
@@ -113,15 +110,15 @@ export const QuickstartCtaSection: React.FC<QuickstartCtaSectionProps> = ({
             <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-white/80 text-xs font-medium">
               <span className="flex items-center gap-1">
                 <Check size={14} className="text-emerald-300" />
-                무료 계정으로 최대 3개 채권 동시 모니터링
+                실제 계정 생성 없음
               </span>
               <span className="flex items-center gap-1">
                 <Check size={14} className="text-emerald-300" />
-                주간 정기 AI 크레딧 리포트
+                AI 리포트 샘플 제공
               </span>
               <span className="flex items-center gap-1">
                 <Check size={14} className="text-emerald-300" />
-                긴급 위험 감지 카톡 전송
+                알림 화면 미리보기
               </span>
             </div>
           </div>

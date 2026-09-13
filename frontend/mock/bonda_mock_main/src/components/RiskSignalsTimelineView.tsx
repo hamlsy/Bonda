@@ -142,16 +142,18 @@ export const RiskSignalsTimelineView: React.FC<RiskSignalsTimelineViewProps> = (
                 />
 
                 {/* Event Card */}
-                <div
+                <button
+                  type="button"
                   onClick={() => setSelectedEvent(isExpanded ? null : event)}
-                  className={`p-4 sm:p-5 rounded-2xl bg-white border cursor-pointer transition-all ${
+                  aria-expanded={isExpanded}
+                  className={`w-full text-left p-4 sm:p-5 rounded-2xl bg-white border cursor-pointer transition-colors ${
                     isExpanded
                       ? 'border-indigo-500 shadow-md ring-1 ring-indigo-500/20'
                       : 'border-slate-200 hover:border-slate-300 shadow-xs'
                   }`}
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-                    <div className="flex items-center gap-2">
+                  <span className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                    <span className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-500 flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
                         {event.date}
@@ -164,30 +166,30 @@ export const RiskSignalsTimelineView: React.FC<RiskSignalsTimelineViewProps> = (
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">
                         {event.eventType}
                       </span>
-                    </div>
+                    </span>
 
                     {event.metricChange && (
                       <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
                         {event.metricChange}
                       </span>
                     )}
-                  </div>
+                  </span>
 
-                  <h4 className="text-sm font-bold text-slate-900 mb-1">{event.title}</h4>
-                  <p className="text-xs text-slate-600 leading-relaxed">{event.summary}</p>
+                  <span className="block text-sm font-bold text-slate-900 mb-1">{event.title}</span>
+                  <span className="block text-xs text-slate-600 leading-relaxed">{event.summary}</span>
 
                   {/* Related Quote if available or clicked */}
-                  {event.relatedFactQuote && (
-                    <div className="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 italic">
+                  {event.relatedFactQuote && isExpanded && (
+                    <span className="block mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 italic">
                       &ldquo;{event.relatedFactQuote}&rdquo;
-                    </div>
+                    </span>
                   )}
 
-                  <div className="mt-2 text-[11px] text-indigo-600 font-semibold flex items-center gap-1">
+                  <span className="mt-2 text-[11px] text-indigo-600 font-semibold flex items-center gap-1">
                     <span>{isExpanded ? '상세 접기' : '클릭하여 관련 팩트 확인'}</span>
                     <ArrowRight className="w-3 h-3" />
-                  </div>
-                </div>
+                  </span>
+                </button>
               </div>
             );
           })}

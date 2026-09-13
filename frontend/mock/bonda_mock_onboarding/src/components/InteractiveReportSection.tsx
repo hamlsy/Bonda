@@ -48,7 +48,7 @@ export const InteractiveReportSection: React.FC<InteractiveReportSectionProps> =
               <span>PROPRIETARY 3-LAYER ARCHITECTURE</span>
             </div>
             <h2 className="text-2xl sm:text-3xl lg:text-[34px] font-bold text-[#0b1c30] tracking-tight">
-              가입 즉시 보게 되는 Bonda의 투명성 리포트
+              Bonda 샘플 투명성 리포트
             </h2>
           </div>
           <p className="text-sm md:text-[15px] text-[#464555] max-w-md leading-relaxed">
@@ -116,7 +116,7 @@ export const InteractiveReportSection: React.FC<InteractiveReportSectionProps> =
               </span>
             </div>
             <span className="text-[11px] px-2.5 py-1 rounded-full bg-white/90 shadow-xs text-slate-600 font-medium border border-slate-200/60">
-              실시간 DART 연동 반영됨
+              샘플 데이터 · 실제 연동 전
             </span>
           </div>
 
@@ -211,7 +211,7 @@ export const InteractiveReportSection: React.FC<InteractiveReportSectionProps> =
                   <ExternalLink size={13} />
                 </button>
                 <span className="text-emerald-600 font-medium bg-emerald-50 px-2 py-0.5 rounded text-[11px]">
-                  검증 완료 100%
+                  출처 표시 예시
                 </span>
               </div>
             </div>
@@ -270,13 +270,13 @@ export const InteractiveReportSection: React.FC<InteractiveReportSectionProps> =
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
                 <span>{activeBond.formula.formulaExpr}</span>
                 <span className="font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded text-[11px]">
-                  환각 배제 100%
+                  AI 출력 예시
                 </span>
               </div>
             </div>
 
             {/* LAYER 3: AI Insights & Action [AI 해석] */}
-            <div className="rounded-xl bg-gradient-to-b from-purple-50/60 via-white to-white p-5 flex flex-col justify-between border border-purple-200/80 shadow-sm relative overflow-hidden group">
+            <div className="rounded-xl bg-white p-5 flex flex-col justify-between border border-slate-200 relative overflow-hidden group">
               <div className="absolute top-0 left-0 right-0 h-1 bg-purple-600" />
               <div>
                 <div className="flex items-center justify-between mb-3">

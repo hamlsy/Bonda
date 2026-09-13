@@ -180,7 +180,7 @@ export const AiInsightsView: React.FC<AiInsightsViewProps> = ({
       </div>
 
       {/* Retail Investor Action Guide */}
-      <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xs">
+      <div className="p-5 sm:p-6 rounded-2xl bg-slate-900 text-white border border-slate-800">
         <h4 className="text-base font-bold text-white mb-3 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-emerald-400" />
           검토 체크리스트 (샘플)

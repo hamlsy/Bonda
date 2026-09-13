@@ -91,7 +91,7 @@ export const DeterministicMetricsView: React.FC<DeterministicMetricsViewProps> =
           </div>
           <p className="text-emerald-900/80 mt-1 leading-relaxed">
             AI의 추론이나 자의적 해석이 개입되지 않은 표준 재무 회계 공식에 따라 산출된 객관적 숫자입니다.
-            각 지표 카드를 통해 분자/분모 산출식과 한국신용평가사 기준 임계값을 즉시 대조할 수 있습니다.
+            각 지표 카드에서 분자·분모 산출식과 화면에 설정된 임계값을 함께 대조할 수 있습니다.
           </p>
         </div>
       </div>
@@ -253,7 +253,7 @@ export const DeterministicMetricsView: React.FC<DeterministicMetricsViewProps> =
       </div>
 
       {/* Retail Investor Interactive Cashflow Simulator */}
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-md border border-indigo-900/50">
+      <div className="p-6 rounded-2xl bg-slate-900 text-white border border-slate-800">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">

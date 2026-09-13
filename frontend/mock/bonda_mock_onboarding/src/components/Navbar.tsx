@@ -48,7 +48,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="font-extrabold text-sm tracking-tighter">B</span>
             </div>
             <span className="text-xl font-bold tracking-tight text-[#0b1c30]">
-              Bonda<span className="text-indigo-600 ml-0.5 font-extrabold">AI</span>
+              Bonda
             </span>
           </a>
 
@@ -71,7 +71,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="px-3.5 py-2 rounded-lg text-sm font-medium text-[#464555] hover:bg-indigo-50 hover:text-indigo-700 transition-colors flex items-center gap-1"
             >
               <span>신용 리스크 알림</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
             </button>
             <button
               onClick={onOpenPricing}
@@ -94,7 +94,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   {user.name.slice(0, 1)}
                 </div>
                 <span className="hidden sm:inline">{user.name}님</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold">Pro</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold">데모</span>
               </button>
 
               {showProfileMenu && (
@@ -136,11 +136,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={onOpenRegister}
                 className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-indigo-600 text-white text-xs font-semibold shadow-sm hover:bg-indigo-700 active:scale-[0.98] transition-all"
               >
-                무료로 시작하기
+                데모 시작하기
               </button>
               <button
                 onClick={onOpenLogin}
-                aria-label="User Account"
+                aria-label="사용자 계정 데모"
                 className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white hover:bg-indigo-700 transition-colors shadow-sm"
               >
                 <User size={16} />
@@ -152,7 +152,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors"
-            aria-label="Toggle Menu"
+            aria-label={mobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -185,7 +185,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             className="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-indigo-50 flex items-center justify-between"
           >
             <span>신용 리스크 알림</span>
-            <span className="text-[11px] px-2 py-0.5 bg-rose-100 text-rose-700 font-bold rounded-full">실시간</span>
+            <span className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-700 font-bold rounded-full">데모</span>
           </button>
           <button
             onClick={() => {
@@ -215,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               }}
               className="flex-1 py-2 text-center text-xs font-semibold rounded-lg bg-indigo-600 text-white"
             >
-              무료로 시작하기
+              데모 시작하기
             </button>
           </div>
         </div>

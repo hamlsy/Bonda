@@ -44,7 +44,7 @@ export const PrinciplesModal: React.FC<PrinciplesModalProps> = ({ onClose }) => 
             <div className="flex items-center gap-2 mb-2 text-indigo-700 font-bold text-sm">
               <div className="w-6 h-6 rounded bg-slate-100 flex items-center justify-center text-xs text-slate-700">1</div>
               <FileText size={16} />
-              <span>원문 사실 (Fact Grounding) 100% 인용</span>
+              <span>원문 사실 (Fact Grounding) 출처 표시</span>
             </div>
             <p className="text-slate-600 leading-relaxed mb-3">
               DART 전자공시시스템 및 3대 신용평가사(한기평, 나신평, 한신평)의 실제 발행 보고서 원문만을 발췌합니다. AI가 문맥을 가공하지 않고 원본 발췌문과 공시 접수번호를 그대로 노출하여 검증 가능성을 제공합니다.
@@ -62,10 +62,10 @@ export const PrinciplesModal: React.FC<PrinciplesModalProps> = ({ onClose }) => 
               <span>결정론적 정량 공식 (Deterministic Calculation)</span>
             </div>
             <p className="text-slate-600 leading-relaxed mb-3">
-              이자보상배율, 부채비율, 순차입금/EBITDA 등 모든 수치 계산은 AI 언어모델의 추론에 맡기지 않고, 파이썬 수학 검증 엔진에서 정확한 수학 공식에 의해 계산됩니다. 오차 0.00%를 보장합니다.
+              이자보상배율, 부채비율, 순차입금/EBITDA 등 수치는 AI 문장 생성과 분리하고, 명시된 입력값과 수식으로 계산하도록 설계합니다.
             </p>
             <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-[11px] text-slate-500 font-mono">
-              ✓ 수식 투명성: EBIT ÷ 총이자비용 산출 근거 100% 개방
+              수식 투명성: EBIT ÷ 총이자비용의 입력값과 산출 근거 표시
             </div>
           </div>
 

@@ -45,7 +45,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({
             Bonda AI 로그인
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">
-            등록된 내 채권의 24시간 감시 리포트 확인
+            등록된 채권 리포트 화면 확인
           </p>
         </div>
 

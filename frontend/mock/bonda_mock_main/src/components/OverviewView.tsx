@@ -66,7 +66,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
       {/* 3 Pillars Visual Triad Comparison */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Pillar 1: Raw Facts (Indigo) */}
-        <div className="p-5 rounded-2xl bg-white border border-indigo-200 shadow-xs flex flex-col justify-between hover:border-indigo-400 transition-all group">
+        <div className="bonda-evidence-card p-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between transition-colors group">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-indigo-100">
               <div className="flex items-center gap-2">
@@ -109,7 +109,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
 
           <button
             onClick={() => onNavigateTab('raw_facts')}
-            className="w-full mt-3 py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full mt-3 py-2 px-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-indigo-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <span>공시 원문 및 주석 전체보기</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -117,7 +117,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
         </div>
 
         {/* Pillar 2: Deterministic Metrics (Emerald) */}
-        <div className="p-5 rounded-2xl bg-white border border-emerald-200 shadow-xs flex flex-col justify-between hover:border-emerald-400 transition-all group">
+        <div className="bonda-evidence-card p-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between transition-colors group">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-emerald-100">
               <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
 
           <button
             onClick={() => onNavigateTab('metrics')}
-            className="w-full mt-3 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full mt-3 py-2 px-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <span>상세 산출식 및 시뮬레이터</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -189,7 +189,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
         </div>
 
         {/* Pillar 3: LLM Insights (Violet) */}
-        <div className="p-5 rounded-2xl bg-white border border-violet-200 shadow-xs flex flex-col justify-between hover:border-violet-400 transition-all group">
+        <div className="bonda-evidence-card p-5 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between transition-colors group">
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-violet-100">
               <div className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
 
           <button
             onClick={() => onNavigateTab('ai_insights')}
-            className="w-full mt-3 py-2 px-3 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+            className="w-full mt-3 py-2 px-3 rounded-lg bg-white hover:bg-slate-50 border border-slate-200 text-violet-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <span>AI 심층 리포트 및 질의응답</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -285,7 +285,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
             </div>
             <p className="text-xs text-slate-600 leading-relaxed">
               {bond.aiInsights.retailInvestorGuidance[0] ||
-                '신용평가사의 수시평가(Rating Watch) 공시 발생 시 즉시 스프레드 확대를 확인하세요.'}
+                '신용평가사의 수시평가(Rating Watch) 공시 발생 시 스프레드 변화를 우선 확인하세요.'}
             </p>
           </div>
           <div className="mt-2 text-[11px] text-indigo-600 font-semibold flex items-center gap-1">

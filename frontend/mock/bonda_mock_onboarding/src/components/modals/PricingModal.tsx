@@ -16,7 +16,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
       <div className="bg-white w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden border border-slate-200 flex flex-col max-h-[92vh]">
         {/* Header */}
-        <div className="p-6 text-center border-b border-slate-100 relative bg-gradient-to-b from-indigo-50/50 to-white">
+        <div className="p-6 text-center border-b border-slate-100 relative bg-white">
           <button
             type="button"
             onClick={onClose}
@@ -108,7 +108,7 @@ export const PricingModal: React.FC<PricingModalProps> = ({
           </div>
 
           {/* Pro Tier */}
-          <div className="border-2 border-indigo-600 rounded-2xl p-6 bg-gradient-to-b from-indigo-50/40 via-white to-white flex flex-col justify-between relative shadow-lg shadow-indigo-100">
+          <div className="border-2 border-indigo-600 rounded-2xl p-6 bg-white flex flex-col justify-between relative">
             <div className="absolute -top-3 right-6 bg-indigo-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full shadow-xs flex items-center gap-1">
               <Sparkles size={11} />
               <span>가장 인기있는 선택</span>
@@ -131,15 +131,15 @@ export const PricingModal: React.FC<PricingModalProps> = ({
               <div className="space-y-3 text-xs text-slate-800">
                 <div className="flex items-center gap-2">
                   <Check size={16} className="text-indigo-600 shrink-0 stroke-[2.5]" />
-                  <span>보유 회사채 <strong>무제한</strong> 실시간 감시</span>
+                  <span>보유 회사채 <strong>무제한</strong> 등록 (예정)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check size={16} className="text-indigo-600 shrink-0 stroke-[2.5]" />
-                  <span><strong>카카오톡 1초 긴급 알림톡</strong> 즉시 발송</span>
+                  <span><strong>카카오톡 위험 알림</strong> 설정 (예정)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check size={16} className="text-indigo-600 shrink-0 stroke-[2.5]" />
-                  <span>DART 공시 원문 딥러닝 실시간 정밀 분석</span>
+                  <span>DART 공시 원문 기반 분석 (예정)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check size={16} className="text-indigo-600 shrink-0 stroke-[2.5]" />

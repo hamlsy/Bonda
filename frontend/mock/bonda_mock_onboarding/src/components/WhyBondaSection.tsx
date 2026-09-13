@@ -50,7 +50,7 @@ export const WhyBondaSection: React.FC<WhyBondaSectionProps> = ({
               <div className="flex items-center justify-between gap-2 mb-2.5">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
-                  <span className="text-xs text-[#0b1c30] font-bold">실시간 통합 피드</span>
+                  <span className="text-xs text-[#0b1c30] font-bold">통합 피드 예시</span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-medium">{activeBond.company}</span>
               </div>
@@ -81,7 +81,7 @@ export const WhyBondaSection: React.FC<WhyBondaSectionProps> = ({
                 매수 시점 대비 변화된 신용위험 감지
               </h3>
               <p className="text-sm text-[#464555] leading-relaxed mb-6">
-                현재 재무만 보는 것은 의미가 없습니다. 내가 샀던 그 날의 지표와 비교해 부채비율 급증, 매출채권 부실 징후 발생 시 카카오톡으로 즉시 알립니다.
+                매수 시점과 현재 지표를 비교해 부채비율과 매출채권 변화를 보여주고, 알림이 필요한 조건을 설정하는 흐름입니다.
               </p>
             </div>
 
@@ -142,7 +142,7 @@ export const WhyBondaSection: React.FC<WhyBondaSectionProps> = ({
                 <span className="w-5 h-5 rounded bg-slate-100 text-slate-700 flex items-center justify-center text-[10px] font-bold">
                   1
                 </span>
-                <span>DART 원문: 100% 사실 인용</span>
+                <span>DART 원문: 출처와 기준일 표시</span>
               </div>
               <div className="flex items-center gap-2.5 text-indigo-800 text-xs font-medium bg-indigo-50/70 p-2 rounded-lg border border-indigo-100">
                 <span className="w-5 h-5 rounded bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">

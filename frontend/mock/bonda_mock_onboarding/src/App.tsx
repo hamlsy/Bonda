@@ -93,13 +93,13 @@ export default function App() {
         simulatedBuyDate: `${data.buyDate} (A+ 안정적)`,
         riskDelta: '+1.5% 안정적 유지',
         riskTrend: 'safe',
-        alertText: `🔔 [정상 등록] ${data.bondName}: DART 공시 및 3대 신평사 24시간 실시간 감시 시작`,
+        alertText: `[데모 등록] ${data.bondName}: 공시 및 신용 변화 화면 예시가 준비되었습니다.`,
         alertLevel: 'safe',
         fact: {
-          title: 'DART 정기/수시공시 연동 활성화',
-          source: 'DART 전자공시 연동',
-          quote: `"${companyPart}의 최근 사업보고서 및 분기 차입금 변동 내역이 Bonda AI 모니터링 엔진에 즉시 연동되었습니다."`,
-          filingDate: '실시간 연동 중',
+          title: '공시 원문 표시 예시',
+          source: 'UI 검증용 샘플',
+          quote: `"${companyPart}의 공시 원문이 연결될 위치를 보여주는 데모 문장입니다."`,
+          filingDate: '연동 예정',
           filingNumber: '2024-AUTO-REG',
           verifiedPercent: 100,
           detailedDARTExcerpt: `[금융감독원 DART 연동 확인서]
@@ -117,11 +117,11 @@ export default function App() {
           debtRatioPercent: 35,
           debtRatioStatus: '순차입금 / EBITDA',
           formulaExpr: '수식: EBIT ÷ 총이자비용',
-          verificationText: '환각 배제 100%'
+          verificationText: '입력값 기준 계산'
         },
         insight: {
-          badge: 'Bonda AI 맞춤 모델',
-          summary: `"${companyPart}에 대한 실시간 DART 공시 감시가 개시되었습니다. 유동성 위기 징후 및 신평사 아웃룩 변동 시 ${data.contactValue}로 즉각 1장 요약 브리핑이 발송됩니다."`,
+          badge: 'AI 출력 예시',
+          summary: `"${companyPart}의 위험 요약과 근거 링크가 배치될 영역입니다. 실제 공시·알림·AI 기능은 연결 전이며 현재 입력은 저장되지 않습니다."`,
           strategy: '만기 확정 이자 수취 유지',
           disclaimer: '* 본 해석은 AI가 생성한 참고 정보이며 법적 투자권유가 아닙니다.'
         },
@@ -131,8 +131,8 @@ export default function App() {
           delta: '▼ -2.0%p'
         },
         recentFeeds: [
-          { title: `${companyPart} 신용 모니터링 센서 가동`, time: '방금 전', source: 'Bonda AI' },
-          { title: 'DART 최신 공시 변동사항 스캔 완료', time: '1분 전', source: 'DART' }
+          { title: `${companyPart} 데모 종목 추가`, time: '방금 전', source: '브라우저 데모' },
+          { title: '공시 연동 화면 예시 준비', time: '1분 전', source: '샘플 데이터' }
         ]
       };
 
@@ -144,7 +144,7 @@ export default function App() {
     const previewEl = document.getElementById('demo-preview');
     previewEl?.scrollIntoView({ behavior: 'smooth' });
 
-    showToast(`🎉 '${data.bondName}'이(가) 등록되어 24시간 실시간 감시를 시작했습니다!`);
+    showToast(`'${data.bondName}' 데모 종목을 추가했습니다. 새로고침하면 초기화됩니다.`);
   };
 
   const handleLoginSuccess = (loggedInUser: { name: string; email: string }) => {
@@ -161,10 +161,10 @@ export default function App() {
   const activeBond = bonds[activeBondId] || Object.values(bonds)[0];
 
   return (
-    <div className="min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col font-sans">
+    <div className="bonda-onboarding min-h-screen bg-[#f8f9ff] text-[#0b1c30] flex flex-col font-sans">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-20 right-4 sm:right-8 z-50 bg-[#0b1c30] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 animate-fade-in border border-indigo-500/40 text-xs sm:text-sm font-semibold">
+        <div role="status" aria-live="polite" className="fixed top-20 right-4 sm:right-8 z-50 max-w-[calc(100vw-2rem)] bg-[#0b1c30] text-white px-5 py-3 rounded-lg flex items-center gap-3 animate-fade-in border border-slate-700 text-xs sm:text-sm font-semibold">
           <CheckCircle2 size={18} className="text-emerald-400 shrink-0" />
           <span>{toastMessage}</span>
         </div>

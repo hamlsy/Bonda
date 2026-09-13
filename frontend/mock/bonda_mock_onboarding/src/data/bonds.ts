@@ -15,7 +15,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
     simulatedBuyDate: '2023.11.14 (AA 안정적)',
     riskDelta: '+24.8% 위험 상승',
     riskTrend: 'up',
-    alertText: '🚨 [주의 감지] 롯데케미칼: 나이스신용평가 무보증사채 등급전망 ‘부정적(Negative)’ 검토',
+    alertText: '[주의 감지] 롯데케미칼: 나이스신용평가 무보증사채 등급전망 ‘부정적(Negative)’ 검토',
     alertLevel: 'danger',
     fact: {
       title: 'DART 수시공시 주요사항보고서',
@@ -39,7 +39,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 78,
       debtRatioStatus: '순차입금 / EBITDA',
       formulaExpr: '수식: EBIT ÷ 총이자비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -96,7 +96,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 40,
       debtRatioStatus: '레버리지 배율 (총자산/자기자본)',
       formulaExpr: '수식: 영업이익 ÷ 금융비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -152,7 +152,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 15,
       debtRatioStatus: '순차입금 / EBITDA',
       formulaExpr: '수식: EBIT ÷ 총이자비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -208,7 +208,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 50,
       debtRatioStatus: '순차입금 / EBITDA',
       formulaExpr: '수식: EBIT ÷ 총이자비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -241,7 +241,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
     simulatedBuyDate: '2023.12.01 (AA 부정적)',
     riskDelta: '-12.0% 리스크 급감',
     riskTrend: 'safe',
-    alertText: '🚀 [턴어라운드] SK하이닉스: HBM3E 공급 독점으로 흑자전환 및 잉여현금흐름 극대화',
+    alertText: '[개선 신호] SK하이닉스: HBM3E 공급 확대에 따른 흑자전환 및 잉여현금흐름 개선 예시',
     alertLevel: 'positive',
     fact: {
       title: 'DART 분기보고서 영업실적 공시',
@@ -265,7 +265,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 30,
       debtRatioStatus: '순차입금 / EBITDA',
       formulaExpr: '수식: EBIT ÷ 총이자비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -321,7 +321,7 @@ export const INITIAL_BONDS: Record<string, BondItem> = {
       debtRatioPercent: 45,
       debtRatioStatus: '순차입금 / EBITDA',
       formulaExpr: '수식: EBIT ÷ 총이자비용',
-      verificationText: '환각 배제 100%'
+      verificationText: '입력값 기준 계산'
     },
     insight: {
       badge: 'Bonda AI 모델',
@@ -350,7 +350,7 @@ export const COMPARISON_TABLE_DATA = [
   {
     criterion: '전문 리포트 해석',
     legacy: '신평사 전문 용어(EBITDA, Net Debt)와 난해한 금융 문장으로 포기',
-    bonda: '초보자도 1초 만에 이해하는 쉬운 한국어 AI 번역 요약'
+    bonda: '원문과 구분해 보여주는 쉬운 한국어 AI 요약 예시'
   },
   {
     criterion: '리스크 감지 속도',
@@ -360,7 +360,7 @@ export const COMPARISON_TABLE_DATA = [
   {
     criterion: 'AI 신뢰도 & 객관성',
     legacy: '일반 챗봇의 그럴듯한 거짓말(할루시네이션) 위험',
-    bonda: '원문-정량식-해석 3단계 분리 투명성 원칙으로 100% 신뢰 검증'
+    bonda: '원문-정량식-해석을 구분하고 출처와 기준일을 함께 표시'
   }
 ];
 
