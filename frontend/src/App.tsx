@@ -16,7 +16,48 @@ import HistoricalReplayPage from "./HistoricalReplayPage";
 import { AppHeader, MobileNav } from "./Navigation";
 import type { AlertItem, Bond, MyBondSummary, RiskState, WatchlistEntry } from "./types";
 
-type PageState = "loading" | "ready" | "error";
+type PageState = "initial-loading" | "ready" | "refreshing" | "stale" | "error";
+type PortfolioFailureKind = "connection" | "temporary";
+
+type PortfolioFailure = {
+  kind: PortfolioFailureKind;
+  consecutiveCount: number;
+};
+
+type PortfolioSnapshot = {
+  bonds: Bond[];
+  myBonds: MyBondSummary[];
+  alerts: AlertItem[];
+  watchlist: WatchlistEntry[];
+  checkedAt: string;
+};
+
+const PORTFOLIO_SNAPSHOT_KEY = "bonda.portfolio.last-success";
+
+function readPortfolioSnapshot(): PortfolioSnapshot | null {
+  try {
+    const raw = window.sessionStorage.getItem(PORTFOLIO_SNAPSHOT_KEY);
+    if (!raw) return null;
+    const snapshot = JSON.parse(raw) as Partial<PortfolioSnapshot>;
+    if (!Array.isArray(snapshot.bonds)
+      || !Array.isArray(snapshot.myBonds)
+      || !Array.isArray(snapshot.alerts)
+      || !Array.isArray(snapshot.watchlist)
+      || typeof snapshot.checkedAt !== "string"
+      || Number.isNaN(Date.parse(snapshot.checkedAt))) return null;
+    return snapshot as PortfolioSnapshot;
+  } catch {
+    return null;
+  }
+}
+
+function storePortfolioSnapshot(snapshot: PortfolioSnapshot) {
+  try {
+    window.sessionStorage.setItem(PORTFOLIO_SNAPSHOT_KEY, JSON.stringify(snapshot));
+  } catch {
+    // The live response remains usable when browser storage is unavailable.
+  }
+}
 
 const stateLabels: Record<RiskState, string> = { NORMAL: "정상", WATCH: "관찰", CAUTION: "주의" };
 const categoryLabels = {
@@ -54,6 +95,16 @@ function formatDateTime(value: string) {
   }).format(new Date(value));
 }
 
+function formatCheckedAt(value: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Asia/Seoul",
+  }).format(new Date(value));
+}
+
 function formatShortDate(value: string) {
   return new Intl.DateTimeFormat("ko-KR", {
     month: "short",
@@ -76,12 +127,22 @@ function alertTarget(alert: AlertItem) {
   return "/#watchlist";
 }
 
+function classifyPortfolioFailure(error: unknown): PortfolioFailureKind {
+  if (error instanceof TypeError) return "connection";
+  if (error instanceof ApiError && (error.status === 401 || error.status === 403)) return "connection";
+  return "temporary";
+}
+
 function PortfolioPage() {
-  const [bonds, setBonds] = useState<Bond[]>([]);
-  const [myBonds, setMyBonds] = useState<MyBondSummary[]>([]);
-  const [alerts, setAlerts] = useState<AlertItem[]>([]);
-  const [watchlist, setWatchlist] = useState<WatchlistEntry[]>([]);
-  const [pageState, setPageState] = useState<PageState>("loading");
+  const [initialSnapshot] = useState(readPortfolioSnapshot);
+  const [bonds, setBonds] = useState<Bond[]>(() => initialSnapshot?.bonds ?? []);
+  const [myBonds, setMyBonds] = useState<MyBondSummary[]>(() => initialSnapshot?.myBonds ?? []);
+  const [alerts, setAlerts] = useState<AlertItem[]>(() => initialSnapshot?.alerts ?? []);
+  const [watchlist, setWatchlist] = useState<WatchlistEntry[]>(() => initialSnapshot?.watchlist ?? []);
+  const [pageState, setPageState] = useState<PageState>(initialSnapshot ? "refreshing" : "initial-loading");
+  const [portfolioFailure, setPortfolioFailure] = useState<PortfolioFailure | null>(null);
+  const [lastSuccessfulAt, setLastSuccessfulAt] = useState<string | null>(initialSnapshot?.checkedAt ?? null);
+  const [recoveryPending, setRecoveryPending] = useState(false);
   const [alertError, setAlertError] = useState("");
   const [pendingAlertId, setPendingAlertId] = useState<number | null>(null);
   const [holdingBondId, setHoldingBondId] = useState("");
@@ -98,9 +159,15 @@ function PortfolioPage() {
   const purchaseDateRef = useRef<HTMLInputElement>(null);
   const purchaseAmountRef = useRef<HTMLInputElement>(null);
   const watchBondRef = useRef<HTMLSelectElement>(null);
+  const loadInFlightRef = useRef(false);
 
-  async function loadPortfolio(signal?: AbortSignal) {
-    setPageState("loading");
+  async function loadPortfolio(signal?: AbortSignal, intent: "initial" | "background" | "recovery" = "background") {
+    if (loadInFlightRef.current) return;
+    loadInFlightRef.current = true;
+    const hasSnapshot = lastSuccessfulAt !== null;
+    if (intent === "initial") setPageState(hasSnapshot ? "refreshing" : "initial-loading");
+    if (intent === "background" && hasSnapshot && pageState !== "stale") setPageState("refreshing");
+    if (intent === "recovery") setRecoveryPending(true);
     try {
       const [bondList, summaries, recentAlerts, watchlistEntries] = await Promise.all([
         getBonds(signal),
@@ -108,26 +175,51 @@ function PortfolioPage() {
         getAlerts(signal),
         getWatchlist(signal),
       ]);
+      const checkedAt = new Date().toISOString();
       setBonds(bondList);
       setMyBonds(summaries);
       setAlerts(recentAlerts);
       setWatchlist(watchlistEntries);
+      setLastSuccessfulAt(checkedAt);
+      storePortfolioSnapshot({ bonds: bondList, myBonds: summaries, alerts: recentAlerts, watchlist: watchlistEntries, checkedAt });
+      setPortfolioFailure(null);
       setPageState("ready");
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return;
-      setPageState("error");
+      const failureKind = classifyPortfolioFailure(error);
+      setPortfolioFailure((current) => ({
+        kind: failureKind,
+        consecutiveCount: current?.kind === failureKind ? current.consecutiveCount + 1 : 1,
+      }));
+      setPageState(hasSnapshot ? "stale" : "error");
+    } finally {
+      loadInFlightRef.current = false;
+      if (intent === "recovery") setRecoveryPending(false);
     }
   }
 
   useEffect(() => {
     document.title = "내 채권 | Bonda";
-    const controller = new AbortController();
-    void loadPortfolio(controller.signal);
-    return () => controller.abort();
+    void loadPortfolio(undefined, "initial");
   }, []);
 
   useEffect(() => {
-    if (pageState !== "ready" || !window.location.hash) return;
+    if (!lastSuccessfulAt) return;
+    const revalidate = () => {
+      if (document.visibilityState === "visible") void loadPortfolio(undefined, "background");
+    };
+    document.addEventListener("visibilitychange", revalidate);
+    window.addEventListener("online", revalidate);
+    window.addEventListener("focus", revalidate);
+    return () => {
+      document.removeEventListener("visibilitychange", revalidate);
+      window.removeEventListener("online", revalidate);
+      window.removeEventListener("focus", revalidate);
+    };
+  }, [lastSuccessfulAt, pageState]);
+
+  useEffect(() => {
+    if ((pageState !== "ready" && pageState !== "stale") || !window.location.hash) return;
     const targetId = decodeURIComponent(window.location.hash.slice(1));
     const frame = window.requestAnimationFrame(() => {
       document.getElementById(targetId)?.scrollIntoView();
@@ -220,55 +312,112 @@ function PortfolioPage() {
   const attentionCount = myBonds.filter((holding) => holding.currentRiskState && holding.currentRiskState.overall !== "NORMAL").length;
   const firstUnreadHolding = myBonds.find((holding) => holding.unreadAlertCount > 0);
   const today = getLocalToday();
-  const overviewTitle = pageState === "loading"
+  const hasSnapshot = lastSuccessfulAt !== null;
+  const isPortfolioEmpty = hasSnapshot && myBonds.length === 0 && watchlist.length === 0;
+  const hasPortfolioContent = hasSnapshot && !isPortfolioEmpty;
+  const failureKind = portfolioFailure?.kind ?? "temporary";
+  const repeatedFailure = (portfolioFailure?.consecutiveCount ?? 0) > 1;
+  const recoveryLabel = failureKind === "connection" ? "연결 상태 확인" : "다시 시도";
+  const recoveryPendingLabel = failureKind === "connection" ? "연결 확인 중…" : "다시 시도 중…";
+  const overviewTitle = pageState === "initial-loading"
     ? "내 채권의 변화를 확인하고 있습니다."
     : pageState === "error"
-      ? "지금은 변화를 불러올 수 없습니다."
-      : unreadCount > 0
-        ? `확인할 변화가 ${unreadCount}개 있습니다.`
-        : "새롭게 확인된 변화가 없습니다.";
-  const overviewSummary = pageState === "ready"
-    ? myBonds.length > 0
-      ? `보유 채권 ${myBonds.length}건의 발행기업을 계속 확인하고 있습니다.`
-      : "채권과 매수일을 등록하면 그 이후의 변화를 확인할 수 있습니다."
+      ? failureKind === "connection"
+        ? "서비스에 연결할 수 없습니다."
+        : "최신 변화를 가져오지 못했습니다."
+      : isPortfolioEmpty
+        ? "확인 중인 채권이 없습니다."
+        : unreadCount > 0
+          ? `확인할 변화가 ${unreadCount}개 있습니다.`
+          : "새롭게 확인된 변화가 없습니다.";
+  const overviewSummary = pageState === "initial-loading"
+    ? "공시와 위험 상태를 최신 순서로 불러오는 중입니다."
     : pageState === "error"
-      ? "연결 상태를 확인한 뒤 다시 시도해 주세요."
-      : "공시와 위험 상태를 최신 순서로 불러오는 중입니다.";
+      ? failureKind === "connection"
+        ? repeatedFailure
+          ? "계속 연결되지 않습니다. 인터넷 연결과 서비스 로그인 상태를 확인해 주세요."
+          : "인터넷 연결 또는 서비스 로그인 상태를 확인해 주세요."
+        : repeatedFailure
+          ? "조회가 계속 지연되고 있습니다. 잠시 후 다시 시도해 주세요."
+          : "일시적인 조회 문제입니다. 저장된 정보는 변경되지 않았습니다."
+      : isPortfolioEmpty
+        ? "첫 채권과 매수일을 등록하면 그 이후의 변화를 추적합니다."
+        : pageState === "stale"
+          ? `보유 채권 ${myBonds.length}건의 마지막 확인 데이터를 유지하고 있습니다.`
+          : pageState === "refreshing"
+            ? `보유 채권 ${myBonds.length}건의 최신 변화를 다시 확인하는 중입니다.`
+            : `보유 채권 ${myBonds.length}건의 발행기업을 계속 확인하고 있습니다.`;
   const overviewAction = myBonds.length === 0
-    ? { href: "#watchlist", label: "채권 등록하기" }
+    ? { href: "#watchlist", label: "첫 채권 등록하기" }
     : firstUnreadHolding
       ? { href: `#holding-${firstUnreadHolding.holdingId}`, label: "새 변화부터 보기" }
       : { href: "#my-bonds", label: "내 채권 보기" };
+  const contextTone = pageState === "error"
+    ? failureKind === "connection" ? "error" : "warning"
+    : pageState === "stale" ? "warning" : pageState === "initial-loading" || pageState === "refreshing" ? "muted" : "normal";
+  const contextLabel = pageState === "error"
+    ? failureKind === "connection" ? "연결 상태" : "데이터 업데이트"
+    : isPortfolioEmpty ? "모니터링 시작" : pageState === "stale" ? "이전 데이터" : "내 채권 모니터링";
+  const headerStatus = pageState === "error"
+    ? { label: failureKind === "connection" ? "연결 확인 필요" : "업데이트 지연", tone: failureKind === "connection" ? "error" : "warning" }
+    : pageState === "stale"
+      ? { label: "이전 데이터", tone: "warning" }
+      : pageState === "initial-loading" || pageState === "refreshing"
+        ? { label: "새로 확인 중", tone: "muted" }
+        : unreadCount > 0
+          ? { label: `새 알림 ${unreadCount}개`, tone: "warning" }
+          : { label: "모니터링 중", tone: "normal" };
 
   return (
-    <div className="app-shell monitoring-shell">
-      <AppHeader status={pageState === "error" ? "연결 확인 필요" : unreadCount > 0 ? `새 알림 ${unreadCount}개` : "모니터링 중"} />
+    <div className={`app-shell monitoring-shell portfolio-state-${pageState}`}>
+      <AppHeader status={headerStatus.label} statusTone={headerStatus.tone as "normal" | "warning" | "error" | "muted"} />
       <main>
-        <section className={`portfolio-overview overview-${pageState}`} aria-labelledby="page-title">
-          <div className="portfolio-overview-copy">
-            <p className="portfolio-context"><span aria-hidden="true" />내 채권 모니터링</p>
+        <section className={`portfolio-overview overview-${pageState}${!hasPortfolioContent ? " is-single-flow" : ""}`} aria-labelledby="page-title">
+          <div className="portfolio-overview-copy" aria-live="polite">
+            <p className="portfolio-context" data-tone={contextTone}><span aria-hidden="true" />{contextLabel}</p>
             <h1 id="page-title">{overviewTitle}</h1>
             <p className="portfolio-summary">{overviewSummary}</p>
-            {pageState === "ready" && (
+            {(pageState === "ready" || pageState === "refreshing") && (
               <a className="primary-cta" href={overviewAction.href}>{overviewAction.label}<span aria-hidden="true">→</span></a>
             )}
             {pageState === "error" && (
-              <button type="button" className="secondary-button" onClick={() => void loadPortfolio()}>다시 불러오기</button>
+              <button type="button" className="recovery-button" onClick={() => void loadPortfolio(undefined, "recovery")} disabled={recoveryPending} aria-busy={recoveryPending}>
+                {recoveryPending && <span className="spinner" aria-hidden="true" />}
+                <span>{recoveryPending ? recoveryPendingLabel : recoveryLabel}</span>
+              </button>
             )}
           </div>
-          <dl className="portfolio-facts" aria-label="포트폴리오 요약">
-            <div><dt>보유</dt><dd>{pageState === "ready" ? myBonds.length : "—"}<span>건</span></dd></div>
-            <div><dt>관찰·주의</dt><dd>{pageState === "ready" ? attentionCount : "—"}<span>건</span></dd></div>
-            <div><dt>관심</dt><dd>{pageState === "ready" ? watchlist.length : "—"}<span>건</span></dd></div>
-          </dl>
+          {hasPortfolioContent && (
+            <div className="portfolio-facts-wrap">
+              <dl className="portfolio-facts" aria-label="포트폴리오 요약">
+                <div><dt>보유</dt><dd>{myBonds.length}<span>건</span></dd></div>
+                <div><dt>관찰·주의</dt><dd>{attentionCount}<span>건</span></dd></div>
+                <div><dt>관심</dt><dd>{watchlist.length}<span>건</span></dd></div>
+              </dl>
+              {lastSuccessfulAt && <p className="portfolio-checked-at">마지막 확인 <time dateTime={lastSuccessfulAt}>{formatCheckedAt(lastSuccessfulAt)}</time></p>}
+            </div>
+          )}
         </section>
 
-        {pageState === "loading" && (
+        {pageState === "initial-loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true"><span className="spinner" aria-hidden="true" /><p>보유 채권의 변화를 확인하고 있습니다.</p></section>
         )}
-        {pageState === "ready" && (
+        {pageState === "stale" && portfolioFailure && lastSuccessfulAt && (
+          <section className="portfolio-status-banner" role="status" aria-live="polite">
+            <div>
+              <h2>{failureKind === "connection" ? "연결이 끊겨 이전 데이터를 표시합니다." : "최신 조회가 지연되어 이전 데이터를 표시합니다."}</h2>
+              <p><time dateTime={lastSuccessfulAt}>{formatCheckedAt(lastSuccessfulAt)}</time>에 정상 확인한 데이터입니다.</p>
+              {repeatedFailure && <p className="recovery-guidance">{failureKind === "connection" ? "인터넷 연결과 서비스 로그인 상태를 확인한 뒤 다시 확인해 주세요." : "일시적인 서비스 지연이 계속되고 있습니다. 잠시 후 다시 시도해 주세요."}</p>}
+            </div>
+            <button type="button" className="recovery-button" onClick={() => void loadPortfolio(undefined, "recovery")} disabled={recoveryPending} aria-busy={recoveryPending}>
+              {recoveryPending && <span className="spinner" aria-hidden="true" />}
+              <span>{recoveryPending ? recoveryPendingLabel : recoveryLabel}</span>
+            </button>
+          </section>
+        )}
+        {hasSnapshot && (
           <>
-            <div className="monitoring-grid">
+            {!isPortfolioEmpty && <div className="monitoring-grid">
             <section id="my-bonds" className="my-bonds-section" aria-labelledby="my-bonds-title">
               <div className="section-heading">
                 <div><h2 id="my-bonds-title">내 채권</h2><p className="section-description">새 변화가 있는 채권부터 보여드립니다.</p></div>
@@ -340,7 +489,7 @@ function PortfolioPage() {
                       <p className="alert-bond-name">{alert.bondName}</p>
                       <h3>{alert.title}</h3>
                       <p>{alert.message}</p>
-                      <Link to={alertTarget(alert)} onClick={() => void handleAlertRead(alert)} aria-busy={pendingAlertId === alert.alertId}>
+                      <Link to={alertTarget(alert)} onClick={() => pageState !== "stale" && void handleAlertRead(alert)} aria-busy={pendingAlertId === alert.alertId}>
                         {pendingAlertId === alert.alertId ? "읽음 처리 중…" : alert.targetType === "RISK_EVENT" ? "원문 근거 보기 →" : "변화 자세히 보기 →"}
                       </Link>
                     </li>
@@ -348,8 +497,9 @@ function PortfolioPage() {
                 </ol>
               )}
             </section>
-            </div>
+            </div>}
 
+            {pageState !== "stale" && (
             <section id="watchlist" className="registration-section" aria-labelledby="registration-title">
               <div className="section-heading"><div><p className="section-label">PORTFOLIO SETUP</p><h2 id="registration-title">내 목록에 등록</h2></div></div>
               <div className="form-grid">
@@ -380,11 +530,12 @@ function PortfolioPage() {
                 </form>
               </div>
             </section>
+            )}
           </>
         )}
       </main>
       <MobileNav />
-      <footer><p>검증된 변화만 보여드립니다.</p></footer>
+      {hasSnapshot && <footer><p>{pageState === "stale" && lastSuccessfulAt ? `${formatCheckedAt(lastSuccessfulAt)}에 확인한 검증 데이터를 보여드립니다.` : "검증된 변화만 보여드립니다."}</p></footer>}
     </div>
   );
 }
