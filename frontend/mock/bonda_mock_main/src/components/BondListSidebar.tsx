@@ -22,6 +22,7 @@ interface BondListSidebarProps {
   onSelectBond: (bondId: string) => void;
   filterCategory: string;
   onFilterChange: (cat: string) => void;
+  onResetFilters: () => void;
 }
 
 export const BondListSidebar: React.FC<BondListSidebarProps> = ({
@@ -30,6 +31,7 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
   onSelectBond,
   filterCategory,
   onFilterChange,
+  onResetFilters,
 }) => {
   const getRatingBadgeStyle = (rating: string) => {
     if (rating.startsWith('AA')) {
@@ -234,8 +236,11 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
         })}
 
         {bonds.length === 0 && (
-          <div className="p-8 text-center text-slate-400 text-xs">
-            검색 결과와 일치하는 채권이 없습니다.
+          <div className="p-8 text-center text-slate-500 text-xs">
+            <p>검색 결과와 일치하는 채권이 없습니다.</p>
+            <button type="button" onClick={onResetFilters} className="mt-3 px-3 py-2 rounded-lg border border-slate-200 bg-white text-indigo-700 font-semibold hover:bg-slate-50">
+              검색과 필터 초기화
+            </button>
           </div>
         )}
       </div>

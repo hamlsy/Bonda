@@ -135,6 +135,10 @@ export default function App() {
           }}
           filterCategory={filterCategory}
           onFilterChange={setFilterCategory}
+          onResetFilters={() => {
+            setSearchQuery('');
+            setFilterCategory('all');
+          }}
         />
 
         {/* Right Detail Pane */}

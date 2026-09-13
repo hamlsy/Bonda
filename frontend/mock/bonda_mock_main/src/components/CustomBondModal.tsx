@@ -27,9 +27,20 @@ export const CustomBondModal: React.FC<CustomBondModalProps> = ({
     '자회사 CJ올리브네트웍스 지분 현물출자 완료 및 전환사채(CB) 조기상환 청구권(풋옵션) 행사 도래.'
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!bondName.trim() || !issuer.trim() || !sector.trim()) {
+      setFormError('채권 종목명, 발행사명, 업종을 모두 입력해 주세요.');
+      document.getElementById('custom-bond-name')?.focus();
+      return;
+    }
+    if (!Number.isFinite(couponRate) || !Number.isFinite(operatingProfit) || !Number.isFinite(interestExpense)) {
+      setFormError('정량 지표에는 유효한 숫자를 입력해 주세요.');
+      return;
+    }
+    setFormError('');
     setIsSubmitting(true);
 
     const icr = operatingProfit / (interestExpense || 1);
@@ -195,7 +206,8 @@ export const CustomBondModal: React.FC<CustomBondModalProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+        <form onSubmit={handleSubmit} noValidate className="space-y-4 text-xs">
+          {formError && <p role="alert" className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 font-semibold">{formError}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="custom-bond-name" className="block font-bold text-slate-700 mb-1">채권 종목명</label>

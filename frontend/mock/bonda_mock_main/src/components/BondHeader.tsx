@@ -30,6 +30,27 @@ export const BondHeader: React.FC<BondHeaderProps> = ({
   onReanalyze,
   isAnalyzing,
 }) => {
+  const tabs = [
+    { id: 'overview' as ActiveTab, label: '종합 개요 (Overview)', icon: Layers },
+    { id: 'raw_facts' as ActiveTab, label: '원문 사실 (Raw Facts)', icon: FileText, badge: '공시·주석', badgeColor: 'bg-indigo-100 text-indigo-700' },
+    { id: 'metrics' as ActiveTab, label: '정량 계산 지표 (Deterministic)', icon: Calculator, badge: '수식 검증', badgeColor: 'bg-emerald-100 text-emerald-700' },
+    { id: 'ai_insights' as ActiveTab, label: 'AI 분석 리포트 (LLM Insights)', icon: Sparkles, badge: '데모 AI', badgeColor: 'bg-violet-100 text-violet-700' },
+    { id: 'timeline' as ActiveTab, label: '위험 신호 & 타임라인 (Timeline)', icon: History },
+  ];
+
+  const moveTabFocus = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+      ? tabs.length - 1
+      : (index + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    const nextTab = tabs[nextIndex];
+    onTabChange(nextTab.id);
+    window.requestAnimationFrame(() => document.getElementById(`tab-btn-${nextTab.id}`)?.focus());
+  };
+
   const getRatingStyle = (rating: string) => {
     if (rating.startsWith('AA')) return 'bg-emerald-600 text-white';
     if (rating.startsWith('A')) return 'bg-blue-600 text-white';
@@ -149,35 +170,7 @@ export const BondHeader: React.FC<BondHeaderProps> = ({
 
         {/* Tab Navigation */}
         <nav role="tablist" aria-label="채권 분석 상세" className="flex items-center gap-1 mt-5 border-t border-slate-100 pt-3 overflow-x-auto scrollbar-none">
-          {[
-            { id: 'overview' as ActiveTab, label: '종합 개요 (Overview)', icon: Layers },
-            {
-              id: 'raw_facts' as ActiveTab,
-              label: '원문 사실 (Raw Facts)',
-              icon: FileText,
-              badge: '공시·주석',
-              badgeColor: 'bg-indigo-100 text-indigo-700',
-            },
-            {
-              id: 'metrics' as ActiveTab,
-              label: '정량 계산 지표 (Deterministic)',
-              icon: Calculator,
-              badge: '수식 검증',
-              badgeColor: 'bg-emerald-100 text-emerald-700',
-            },
-            {
-              id: 'ai_insights' as ActiveTab,
-              label: 'AI 분석 리포트 (LLM Insights)',
-              icon: Sparkles,
-              badge: 'Gemini',
-              badgeColor: 'bg-violet-100 text-violet-700',
-            },
-            {
-              id: 'timeline' as ActiveTab,
-              label: '위험 신호 & 타임라인 (Timeline)',
-              icon: History,
-            },
-          ].map((tab) => {
+          {tabs.map((tab, index) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
 
@@ -190,6 +183,7 @@ export const BondHeader: React.FC<BondHeaderProps> = ({
                 key={tab.id}
                 id={`tab-btn-${tab.id}`}
                 onClick={() => onTabChange(tab.id)}
+                onKeyDown={(event) => moveTabFocus(event, index)}
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-slate-900 text-white'
