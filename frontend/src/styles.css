@@ -941,7 +941,8 @@ input[aria-invalid="true"] { border-color: var(--color-error); }
 .form-message p { margin: 0; color: var(--color-error); }
 .form-message .success-message { color: var(--color-primary); }
 
-button {
+@layer base {
+:where(button) {
   min-height: 3rem;
   border: 1px solid var(--color-primary);
   border-radius: var(--radius-md);
@@ -951,14 +952,15 @@ button {
   cursor: pointer;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
-button:hover { border-color: var(--color-primary-dark); background: var(--color-primary-dark); }
-button:active { transform: scale(0.985); }
-button:disabled {
+:where(button:hover) { border-color: var(--color-primary-dark); background: var(--color-primary-dark); }
+:where(button:active) { transform: scale(0.985); }
+:where(button:disabled) {
   border-color: var(--color-line);
   background: var(--color-line);
   color: var(--color-muted);
   cursor: not-allowed;
   transform: none;
+}
 }
 
 /* Transparent and neutral controls must not inherit the solid button treatment. */

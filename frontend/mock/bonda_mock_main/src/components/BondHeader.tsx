@@ -134,20 +134,21 @@ export const BondHeader: React.FC<BondHeaderProps> = ({
 
             {/* Reanalyze AI Button */}
             <button
+              type="button"
               id="reanalyze-ai-btn"
               onClick={onReanalyze}
               disabled={isAnalyzing}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs shadow-sm hover:shadow-md transition-all active:scale-98 disabled:opacity-50 cursor-pointer"
-              title="최신 공시와 정량 지표를 바탕으로 Gemini AI 크레딧 리포트를 재작성합니다"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs transition-colors disabled:opacity-50 cursor-pointer"
+              title="데모 분석 화면 열기"
             >
               <RotateCw className={`w-3.5 h-3.5 ${isAnalyzing ? 'animate-spin' : ''}`} />
-              <span>{isAnalyzing ? 'AI 심층 추론중...' : 'AI 실시간 재분석'}</span>
+              <span>{isAnalyzing ? '데모 준비 중...' : 'AI 분석 보기'}</span>
             </button>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <nav className="flex items-center gap-1.5 mt-5 border-t border-slate-100 pt-3 overflow-x-auto scrollbar-none">
+        <nav role="tablist" aria-label="채권 분석 상세" className="flex items-center gap-1 mt-5 border-t border-slate-100 pt-3 overflow-x-auto scrollbar-none">
           {[
             { id: 'overview' as ActiveTab, label: '종합 개요 (Overview)', icon: Layers },
             {
@@ -182,12 +183,16 @@ export const BondHeader: React.FC<BondHeaderProps> = ({
 
             return (
               <button
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                tabIndex={isActive ? 0 : -1}
                 key={tab.id}
                 id={`tab-btn-${tab.id}`}
                 onClick={() => onTabChange(tab.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   isActive
-                    ? 'bg-slate-900 text-white shadow-xs'
+                    ? 'bg-slate-900 text-white'
                     : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >

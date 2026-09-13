@@ -23,7 +23,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
   const latestFact = bond.rawFacts.disclosures[0];
 
   return (
-    <div className="space-y-6">
+    <div className="bonda-view space-y-6">
       {/* Top Alert / Status Banner */}
       {topSignal && (
         <div
@@ -36,11 +36,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
           }`}
         >
           <div className="flex items-start gap-3">
-            <span className="text-xl mt-0.5">
-              {topSignal.type === 'alert' && '🔴'}
-              {topSignal.type === 'watch' && '🟡'}
-              {topSignal.type === 'positive' && '🟢'}
-            </span>
+            <AlertTriangle className={`w-5 h-5 mt-0.5 shrink-0 ${topSignal.type === 'positive' ? 'text-emerald-700' : topSignal.type === 'watch' ? 'text-amber-700' : 'text-rose-700'}`} />
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider">
@@ -79,7 +75,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
                 </span>
                 <div>
                   <h4 className="font-extrabold text-slate-900 text-sm">원문 사실 (Raw Facts)</h4>
-                  <span className="text-[10px] text-indigo-600 font-semibold">100% 팩트 보장</span>
+                  <span className="text-xs text-indigo-700 font-semibold">샘플 원문 데이터</span>
                 </div>
               </div>
               <span className="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded font-mono">
@@ -130,7 +126,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
                 </span>
                 <div>
                   <h4 className="font-extrabold text-slate-900 text-sm">정량 계산 지표</h4>
-                  <span className="text-[10px] text-emerald-600 font-semibold">오차 0% 확정치</span>
+                  <span className="text-xs text-emerald-700 font-semibold">수식 기반 샘플 계산</span>
                 </div>
               </div>
               <span className="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded font-mono">
@@ -202,7 +198,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
                 </span>
                 <div>
                   <h4 className="font-extrabold text-slate-900 text-sm">AI 분석 리포트</h4>
-                  <span className="text-[10px] text-violet-600 font-semibold">Gemini 심층추론</span>
+                  <span className="text-xs text-violet-700 font-semibold">AI 출력 예시</span>
                 </div>
               </div>
               <span className="text-[10px] bg-violet-50 text-violet-700 px-2 py-0.5 rounded font-mono">
@@ -256,7 +252,7 @@ export const OverviewView: React.FC<OverviewViewProps> = ({ bond, onNavigateTab 
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-slate-300">내 1,000만원 투자 시 예상 현금흐름</span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-emerald-400 font-semibold">
-              세후 실수령 기준
+              단순 예시 · 수수료 제외
             </span>
           </div>
 

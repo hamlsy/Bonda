@@ -66,7 +66,7 @@ export const AiInsightsView: React.FC<AiInsightsViewProps> = ({
   const VerdictIcon = style.icon;
 
   return (
-    <div className="space-y-6">
+    <div className="bonda-view space-y-6">
       {/* Domain Philosophy Card */}
       <div className="p-4 rounded-2xl bg-violet-50/70 border border-violet-200/80 flex items-start gap-3 text-xs">
         <div className="w-8 h-8 rounded-xl bg-violet-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -76,12 +76,12 @@ export const AiInsightsView: React.FC<AiInsightsViewProps> = ({
           <div className="font-bold text-violet-950 text-sm flex items-center gap-2">
             AI 분석 리포트 (LLM Insights) 검증 원칙
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-200/60 text-violet-800 font-semibold">
-              Gemini 3.8 AI 심층 추론
+              데모 AI 출력
             </span>
           </div>
           <p className="text-violet-900/80 mt-1 leading-relaxed">
-            원문 공시 사실(Raw Facts)과 정량 지표(Deterministic Metrics)를 교차 대조하여 숨겨진 우발채무,
-            단기 리파이낸싱 스트레스, 그룹 지원 가능성을 종합 분석한 개인투자자 맞춤형 인사이트입니다.
+            AI 결과가 배치될 영역의 샘플입니다. 실제 모델과 근거 데이터가 연결되기 전까지 투자 판단 자료로
+            사용할 수 없으며, 원문 사실과 정량 지표를 먼저 확인해야 합니다.
           </p>
         </div>
       </div>
@@ -183,7 +183,7 @@ export const AiInsightsView: React.FC<AiInsightsViewProps> = ({
       <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-xs">
         <h4 className="text-base font-bold text-white mb-3 flex items-center gap-2">
           <CheckCircle className="w-5 h-5 text-emerald-400" />
-          개인투자자 실전 대응 가이드 (Retail Action Rules)
+          검토 체크리스트 (샘플)
         </h4>
 
         <div className="space-y-2.5 text-xs sm:text-sm">
@@ -205,10 +205,10 @@ export const AiInsightsView: React.FC<AiInsightsViewProps> = ({
       <div className="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-3">
         <div className="flex items-center gap-2 text-slate-900">
           <Sparkles className="w-4 h-4 text-violet-600" />
-          <h4 className="text-sm font-bold">채권 전문 AI에게 추가 질문하기</h4>
+          <h4 className="text-sm font-bold">AI 질문 흐름 미리보기</h4>
         </div>
         <p className="text-xs text-slate-500">
-          아래 추천 질문을 누르거나, 개인적으로 궁금한 우발채무나 상환 리스크를 직접 질문해보세요.
+          현재는 질문 접수 동작만 확인할 수 있습니다. 실제 응답 생성 기능은 연결 예정입니다.
         </p>
 
         {/* Preset Question Chips */}

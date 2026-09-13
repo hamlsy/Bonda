@@ -55,7 +55,7 @@ export const RiskSignalsTimelineView: React.FC<RiskSignalsTimelineViewProps> = (
   };
 
   return (
-    <div className="space-y-8">
+    <div className="bonda-view space-y-8">
       {/* 1. Active Risk Signals Card */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">

@@ -9,7 +9,6 @@ import {
   TrendingDown,
   TrendingUp,
   Clock,
-  Flame,
   FileText,
   Calculator,
   Sparkles,
@@ -82,8 +81,8 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
       <div className="p-4 border-b border-slate-100 bg-slate-50/50">
         <div className="flex items-center justify-between mb-2.5">
           <span className="text-xs font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-            <Flame className="w-4 h-4 text-indigo-600" />
-            <span>실시간 감시 채권 리스트</span>
+            <Shield className="w-4 h-4 text-indigo-600" />
+            <span>관심 채권</span>
           </span>
           <span className="text-xs text-slate-500 font-medium">총 {bonds.length}종목</span>
         </div>
@@ -92,14 +91,16 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-xs">
           {[
             { id: 'all', label: '전체' },
-            { id: 'signals', label: '🚨 위험신호' },
-            { id: 'high_yield', label: '🚀 BBB급 고수익' },
-            { id: 'investment', label: '💎 AA급 우량' },
-            { id: 'short_term', label: '⏱️ 만기 1년내' },
+            { id: 'signals', label: '위험 신호' },
+            { id: 'high_yield', label: 'BBB급' },
+            { id: 'investment', label: 'AA급' },
+            { id: 'short_term', label: '만기 1년 이내' },
           ].map((cat) => (
             <button
+              type="button"
               key={cat.id}
               onClick={() => onFilterChange(cat.id)}
+              aria-pressed={filterCategory === cat.id}
               className={`px-2.5 py-1.5 rounded-lg whitespace-nowrap font-medium transition-all cursor-pointer ${
                 filterCategory === cat.id
                   ? 'bg-indigo-600 text-white shadow-xs'
@@ -119,13 +120,15 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
           const topSignal = bond.riskSignals[0];
 
           return (
-            <div
+            <button
+              type="button"
               key={bond.id}
               id={`bond-card-${bond.id}`}
               onClick={() => onSelectBond(bond.id)}
-              className={`p-3.5 rounded-xl transition-all cursor-pointer border ${
+              aria-pressed={isSelected}
+              className={`w-full text-left p-3.5 rounded-lg transition-colors cursor-pointer border ${
                 isSelected
-                  ? 'bg-indigo-50/70 border-indigo-500 shadow-xs ring-1 ring-indigo-500/20'
+                  ? 'bg-indigo-50/60 border-indigo-400'
                   : 'bg-white hover:bg-slate-50 border-transparent hover:border-slate-200'
               }`}
             >
@@ -200,11 +203,7 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
                       : 'bg-emerald-50/80 text-emerald-900 border border-emerald-200/60'
                   }`}
                 >
-                  <span className="shrink-0 mt-0.5">
-                    {topSignal.type === 'alert' && '🔴'}
-                    {topSignal.type === 'watch' && '🟡'}
-                    {topSignal.type === 'positive' && '🟢'}
-                  </span>
+                  <AlertTriangle className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${topSignal.type === 'positive' ? 'text-emerald-600' : topSignal.type === 'watch' ? 'text-amber-600' : 'text-rose-600'}`} />
                   <div className="line-clamp-1 font-medium">{topSignal.title}</div>
                 </div>
               )}
@@ -230,7 +229,7 @@ export const BondListSidebar: React.FC<BondListSidebarProps> = ({
                   <ArrowUpRight className="w-3 h-3" />
                 </span>
               </div>
-            </div>
+            </button>
           );
         })}
 

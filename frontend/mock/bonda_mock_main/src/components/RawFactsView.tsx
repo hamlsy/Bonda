@@ -28,7 +28,7 @@ export const RawFactsView: React.FC<RawFactsViewProps> = ({ rawFacts, issuerName
   };
 
   return (
-    <div className="space-y-6">
+    <div className="bonda-view space-y-6">
       {/* Domain Philosophy Card */}
       <div className="p-4 rounded-2xl bg-indigo-50/70 border border-indigo-200/80 flex items-start gap-3 text-xs">
         <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-xs">
@@ -38,12 +38,12 @@ export const RawFactsView: React.FC<RawFactsViewProps> = ({ rawFacts, issuerName
           <div className="font-bold text-indigo-950 text-sm flex items-center gap-2">
             원문 사실 (Raw Facts) 검증 원칙
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-200/60 text-indigo-800 font-semibold">
-              100% 팩트 보장 · 왜곡 배제
+              데모 원문 · 실제 연동 전
             </span>
           </div>
           <p className="text-indigo-900/80 mt-1 leading-relaxed">
-            금융감독원 전자공시시스템(DART), 공인회계사 감사보고서 주석, 국내 신용평가 3사(한기평·한신평·NICE)
-            공식 본평가서의 원문 문장을 일체의 자의적 해석 없이 인용합니다.
+            원문과 해석을 구분하는 화면 예시입니다. 현재 인용문과 출처 정보는 UI 검증용 샘플이며 실제 DART
+            문서와 대조되지 않았습니다.
           </p>
         </div>
       </div>
@@ -116,9 +116,9 @@ export const RawFactsView: React.FC<RawFactsViewProps> = ({ rawFacts, issuerName
               <div className="mt-3 flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-100">
                 <span className="flex items-center gap-1 text-indigo-600 font-medium">
                   <CheckCircle className="w-3 h-3 text-emerald-500" />
-                  공시 검증 완료 (불변 팩트)
+                  샘플 원문 표시
                 </span>
-                <span className="text-slate-400">DART 공시 시스템 실시간 연계</span>
+                <span className="text-slate-500">실제 공시 연동 예정</span>
               </div>
             </div>
           ))}

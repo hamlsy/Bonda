@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { CorporateBond, ActiveTab } from './types';
 import { MOCK_BONDS } from './data/mockBonds';
 import { Navbar } from './components/Navbar';
@@ -24,26 +24,13 @@ export default function App() {
   const [isSimulatorOpen, setIsSimulatorOpen] = useState(false);
   const [isLegendOpen, setIsLegendOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [hasGeminiKey, setHasGeminiKey] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  // Check backend health & Gemini key status
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.hasGeminiKey) {
-          setHasGeminiKey(true);
-        }
-      })
-      .catch(() => {
-        // Fallback gracefully
-      });
-  }, []);
+  const toastTimerRef = useRef<number | null>(null);
 
   const showToast = (msg: string) => {
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3500);
+    toastTimerRef.current = window.setTimeout(() => setToastMessage(null), 3500);
   };
 
   // Filtered bonds based on search and category
@@ -84,99 +71,23 @@ export default function App() {
     return bonds.find((b) => b.id === selectedBondId) || bonds[0];
   }, [bonds, selectedBondId]);
 
-  // Re-run AI analysis
+  // Demo-only interaction until a verified analysis API is connected.
   const handleReanalyze = async () => {
     if (!selectedBond) return;
     setIsAnalyzing(true);
-
-    try {
-      const response = await fetch('/api/gemini/analyze-bond', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bondName: selectedBond.name,
-          issuer: selectedBond.issuer,
-          rating: selectedBond.rating,
-          outlook: selectedBond.outlook,
-          metrics: selectedBond.deterministicMetrics,
-          rawFacts: selectedBond.rawFacts,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.analysis) {
-        setBonds((prev) =>
-          prev.map((b) =>
-            b.id === selectedBond.id
-              ? {
-                  ...b,
-                  aiInsights: {
-                    ...b.aiInsights,
-                    ...data.analysis,
-                    isCustomGenerated: true,
-                  },
-                }
-              : b
-          )
-        );
-        showToast(`Gemini AI 분석이 완료되었습니다. (${selectedBond.name})`);
-        setActiveTab('ai_insights');
-      } else {
-        showToast('AI 분석 리포트를 갱신하였습니다.');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('AI 분석 리포트를 갱신하였습니다.');
-    } finally {
-      setIsAnalyzing(false);
-    }
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
+    setActiveTab('ai_insights');
+    showToast(`${selectedBond.name}의 데모 분석 화면을 열었습니다. 서버에는 저장되지 않습니다.`);
+    setIsAnalyzing(false);
   };
 
-  // Ask custom question to AI
+  // Preserve the planned interaction without claiming a server-generated answer.
   const handleAskCustomQuestion = async (question: string) => {
     if (!selectedBond) return;
     setIsAnalyzing(true);
-
-    try {
-      const response = await fetch('/api/gemini/analyze-bond', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          bondName: selectedBond.name,
-          issuer: selectedBond.issuer,
-          rating: selectedBond.rating,
-          outlook: selectedBond.outlook,
-          metrics: selectedBond.deterministicMetrics,
-          rawFacts: selectedBond.rawFacts,
-          customQuery: question,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success && data.analysis) {
-        setBonds((prev) =>
-          prev.map((b) =>
-            b.id === selectedBond.id
-              ? {
-                  ...b,
-                  aiInsights: {
-                    ...b.aiInsights,
-                    ...data.analysis,
-                    summary: `[질의: "${question}"] ${data.analysis.summary}`,
-                    isCustomGenerated: true,
-                  },
-                }
-              : b
-          )
-        );
-        showToast('질문에 대한 AI 크레딧 분석이 반영되었습니다.');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('분석 응답을 불러왔습니다.');
-    } finally {
-      setIsAnalyzing(false);
-    }
+    await new Promise((resolve) => window.setTimeout(resolve, 500));
+    showToast(`“${question}” 질문이 데모로 접수되었습니다. 실제 AI 연결은 개발 예정입니다.`);
+    setIsAnalyzing(false);
   };
 
   // Add custom bond
@@ -184,14 +95,14 @@ export default function App() {
     setBonds((prev) => [newBond, ...prev]);
     setSelectedBondId(newBond.id);
     setActiveTab('overview');
-    showToast(`새 채권 [${newBond.name}] 신용 진단이 추가되었습니다.`);
+    showToast(`${newBond.name} 데모 진단을 추가했습니다. 새로고침하면 초기화됩니다.`);
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 antialiased">
+    <div className="bonda-product min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 antialiased">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-5 right-5 z-50 px-4 py-3 bg-slate-900 text-white text-xs font-semibold rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
+        <div role="status" aria-live="polite" className="fixed bottom-5 right-5 z-50 max-w-[calc(100vw-2rem)] px-4 py-3 bg-slate-900 text-white text-xs font-semibold rounded-lg shadow-xl border border-slate-800 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400" />
           <span>{toastMessage}</span>
         </div>
@@ -203,7 +114,6 @@ export default function App() {
         onSearchChange={setSearchQuery}
         onOpenSimulator={() => setIsSimulatorOpen(true)}
         onOpenLegend={() => setIsLegendOpen(true)}
-        hasGeminiKey={hasGeminiKey}
         totalBondsCount={bonds.length}
       />
 
@@ -239,7 +149,7 @@ export default function App() {
           />
 
           {/* Tab Content View */}
-          <div className="p-4 sm:p-6 flex-1">
+          <div role="tabpanel" aria-labelledby={`tab-btn-${activeTab}`} className="p-4 sm:p-6 flex-1">
             {activeTab === 'overview' && (
               <OverviewView bond={selectedBond} onNavigateTab={setActiveTab} />
             )}

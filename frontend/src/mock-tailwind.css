@@ -3,3 +3,111 @@
 @source "../mock/bonda_mock_onboarding/src";
 @source "../mock/bonda_mock_main/src";
 
+/* /monitoring: mock fidelity with a restrained, production-oriented finish. */
+.bonda-product {
+  --bonda-ink: #172033;
+  --bonda-muted: #667085;
+  --bonda-canvas: #f4f6f8;
+  --bonda-surface: #ffffff;
+  --bonda-line: #d9dee8;
+  --bonda-primary: #4057d6;
+  min-width: 320px;
+  max-width: 100vw;
+  overflow-x: clip;
+  background: var(--bonda-canvas);
+  color: var(--bonda-ink);
+}
+
+.bonda-product main {
+  width: 100%;
+  max-width: 1440px;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.bonda-product button,
+.bonda-product input,
+.bonda-product select,
+.bonda-product textarea {
+  min-height: 2.5rem;
+}
+
+.bonda-product button:focus-visible,
+.bonda-product input:focus-visible,
+.bonda-product select:focus-visible,
+.bonda-product textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--bonda-primary) 28%, transparent);
+  outline-offset: 2px;
+}
+
+.bonda-product [class*="text-[10px]"],
+.bonda-product [class*="text-[11px]"] {
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.bonda-view [class*="rounded-2xl"],
+.bonda-view [class*="rounded-3xl"] {
+  border-radius: 0.625rem;
+}
+
+.bonda-view [class*="shadow-"] {
+  box-shadow: none;
+}
+
+.bonda-view [class*="bg-gradient"] {
+  background-image: none;
+}
+
+.bonda-navbar {
+  box-shadow: none;
+}
+
+.bonda-dialog {
+  width: calc(100% - 2rem);
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--bonda-ink);
+}
+
+.bonda-dialog::backdrop {
+  background: rgba(15, 23, 42, 0.58);
+}
+
+@media (max-width: 767px) {
+  .bonda-product main > aside {
+    max-height: 31rem;
+    border-right: 0;
+    border-bottom: 1px solid var(--bonda-line);
+  }
+
+  .bonda-product main > section {
+    overflow: visible;
+  }
+
+  .bonda-product nav[role="tablist"] {
+    max-width: calc(100vw - 2rem);
+    padding-bottom: 0.35rem;
+  }
+
+  .bonda-dialog {
+    width: calc(100% - 1rem);
+    max-height: calc(100dvh - 1rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bonda-product *,
+  .bonda-product *::before,
+  .bonda-product *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
