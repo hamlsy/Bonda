@@ -78,6 +78,14 @@ export function createWatchlist(bondId: number) {
   });
 }
 
+export function deleteHolding(holdingId: number) {
+  return request<void>(`/api/holdings/${holdingId}`, { method: "DELETE" });
+}
+
+export function deleteWatchlist(watchlistId: number) {
+  return request<void>(`/api/watchlist/${watchlistId}`, { method: "DELETE" });
+}
+
 export function getSinceBought(holdingId: number, signal?: AbortSignal) {
   return request<SinceBoughtResponse>(`/api/holdings/${holdingId}/since-bought`, { signal });
 }

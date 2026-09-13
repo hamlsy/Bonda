@@ -131,6 +131,24 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 My Bonds 화면은 변화가 있는 Holding과 unread Alert를 먼저 보여주며, Holding별 Since I Bought 또는 Risk Event Evidence로 명확히 이동한다. Holding/Watchlist 등록과 Since I Bought의 현재 Risk State, 날짜순 Timeline, 원문 Evidence, 보수적인 변화 설명, 재무 기준점 비교를 mobile-first로 유지한다.
 
+### Frontend-first capability status
+
+UI는 `/` 온보딩과 `/monitoring` 작업공간으로 나눈다. 현재 API가 있는 기능은 실제 데이터와 연결하고, 아직 서버 계약이 없는 기능은 `데모` 또는 `연동 준비 중`으로 명시한다. 미연동 기능은 결제·인증·저장·외부 발송이 완료된 것처럼 표시하지 않는다.
+
+| 기능 | 현재 frontend | 필요한 후속 backend |
+|---|---|---|
+| 보유·관심 채권, 알림, 매수 이후, 원문, 과거 재현 | 실제 API 연동 | 기존 계약 유지 |
+| 보유·관심 채권 삭제 | 확인 dialog 후 실제 API 연동 | 기존 DELETE 계약 유지 |
+| 채권 검색·등급·만기·위험 필터 | client-side | query, sort, paging가 포함된 검색 API |
+| 로그인·사용자 메뉴 | session 내 UI demo | 사용자 domain, OAuth, session, 포트폴리오 소유권 |
+| 알림 조건·카카오·이메일 | 설정·메시지 preview | 연락처 인증, preference, delivery adapter와 이력 |
+| 요금제·결제 | 가격 비교 UI demo | 상품 정책, 구독 lifecycle, 결제·해지·환불 |
+| 직접 채권 진단 | 입력과 결과 상태 demo | 채권 식별, 공시 ingestion, analysis run, candidate validation |
+| 재분석·추가 질문 | pending/result/failure UI demo | 비용·rate limit가 있는 분석 endpoint와 근거 제한 |
+| 시장가격·YTM·상세 비율 | 데이터 미연동 상태 표시 | 시장 데이터와 정규화된 재무 metric API |
+
+인증, 외부 알림, 결제는 MVP 제외 범위를 유지하며 각 domain/API 계약이 승인된 뒤에만 실제 side effect를 연결한다.
+
 ## 제외 범위
 
 Push/Email/SMS, Evaluation Dashboard와 AI 추천 화면은 구현하지 않는다.

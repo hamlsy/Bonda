@@ -231,7 +231,7 @@ export default function SinceBoughtPage() {
 
   return (
     <div className="app-shell since-shell">
-      <AppHeader backLabel="내 채권으로" />
+      <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
 
       <main>
         {pageState === "loading" && (
@@ -244,14 +244,14 @@ export default function SinceBoughtPage() {
           <section className="state-panel error-panel" role="alert">
             <div><h1 className="state-title">변화 기록을 불러오지 못했습니다</h1><p>연결 상태를 확인한 뒤 다시 시도해 주세요.</p></div>
             <button type="button" className="secondary-button" onClick={() => setRetryKey((value) => value + 1)}>다시 불러오기</button>
-            <Link className="text-link" to="/">내 채권으로 돌아가기</Link>
+            <Link className="text-link" to="/monitoring">내 채권으로 돌아가기</Link>
           </section>
         )}
         {pageState === "ready" && data && (
           <>
             <section className="since-hero" aria-labelledby="since-title">
               <div className="since-hero-copy">
-                <p className="eyebrow">SINCE I BOUGHT</p>
+                <p className="eyebrow">매수 이후 변화</p>
                 <p className="since-issuer">{data.holding.issuerName}</p>
                 <h1 id="since-title">{data.holding.bondName}</h1>
                 <p className="since-question">내가 산 뒤, 회사에 무엇이 달라졌을까요?</p>
@@ -271,7 +271,7 @@ export default function SinceBoughtPage() {
 
             <section className="risk-state-section" aria-labelledby="current-state-title">
               <div className="section-heading compact-heading">
-                <div><p className="section-label">CURRENT STATE</p><h2 id="current-state-title">현재 확인 상태</h2></div>
+                <div><p className="section-label">정책 계산 결과</p><h2 id="current-state-title">현재 확인 상태</h2></div>
                 {data.currentRiskState && <p>{formatDate(data.currentRiskState.snapshotDate)} 기준</p>}
               </div>
               {data.currentRiskState ? (
@@ -287,7 +287,7 @@ export default function SinceBoughtPage() {
             <div className="since-layout">
               <section className="timeline-section" aria-labelledby="timeline-title">
                 <div className="section-heading compact-heading">
-                  <div><p className="section-label">CHANGE TIMELINE</p><h2 id="timeline-title">Since I Bought</h2></div>
+                  <div><p className="section-label">날짜순 검증 기록</p><h2 id="timeline-title">매수 이후 변화</h2></div>
                   <p>매수일부터 날짜순</p>
                 </div>
                 <Timeline items={data.timeline} />
@@ -295,7 +295,7 @@ export default function SinceBoughtPage() {
 
               <aside className="since-aside">
                 <section className="explanation-section" aria-labelledby="explanation-title">
-                  <p className="section-label">BONDA INTERPRETATION</p>
+                  <p className="section-label">참고 해석</p>
                   <h2 id="explanation-title">Bonda의 해석</h2>
                   {data.explanation.status === "AVAILABLE" && <p className="explanation-copy">{data.explanation.summary}</p>}
                   {data.explanation.status === "NOT_NEEDED" && <p className="muted-copy">설명할 새로운 변화가 아직 없습니다.</p>}
@@ -304,7 +304,7 @@ export default function SinceBoughtPage() {
                 </section>
 
                 <section className="financial-section" aria-labelledby="financial-title">
-                  <p className="section-label">FINANCIAL CHANGE</p>
+                  <p className="section-label">계산된 변화</p>
                   <h2 id="financial-title">재무 기준점 비교</h2>
                   {data.financialContext.baseline && data.financialContext.current && (
                     <p className="period-comparison">{data.financialContext.baseline.period} → {data.financialContext.current.period}</p>
@@ -317,7 +317,7 @@ export default function SinceBoughtPage() {
         )}
       </main>
       <MobileNav />
-      <footer><p>Bonda monitors change. Decisions remain yours.</p></footer>
+      <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
   );
 }

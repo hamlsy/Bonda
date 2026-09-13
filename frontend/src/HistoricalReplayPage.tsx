@@ -98,10 +98,10 @@ export default function HistoricalReplayPage() {
 
   return (
     <div className="app-shell replay-shell">
-      <AppHeader backLabel="내 채권으로" />
+      <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
         <section className="page-intro replay-intro">
-          <p className="eyebrow">HISTORICAL REPLAY</p>
+          <p className="eyebrow">과거 시점 재현</p>
           <h1>그때까지 알 수 있던 것만 봅니다.</h1>
           <p>기준일 이후 공개된 공시와 재무정보를 제외하고 당시 Risk State를 다시 계산합니다.</p>
         </section>
@@ -128,7 +128,7 @@ export default function HistoricalReplayPage() {
         {result && (
           <section className="replay-result" aria-labelledby="replay-result-title">
             <div className="replay-summary">
-              <div><p className="section-label">AS OF {result.cutoffDate}</p><h2 id="replay-result-title">{result.issuer.name}</h2></div>
+              <div><p className="section-label">{result.cutoffDate} 기준</p><h2 id="replay-result-title">{result.issuer.name}</h2></div>
               <div className={`replay-overall state-${result.riskSnapshot.overall.toLowerCase()}`}><span>당시 종합 상태</span><strong>{stateLabels[result.riskSnapshot.overall]}</strong></div>
             </div>
             <p className="replay-source-count">공시 Version {result.disclosuresUsed.length}개 · 검증 Event {result.riskEvents.length}개 · 재무 {result.financialSnapshot?.period ?? "없음"}</p>
@@ -137,7 +137,7 @@ export default function HistoricalReplayPage() {
                 <div key={category}><dt>{categoryLabels[category]}</dt><dd>{stateLabels[result.riskSnapshot[category]]}</dd></div>
               ))}
             </dl>
-            <div className="section-heading replay-timeline-heading"><div><p className="section-label">AVAILABLE THEN</p><h2>당시 Timeline</h2></div></div>
+            <div className="section-heading replay-timeline-heading"><div><p className="section-label">당시 공개된 정보</p><h2>그때의 변화 기록</h2></div></div>
             {result.timeline.length === 0 ? (
               <div className="quiet-empty"><p>기준일까지 사용할 수 있었던 공시·재무 변화가 없습니다.</p></div>
             ) : (
@@ -155,7 +155,7 @@ export default function HistoricalReplayPage() {
         )}
       </main>
       <MobileNav />
-      <footer><p>Bonda monitors change. Decisions remain yours.</p></footer>
+      <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
   );
 }

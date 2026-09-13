@@ -1,9 +1,11 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
-import { Link, Navigate, Route, Routes } from "react-router-dom";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Link, Route, Routes, useSearchParams } from "react-router-dom";
 import {
   ApiError,
   createHolding,
   createWatchlist,
+  deleteHolding,
+  deleteWatchlist,
   getAlerts,
   getBonds,
   getMyBonds,
@@ -13,6 +15,10 @@ import {
 import RiskEventPage from "./RiskEventPage";
 import SinceBoughtPage from "./SinceBoughtPage";
 import HistoricalReplayPage from "./HistoricalReplayPage";
+import LandingPage from "./LandingPage";
+import NotFoundPage from "./NotFoundPage";
+import DemoMonitoring from "./DemoMonitoring";
+import { Dialog, Toast } from "./Dialogs";
 import { AppHeader, MobileNav } from "./Navigation";
 import type { AlertItem, Bond, MyBondSummary, RiskState, WatchlistEntry } from "./types";
 
@@ -23,6 +29,9 @@ type PortfolioFailure = {
   kind: PortfolioFailureKind;
   consecutiveCount: number;
 };
+
+type WorkspaceTab = "overview" | "facts" | "metrics" | "insight" | "timeline";
+type WorkspaceFilter = "all" | "signals" | "investment" | "short";
 
 type PortfolioSnapshot = {
   bonds: Bond[];
@@ -124,7 +133,7 @@ function getLocalToday() {
 function alertTarget(alert: AlertItem) {
   if (alert.targetType === "RISK_EVENT") return `/risk-events/${alert.targetId}`;
   if (alert.targetType === "SINCE_BOUGHT") return `/holdings/${alert.targetId}/since-bought`;
-  return "/#watchlist";
+  return "/monitoring#watchlist";
 }
 
 function classifyPortfolioFailure(error: unknown): PortfolioFailureKind {
@@ -134,6 +143,7 @@ function classifyPortfolioFailure(error: unknown): PortfolioFailureKind {
 }
 
 function PortfolioPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [initialSnapshot] = useState(readPortfolioSnapshot);
   const [bonds, setBonds] = useState<Bond[]>(() => initialSnapshot?.bonds ?? []);
   const [myBonds, setMyBonds] = useState<MyBondSummary[]>(() => initialSnapshot?.myBonds ?? []);
@@ -155,6 +165,20 @@ function PortfolioPage() {
   const [watchError, setWatchError] = useState("");
   const [watchNotice, setWatchNotice] = useState("");
   const [watchPending, setWatchPending] = useState(false);
+  const [workspaceTab, setWorkspaceTab] = useState<WorkspaceTab>("overview");
+  const [selectedHoldingId, setSelectedHoldingId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get("q") ?? "");
+  const [workspaceFilter, setWorkspaceFilter] = useState<WorkspaceFilter>(() => (searchParams.get("filter") as WorkspaceFilter) || "all");
+  const [workspaceDialog, setWorkspaceDialog] = useState<"framework" | "diagnosis" | null>(null);
+  const [analysisPending, setAnalysisPending] = useState(false);
+  const [analysisNotice, setAnalysisNotice] = useState("");
+  const [demoMode, setDemoMode] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: "holding" | "watchlist"; id: number; name: string } | null>(null);
+  const [deletePending, setDeletePending] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [question, setQuestion] = useState("");
+  const [questionResult, setQuestionResult] = useState("");
+  const searchRef = useRef<HTMLInputElement>(null);
   const holdingBondRef = useRef<HTMLSelectElement>(null);
   const purchaseDateRef = useRef<HTMLInputElement>(null);
   const purchaseAmountRef = useRef<HTMLInputElement>(null);
@@ -202,6 +226,13 @@ function PortfolioPage() {
     document.title = "내 채권 | Bonda";
     void loadPortfolio(undefined, "initial");
   }, []);
+
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (searchQuery) next.set("q", searchQuery); else next.delete("q");
+    if (workspaceFilter !== "all") next.set("filter", workspaceFilter); else next.delete("filter");
+    if (next.toString() !== searchParams.toString()) setSearchParams(next, { replace: true });
+  }, [searchQuery, workspaceFilter, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!lastSuccessfulAt) return;
@@ -307,6 +338,41 @@ function PortfolioPage() {
     }
   }
 
+  function runDemoAnalysis() {
+    if (analysisPending) return;
+    setAnalysisPending(true);
+    setAnalysisNotice("");
+    window.setTimeout(() => {
+      setAnalysisPending(false);
+      setAnalysisNotice("재분석 실행 화면을 체험했습니다. 위험 상태와 저장 데이터는 변경되지 않았습니다.");
+      setWorkspaceTab("insight");
+    }, 900);
+  }
+
+  function askDemoQuestion(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!question.trim()) return;
+    setQuestionResult("예시 응답: 현재 API에는 추가 질의 기능이 없습니다. 실제 연동 시 검증된 원문과 계산 결과만 입력으로 사용합니다.");
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget || deletePending) return;
+    setDeletePending(true);
+    setDeleteError("");
+    try {
+      if (deleteTarget.type === "holding") await deleteHolding(deleteTarget.id);
+      else await deleteWatchlist(deleteTarget.id);
+      const removedName = deleteTarget.name;
+      setDeleteTarget(null);
+      await loadPortfolio();
+      setAnalysisNotice(`${removedName}을(를) 목록에서 삭제했습니다.`);
+    } catch {
+      setDeleteError("삭제하지 못했습니다. 연결 상태를 확인한 뒤 다시 시도해 주세요.");
+    } finally {
+      setDeletePending(false);
+    }
+  }
+
   const watchedBondIds = new Set(watchlist.map((entry) => entry.bond.id));
   const unreadCount = alerts.filter((alert) => !alert.isRead).length;
   const attentionCount = myBonds.filter((holding) => holding.currentRiskState && holding.currentRiskState.overall !== "NORMAL").length;
@@ -315,6 +381,18 @@ function PortfolioPage() {
   const hasSnapshot = lastSuccessfulAt !== null;
   const isPortfolioEmpty = hasSnapshot && myBonds.length === 0 && watchlist.length === 0;
   const hasPortfolioContent = hasSnapshot && !isPortfolioEmpty;
+  const filteredHoldings = useMemo(() => myBonds.filter((holding) => {
+    const bond = bonds.find((item) => item.id === holding.bondId);
+    const query = searchQuery.trim().toLocaleLowerCase("ko-KR");
+    const matchesQuery = !query || [holding.bondName, holding.issuerName, bond?.creditRating ?? ""].some((value) => value.toLocaleLowerCase("ko-KR").includes(query));
+    if (!matchesQuery) return false;
+    if (workspaceFilter === "signals") return Boolean(holding.currentRiskState && holding.currentRiskState.overall !== "NORMAL") || holding.unreadAlertCount > 0;
+    if (workspaceFilter === "investment") return Boolean(bond?.creditRating.match(/^(AAA|AA|A|BBB)/));
+    if (workspaceFilter === "short") return Boolean(bond && new Date(bond.maturityDate).getTime() - Date.now() <= 365 * 24 * 60 * 60 * 1000);
+    return true;
+  }), [myBonds, bonds, searchQuery, workspaceFilter]);
+  const selectedHolding = filteredHoldings.find((holding) => holding.holdingId === selectedHoldingId) ?? filteredHoldings[0] ?? null;
+  const selectedBond = selectedHolding ? bonds.find((bond) => bond.id === selectedHolding.bondId) ?? null : null;
   const failureKind = portfolioFailure?.kind ?? "temporary";
   const repeatedFailure = (portfolioFailure?.consecutiveCount ?? 0) > 1;
   const recoveryLabel = failureKind === "connection" ? "연결 상태 확인" : "다시 시도";
@@ -381,10 +459,7 @@ function PortfolioPage() {
               <a className="primary-cta" href={overviewAction.href}>{overviewAction.label}<span aria-hidden="true">→</span></a>
             )}
             {pageState === "error" && (
-              <button type="button" className="recovery-button" onClick={() => void loadPortfolio(undefined, "recovery")} disabled={recoveryPending} aria-busy={recoveryPending}>
-                {recoveryPending && <span className="spinner" aria-hidden="true" />}
-                <span>{recoveryPending ? recoveryPendingLabel : recoveryLabel}</span>
-              </button>
+              <div className="error-actions"><button type="button" className="recovery-button" onClick={() => void loadPortfolio(undefined, "recovery")} disabled={recoveryPending} aria-busy={recoveryPending}>{recoveryPending && <span className="spinner" aria-hidden="true" />}<span>{recoveryPending ? recoveryPendingLabel : recoveryLabel}</span></button><button type="button" className="secondary-button" onClick={() => setDemoMode(true)}>데모 데이터로 화면 보기</button></div>
             )}
           </div>
           {hasPortfolioContent && (
@@ -402,6 +477,7 @@ function PortfolioPage() {
         {pageState === "initial-loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true"><span className="spinner" aria-hidden="true" /><p>보유 채권의 변화를 확인하고 있습니다.</p></section>
         )}
+        {demoMode && pageState === "error" && <DemoMonitoring />}
         {pageState === "stale" && portfolioFailure && lastSuccessfulAt && (
           <section className="portfolio-status-banner" role="status" aria-live="polite">
             <div>
@@ -417,6 +493,45 @@ function PortfolioPage() {
         )}
         {hasSnapshot && (
           <>
+            {!isPortfolioEmpty && (
+              <section className="credit-workspace" aria-labelledby="workspace-title">
+                <header className="workspace-toolbar">
+                  <div><p className="context-label"><span />신용 변화 작업공간</p><h2 id="workspace-title">내 채권 리포트</h2></div>
+                  <div className="workspace-tools">
+                    <label className="workspace-search" htmlFor="workspace-search"><span className="sr-only">채권 검색</span><input ref={searchRef} id="workspace-search" type="search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="채권명, 발행사, 등급 검색" />{searchQuery && <button type="button" onClick={() => { setSearchQuery(""); searchRef.current?.focus(); }} aria-label="검색어 지우기">×</button>}</label>
+                    <button type="button" className="secondary-button" onClick={() => setWorkspaceDialog("diagnosis")}>새 채권 진단</button>
+                    <button type="button" className="icon-button" onClick={() => setWorkspaceDialog("framework")} aria-label="분석 구조 설명">?</button>
+                  </div>
+                </header>
+                <div className="workspace-filter" aria-label="채권 필터">{([
+                  ["all", "전체"], ["signals", "변화 있음"], ["investment", "투자등급"], ["short", "1년 이내 만기"],
+                ] as Array<[WorkspaceFilter, string]>).map(([value, label]) => <button key={value} type="button" aria-pressed={workspaceFilter === value} onClick={() => setWorkspaceFilter(value)}>{label}</button>)}</div>
+                <div className="workspace-frame">
+                  <aside className="workspace-sidebar" aria-label="보유 채권 선택">
+                    <div className="workspace-sidebar-heading"><strong>보유 채권</strong><span>{filteredHoldings.length}건</span></div>
+                    {filteredHoldings.length === 0 ? <div className="workspace-no-results"><p>검색 조건에 맞는 채권이 없습니다.</p><button type="button" onClick={() => { setSearchQuery(""); setWorkspaceFilter("all"); }}>조건 초기화</button></div> : filteredHoldings.map((holding) => {
+                      const bond = bonds.find((item) => item.id === holding.bondId);
+                      return <button className="workspace-bond" type="button" key={holding.holdingId} aria-pressed={selectedHolding?.holdingId === holding.holdingId} onClick={() => setSelectedHoldingId(holding.holdingId)}><span><small>{holding.issuerName}</small><strong>{holding.bondName}</strong><em>{bond?.creditRating ?? "등급 없음"} · {holding.unreadAlertCount > 0 ? `새 변화 ${holding.unreadAlertCount}` : "새 변화 없음"}</em></span>{holding.currentRiskState ? <span className={`state-tag state-${holding.currentRiskState.overall.toLowerCase()}`}>{stateLabels[holding.currentRiskState.overall]}</span> : <span className="state-missing">계산 전</span>}</button>;
+                    })}
+                  </aside>
+                  <div className="workspace-detail">
+                    {selectedHolding && selectedBond ? <>
+                      <header className="bond-detail-header"><div><p>{selectedHolding.issuerName}</p><h3>{selectedHolding.bondName}</h3><div className="bond-meta"><span>{selectedBond.creditRating}</span><span>만기 {formatDate(selectedBond.maturityDate)}</span><span>표면금리 {selectedBond.couponRate.toFixed(3)}%</span></div></div><div className="bond-header-actions">{selectedHolding.currentRiskState && <span className={`state-tag state-${selectedHolding.currentRiskState.overall.toLowerCase()}`}>{stateLabels[selectedHolding.currentRiskState.overall]}</span>}<button type="button" className="secondary-button" onClick={runDemoAnalysis} disabled={analysisPending} aria-busy={analysisPending}>{analysisPending ? "화면 실행 중…" : "재분석 데모"}</button></div></header>
+                      <nav className="workspace-tabs" aria-label="채권 리포트" role="tablist">{([
+                        ["overview", "요약"], ["facts", "원문 사실"], ["metrics", "정량 지표"], ["insight", "AI 해석"], ["timeline", "변화 기록"],
+                      ] as Array<[WorkspaceTab, string]>).map(([value, label]) => <button type="button" role="tab" aria-selected={workspaceTab === value} key={value} onClick={() => setWorkspaceTab(value)}>{label}</button>)}</nav>
+                      <div className="workspace-tab-panel" role="tabpanel">
+                        {workspaceTab === "overview" && <div className="workspace-overview"><div className="attention-panel"><span>{selectedHolding.unreadAlertCount > 0 ? "확인할 변화" : "현재 요약"}</span><h4>{selectedHolding.latestRiskChange ? `${categoryLabels[selectedHolding.latestRiskChange.category]} ${stateLabels[selectedHolding.latestRiskChange.previousState]} → ${stateLabels[selectedHolding.latestRiskChange.currentState]}` : "매수 이후 위험 상태 변화가 없습니다."}</h4><p>{selectedHolding.latestAlert?.message ?? "검증된 새 알림이 없습니다."}</p></div><div className="report-rail"><article data-layer="fact"><span>1</span><div><small>검증 원문</small><h4>{selectedHolding.newEventCount}건의 검증된 변화</h4><p>원문과 일치한 Event만 집계합니다.</p><button type="button" onClick={() => setWorkspaceTab("facts")}>원문 사실 보기</button></div></article><article data-layer="calc"><span>2</span><div><small>계산된 변화</small><h4>{selectedHolding.currentRiskState ? `${stateLabels[selectedHolding.currentRiskState.overall]} 상태` : "계산 전"}</h4><p>재현 가능한 정책 규칙의 결과입니다.</p><button type="button" onClick={() => setWorkspaceTab("metrics")}>정량 지표 보기</button></div></article><article data-layer="ai"><span>3</span><div><small>참고 해석</small><h4>검증 데이터만 설명</h4><p>위험 상태 결정과 투자 추천에는 사용하지 않습니다.</p><button type="button" onClick={() => setWorkspaceTab("insight")}>해석 보기</button></div></article></div></div>}
+                        {workspaceTab === "facts" && <div className="workspace-facts"><p className="layer-kicker fact">검증 원문</p><h4>최근 알림과 연결된 공시 근거</h4>{selectedHolding.latestAlert?.riskEventId ? <><p>{selectedHolding.latestAlert.message}</p><Link className="primary-button" to={`/risk-events/${selectedHolding.latestAlert.riskEventId}`}>원문 근거 열기</Link></> : <div className="quiet-empty"><p>현재 목록에서 바로 연결할 원문 Event가 없습니다.</p><small>매수 이후 상세에는 날짜순 검증 기록이 표시됩니다.</small></div>}</div>}
+                        {workspaceTab === "metrics" && <div className="workspace-metrics"><p className="layer-kicker calc">정량 지표</p><h4>현재 위험 범주</h4>{selectedHolding.currentRiskState ? <dl>{([['liquidity','유동성'],['cashFlow','현금흐름'],['leverage','부채 부담'],['earnings','수익성'],['credit','신용']] as const).map(([key,label]) => <div key={key}><dt>{label}</dt><dd className={`state-${selectedHolding.currentRiskState![key].toLowerCase()}`}>{stateLabels[selectedHolding.currentRiskState![key]]}</dd></div>)}</dl> : <div className="quiet-empty"><p>계산된 위험 Snapshot이 없습니다.</p></div>}<p className="metric-note">수익률·시장가격 등 mock의 시장 지표는 현재 API에 없어 후속 연동 대상으로 남겨두었습니다.</p></div>}
+                        {workspaceTab === "insight" && <div className="workspace-insight"><p className="layer-kicker ai">참고 해석</p><h4>추가 질문 화면</h4><div className="truth-note"><strong>데모 기능</strong><p>실제 AI 호출이나 위험 상태 변경 없이 화면 동작만 확인합니다.</p></div>{analysisNotice && <p className="analysis-notice" role="status">{analysisNotice}</p>}<form onSubmit={askDemoQuestion} noValidate><label htmlFor="credit-question">검증된 변화에 대해 질문</label><textarea className="resize-none" id="credit-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="예: 부채 부담이 관찰 상태가 된 계산 근거는 무엇인가요?" /><button type="submit" disabled={!question.trim()}>질문 화면 실행</button></form>{questionResult && <div className="demo-answer" role="status"><strong>데모 답변</strong><p>{questionResult}</p></div>}<Link className="text-link" to={`/holdings/${selectedHolding.holdingId}/since-bought`}>실제 매수 이후 설명 보기 →</Link></div>}
+                        {workspaceTab === "timeline" && <div className="workspace-timeline"><p className="layer-kicker">변화 기록</p><h4>매수일부터 현재까지</h4><ol><li><time>{formatDate(selectedHolding.purchaseDate)}</time><span /><div><strong>채권 매수</strong><p>{formatMoney(selectedHolding.purchaseAmount)} 등록</p></div></li>{selectedHolding.latestActivityAt && <li><time>{formatDateTime(selectedHolding.latestActivityAt)}</time><span /><div><strong>최근 확인된 변화</strong><p>{selectedHolding.latestAlert?.message ?? "검증된 상태 변화"}</p></div></li>}</ol><Link className="primary-button" to={`/holdings/${selectedHolding.holdingId}/since-bought`}>전체 변화 기록 보기</Link></div>}
+                      </div>
+                    </> : <div className="workspace-empty-detail"><h3>표시할 보유 채권이 없습니다.</h3><p>검색 조건을 초기화하거나 아래에서 채권을 등록해 주세요.</p></div>}
+                  </div>
+                </div>
+              </section>
+            )}
             {!isPortfolioEmpty && <div className="monitoring-grid">
             <section id="my-bonds" className="my-bonds-section" aria-labelledby="my-bonds-title">
               <div className="section-heading">
@@ -463,6 +578,7 @@ function PortfolioPage() {
                           <span className="holding-row-action">매수 이후 변화 보기 <span aria-hidden="true">→</span></span>
                         </div>
                       </Link>
+                      <button type="button" className="row-delete-button" onClick={() => setDeleteTarget({ type: "holding", id: holding.holdingId, name: holding.bondName })}>보유 목록에서 삭제</button>
                     </li>
                   )})}
                 </ol>
@@ -501,7 +617,7 @@ function PortfolioPage() {
 
             {pageState !== "stale" && (
             <section id="watchlist" className="registration-section" aria-labelledby="registration-title">
-              <div className="section-heading"><div><p className="section-label">PORTFOLIO SETUP</p><h2 id="registration-title">내 목록에 등록</h2></div></div>
+              <div className="section-heading"><div><p className="section-label">포트폴리오 설정</p><h2 id="registration-title">내 목록에 등록</h2></div></div>
               <div className="form-grid">
                 <form className="entry-form" onSubmit={handleHoldingSubmit} noValidate>
                   <div className="form-heading"><span className="form-index">01</span><div><h3>보유 채권 등록</h3><p>실제 매수한 금액과 날짜를 기록합니다.</p></div></div>
@@ -525,6 +641,7 @@ function PortfolioPage() {
                     {bonds.map((bond) => <option key={bond.id} value={bond.id} disabled={watchedBondIds.has(bond.id)}>{bond.name}{watchedBondIds.has(bond.id) ? " · 등록됨" : ""}</option>)}
                   </select>
                   <div className="watchlist-summary"><span>현재 관심 채권</span><strong>{watchlist.length}개</strong></div>
+                  {watchlist.length > 0 && <ul className="watchlist-entries">{watchlist.map((entry) => <li key={entry.id}><span>{entry.bond.name}</span><button type="button" onClick={() => setDeleteTarget({ type: "watchlist", id: entry.id, name: entry.bond.name })}>삭제</button></li>)}</ul>}
                   <div className="form-message" aria-live="polite">{watchError && <p id="watch-error" role="alert">{watchError}</p>}{watchNotice && <p className="success-message">{watchNotice}</p>}</div>
                   <button type="submit" disabled={watchPending || bonds.length === 0} aria-busy={watchPending}>{watchPending ? "등록 중…" : "관심 채권 등록"}</button>
                 </form>
@@ -535,6 +652,10 @@ function PortfolioPage() {
         )}
       </main>
       <MobileNav />
+      <Dialog open={workspaceDialog === "framework"} onClose={() => setWorkspaceDialog(null)} title="Bonda 분석 구조" eyebrow="정보의 권위를 분리"><div className="dialog-copy"><h3>검증 원문</h3><p>AI가 찾은 후보 중 원문, 금액, 날짜와 발행사 연결을 규칙으로 검증한 사실입니다.</p><h3>정량 지표</h3><p>versioned policy가 같은 입력에 같은 위험 상태를 계산합니다.</p><h3>AI 해석</h3><p>검증된 변화만 짧게 설명하며 공식 상태를 결정하지 않습니다.</p></div></Dialog>
+      <Dialog open={workspaceDialog === "diagnosis"} onClose={() => setWorkspaceDialog(null)} title="새 채권 직접 진단" eyebrow="저장되지 않는 데모"><div className="truth-note"><strong>백엔드 연동 전</strong><p>직접 입력한 채권과 공시 문장은 서버에 전송되지 않습니다.</p></div><form className="dialog-form" onSubmit={(event) => { event.preventDefault(); setWorkspaceDialog(null); setAnalysisNotice("직접 진단 입력 흐름을 체험했습니다. 분석 결과는 저장되지 않았습니다."); }} noValidate><label htmlFor="diagnosis-bond">채권명</label><input id="diagnosis-bond" placeholder="예: CJ CGV 35" /><label htmlFor="diagnosis-issuer">발행사</label><input id="diagnosis-issuer" placeholder="예: CJ CGV" /><label htmlFor="diagnosis-source">공시 문장</label><textarea className="resize-none" id="diagnosis-source" placeholder="DART 공시 문구를 붙여넣어 화면 흐름을 확인하세요." /><button type="submit" className="primary-button">진단 화면 실행</button></form></Dialog>
+      <Dialog open={Boolean(deleteTarget)} onClose={() => !deletePending && setDeleteTarget(null)} title={`${deleteTarget?.name ?? "채권"} 삭제`} eyebrow="목록에서 제거"><p className="delete-copy">{deleteTarget?.type === "holding" ? "보유 기록과 이 채권을 기준으로 한 화면 접근이 목록에서 사라집니다." : "관심 채권 목록에서 제거합니다."}</p>{deleteError && <p className="form-error" role="alert">{deleteError}</p>}<div className="dialog-actions split"><button type="button" className="secondary-button" onClick={() => setDeleteTarget(null)} disabled={deletePending}>취소</button><button type="button" className="danger-button" onClick={() => void confirmDelete()} disabled={deletePending} aria-busy={deletePending}>{deletePending ? "삭제 중…" : "삭제"}</button></div></Dialog>
+      {analysisNotice && <Toast message={analysisNotice} onDismiss={() => setAnalysisNotice("")} />}
       {hasSnapshot && <footer><p>{pageState === "stale" && lastSuccessfulAt ? `${formatCheckedAt(lastSuccessfulAt)}에 확인한 검증 데이터를 보여드립니다.` : "검증된 변화만 보여드립니다."}</p></footer>}
     </div>
   );
@@ -543,11 +664,12 @@ function PortfolioPage() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<PortfolioPage />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/monitoring" element={<PortfolioPage />} />
       <Route path="/holdings/:holdingId/since-bought" element={<SinceBoughtPage />} />
       <Route path="/risk-events/:riskEventId" element={<RiskEventPage />} />
       <Route path="/admin/replay" element={<HistoricalReplayPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

@@ -60,7 +60,7 @@ export default function RiskEventPage() {
 
   return (
     <div className="app-shell evidence-page-shell">
-      <AppHeader backLabel="내 채권으로" />
+      <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
         {pageState === "loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true">
@@ -75,7 +75,7 @@ export default function RiskEventPage() {
         )}
         {pageState === "ready" && detail && (
           <article className="evidence-page">
-            <p className="eyebrow">EVIDENCE FIRST</p>
+            <p className="eyebrow">검증 원문</p>
             <h1>{detail.disclosureTitle}</h1>
             <p className="evidence-page-meta">{formatDateTime(detail.publishedAt)} · 접수번호 {detail.sourceReceiptNo}</p>
             <div className="source-rule"><span>검증된 변화 유형</span><strong>{eventTypeLabel(detail.eventType)}</strong></div>
@@ -97,7 +97,7 @@ export default function RiskEventPage() {
         )}
       </main>
       <MobileNav />
-      <footer><p>Bonda monitors change. Decisions remain yours.</p></footer>
+      <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
   );
 }

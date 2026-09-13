@@ -8,7 +8,7 @@ type AppHeaderProps = {
 };
 
 function routeState(pathname: string, hash: string) {
-  const isPortfolioRoute = pathname === "/";
+  const isPortfolioRoute = pathname === "/monitoring";
   const isWatchlist = isPortfolioRoute && hash === "#watchlist";
   const isAlerts = pathname.includes("/risk-events/") || (isPortfolioRoute && hash === "#alerts");
   return {
@@ -25,11 +25,11 @@ export function AppHeader({ status, statusTone = "muted", backLabel, backTo = "/
 
   return (
     <header className="site-header">
-      <Link className="wordmark" to="/" aria-label="Bonda 홈">Bonda</Link>
+      <Link className="wordmark" to="/" aria-label="Bonda 홈"><span aria-hidden="true">B</span>Bonda</Link>
       <nav className="primary-nav" aria-label="주요 메뉴">
-        <Link to="/#my-bonds" aria-current={isMyBonds ? "page" : undefined}>내 채권</Link>
-        <Link to="/#watchlist" aria-current={isWatchlist ? "page" : undefined}>관심 채권</Link>
-        <Link to="/#alerts" aria-current={isAlerts ? "page" : undefined}>알림</Link>
+        <Link to="/monitoring#my-bonds" aria-current={isMyBonds ? "page" : undefined}>내 채권</Link>
+        <Link to="/monitoring#watchlist" aria-current={isWatchlist ? "page" : undefined}>관심 채권</Link>
+        <Link to="/monitoring#alerts" aria-current={isAlerts ? "page" : undefined}>알림</Link>
         <Link to="/admin/replay" aria-current={isReplay ? "page" : undefined}>과거 재현</Link>
       </nav>
       <div className="header-context">
@@ -46,9 +46,9 @@ export function MobileNav() {
 
   return (
     <nav className="mobile-nav" aria-label="모바일 주요 메뉴">
-      <Link to="/#my-bonds" aria-current={isMyBonds ? "page" : undefined}>내 채권</Link>
-      <Link to="/#watchlist" aria-current={isWatchlist ? "page" : undefined}>관심 채권</Link>
-      <Link to="/#alerts" aria-current={isAlerts ? "page" : undefined}>알림</Link>
+      <Link to="/monitoring#my-bonds" aria-current={isMyBonds ? "page" : undefined}>내 채권</Link>
+      <Link to="/monitoring#watchlist" aria-current={isWatchlist ? "page" : undefined}>관심 채권</Link>
+      <Link to="/monitoring#alerts" aria-current={isAlerts ? "page" : undefined}>알림</Link>
     </nav>
   );
 }

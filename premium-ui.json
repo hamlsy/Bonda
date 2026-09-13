@@ -2,6 +2,8 @@
   "profile": "product-minimal",
   "sourceRoots": ["frontend/src"],
   "locale": "ko-KR",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Date", "Form", "Scrollbar", "Toast", "CRUD"],
   "ownership": {
     "Select/Listbox": "native",
     "Date": "native"
