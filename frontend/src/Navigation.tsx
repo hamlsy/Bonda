@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { Bell, BriefcaseBusiness, Star } from "lucide-react";
 
 type AppHeaderProps = {
   status?: string;
@@ -46,9 +47,9 @@ export function MobileNav() {
 
   return (
     <nav className="mobile-nav" aria-label="모바일 주요 메뉴">
-      <Link to="/monitoring#my-bonds" aria-current={isMyBonds ? "page" : undefined}>내 채권</Link>
-      <Link to="/monitoring#watchlist" aria-current={isWatchlist ? "page" : undefined}>관심 채권</Link>
-      <Link to="/monitoring#alerts" aria-current={isAlerts ? "page" : undefined}>알림</Link>
+      <Link to="/monitoring#my-bonds" aria-current={isMyBonds ? "page" : undefined}><BriefcaseBusiness aria-hidden="true" /><span>내 채권</span></Link>
+      <Link to="/monitoring#watchlist" aria-current={isWatchlist ? "page" : undefined}><Star aria-hidden="true" /><span>관심 채권</span></Link>
+      <Link to="/monitoring#alerts" aria-current={isAlerts ? "page" : undefined}><Bell aria-hidden="true" /><span>알림</span></Link>
     </nav>
   );
 }
