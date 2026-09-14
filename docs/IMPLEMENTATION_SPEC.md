@@ -129,9 +129,13 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 
 ## Current frontend baseline
 
-`/`는 `frontend/mock/bonda_mock_onboarding`, `/monitoring`은
-`frontend/mock/bonda_mock_main`의 원본 화면과 내장 더미 데이터를 직접
-렌더링한다. 현재 제품 UI의 시각적 기준 화면은 `/monitoring`이다.
+`/`는 `frontend/src/LandingPage.tsx`, `/monitoring`은
+`frontend/src/MonitoringPage.tsx`를 직접 렌더링한다. 런타임 route는
+`frontend/mock`을 import하지 않으며 `frontend/src/styles.css`와 root `DESIGN.md`가
+시각 token과 component 규칙의 canonical owner다. `/monitoring`의 현재 demo fixture는
+화면 가까이에 `[데모 데이터]`로 표시하고 정식 API 데이터와 혼동하지 않게 한다.
+현재 제품 UI의 시각적 기준 화면은 `docs/design/evidence-rail-reference.png`와
+`/monitoring`의 고정 viewport capture다.
 `/holdings/:holdingId/since-bought`, `/risk-events/:riskEventId`,
 `/admin/replay`의 기존 API 연동 화면은 별도 경로에 보존되어 있다.
 
