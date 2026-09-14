@@ -198,7 +198,7 @@ export default function MonitoringPage() {
                   <h2>{selected.name}</h2>
                   <dl><div><dt>등급</dt><dd>{selected.rating}</dd></div><div><dt>만기</dt><dd>{selected.maturity}</dd></div><div><dt>표면금리</dt><dd>{selected.coupon}</dd></div><div><dt>최근 확인</dt><dd>{selected.changeDate}</dd></div></dl>
                 </div>
-                <div className="identity-actions"><StateLabel state={selected.state} /><button type="button" className="evidence-icon-button" aria-label="데이터 다시 확인" onClick={() => setNotice("최신 데모 기준일을 다시 확인했습니다.")}><RefreshCw size={18} /></button><button type="button" className="evidence-icon-button" aria-label="알림 설정"><Bell size={18} /></button></div>
+                <div className="identity-actions"><StateLabel state={selected.state} /><button type="button" className="evidence-icon-button" aria-label="데이터 다시 확인" onClick={() => setNotice("최신 데모 기준일을 다시 확인했습니다.")}><RefreshCw size={18} /></button><button type="button" className="evidence-icon-button" aria-label="알림 설정" onClick={() => setNotice("알림 조건 설정은 후속 API 연동 범위입니다.")}><Bell size={18} /></button></div>
               </header>
 
               <nav className="evidence-tabs" role="tablist" aria-label="채권 상세 구역" onKeyDown={handleTabKeys}>
