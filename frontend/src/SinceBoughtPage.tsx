@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { getRiskEvent, getSinceBought } from "./api";
 import { AppHeader, MobileNav } from "./Navigation";
-import SignalLine from "./SignalLine";
 import type {
   FinancialChange,
   RiskEventDetail,
@@ -27,6 +26,14 @@ const stateLabels: Record<RiskState, string> = {
   WATCH: "관찰",
   CAUTION: "주의",
 };
+
+function overallState(state: SinceBoughtResponse["currentRiskState"]) {
+  if (!state) return null;
+  const values = [state.liquidity, state.cashFlow, state.leverage, state.earnings, state.credit];
+  if (values.includes("CAUTION")) return "CAUTION";
+  if (values.includes("WATCH")) return "WATCH";
+  return "NORMAL";
+}
 
 const timelineLabels: Record<SinceBoughtTimelineItem["type"], string> = {
   PURCHASE: "매수",
@@ -106,7 +113,7 @@ function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
           {state?.status === "loading" && <p>검증된 원문을 불러오고 있어요.</p>}
           {state?.status === "error" && (
             <div className="inline-error" role="alert">
-              <p>원문 근거를 불러오지 못했습니다.</p>
+              <p>공시 원문을 불러오지 못했습니다.</p>
               <button type="button" onClick={() => void fetchEvidence()}>다시 시도</button>
             </div>
           )}
@@ -118,7 +125,7 @@ function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
                 <small>{formatDateTime(state.detail.publishedAt)} · 접수번호 {state.detail.sourceReceiptNo}</small>
               </div>
               {state.detail.evidence.length === 0 ? (
-                <p>연결된 근거 구간이 없습니다.</p>
+                <p>연결된 원문 구간이 없습니다.</p>
               ) : (
                 <ul>
                   {state.detail.evidence.map((evidence) => (
@@ -157,7 +164,7 @@ function Timeline({ items }: { items: SinceBoughtTimelineItem[] }) {
               <h3>{item.title}</h3>
               <p>{item.summary}</p>
               {item.riskEventId && item.evidenceAvailable && <EvidenceDisclosure riskEventId={item.riskEventId} />}
-              {item.riskEventId && !item.evidenceAvailable && <p className="evidence-unavailable">연결된 원문 근거가 없습니다.</p>}
+              {item.riskEventId && !item.evidenceAvailable && <p className="evidence-unavailable">연결된 공시 원문이 없습니다.</p>}
             </article>
           </li>
         ))}
@@ -229,11 +236,12 @@ export default function SinceBoughtPage() {
     return () => controller.abort();
   }, [numericHoldingId, retryKey]);
 
-  return (
-    <div className="app-shell since-shell">
+  return <>
+    <div className="app-shell pulse-product-page since-shell">
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
 
       <main>
+        <section className="route-command" aria-label="매수 이후 추적 안내"><div><span>HOLDING PULSE</span><strong>매수 이후의 변화만 이어서 봅니다.</strong></div><small>공시 · 상태 · 재무</small></section>
         {pageState === "loading" && (
           <section className="state-panel since-loading" aria-live="polite" aria-busy="true">
             <span className="spinner" aria-hidden="true" />
@@ -263,9 +271,10 @@ export default function SinceBoughtPage() {
                   <div><dt>매수금액</dt><dd>{formatMoney(data.holding.purchaseAmount)}</dd></div>
                 </dl>
               </div>
-              <div className="since-hero-visual">
-                <p>시간이 흐를수록,<br />더 명확한 변화만</p>
-                <SignalLine compact />
+              <div className="since-hero-visual pulse-summary-board" aria-label="매수 이후 추적 요약">
+                <div><span>추적 기간</span><strong>{formatDate(data.holding.purchaseDate)}부터</strong></div>
+                <div><span>확인된 변화</span><strong>{data.timeline.filter((item) => item.type !== "PURCHASE").length}건</strong></div>
+                <div><span>현재 상태</span><strong>{overallState(data.currentRiskState) ? stateLabels[overallState(data.currentRiskState)!] : "계산 전"}</strong></div>
               </div>
             </section>
 
@@ -316,8 +325,8 @@ export default function SinceBoughtPage() {
           </>
         )}
       </main>
-      <MobileNav />
       <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
-  );
+    <MobileNav />
+  </>;
 }

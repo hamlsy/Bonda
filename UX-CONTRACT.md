@@ -125,7 +125,7 @@
 
 - Migration status: Pulse Command 전환 완료. 최종 비교와 검증 기록은 `design-qa.md`에서 관리한다.
 - Canonical primitives and owners: `frontend/src`, `frontend/src/styles.css`, shared `Navigation.tsx` and `Dialogs.tsx`.
-- Current risk-prioritized slices: `/monitoring`, then mobile, then landing and preserved routes.
+- Current risk-prioritized slices: Pulse Command 기준으로 landing, monitoring, detail, source, replay, not-found 전환 완료.
 - Legacy import/token enforcement: runtime routes must not import `frontend/mock`; broad class-string overrides are prohibited.
 - Rollout/rollback and removal gates: each route moves only after build, strict audit, interaction and fixed-viewport capture pass.
 

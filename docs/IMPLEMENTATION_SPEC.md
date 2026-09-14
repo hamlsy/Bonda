@@ -135,7 +135,10 @@ PostgreSQL schema는 Flyway migration으로만 변경한다. 개발 확인용 se
 시각 token과 component 규칙의 canonical owner다. `/monitoring`의 현재 demo fixture는
 화면 가까이에 `[데모 데이터]`로 표시하고 정식 API 데이터와 혼동하지 않게 한다.
 현재 제품 UI의 시각적 기준 화면은 `docs/design/monitoring-pulse-command-target.png`와
-`/monitoring`의 고정 viewport capture다.
+각 runtime route의 고정 viewport capture다. `/`, `/monitoring`, `/holdings/:holdingId/since-bought`,
+`/risk-events/:riskEventId`, `/admin/replay`, not-found route는 같은 Pulse Command token과
+navigation·feedback 규칙을 사용한다. Vercel은 `frontend/vercel.json`의 SPA rewrite로 직접
+경로 접근과 새로고침을 `index.html`에 연결한다.
 `/holdings/:holdingId/since-bought`, `/risk-events/:riskEventId`,
 `/admin/replay`의 기존 API 연동 화면은 별도 경로에 보존되어 있다.
 

@@ -45,7 +45,8 @@ components:
 ### Creative North Star
 
 포트폴리오 관제 화면의 빠른 상태 파악과 리서치 노트의 정렬된 숫자를 결합해,
-개인투자자가 보유 채권의 변화를 ‘계속 추적되고 있다’고 느끼는 작업면을 만든다.
+첫 방문부터 원문 확인과 과거 재현까지 개인투자자가 보유 채권의 변화를
+‘계속 추적되고 있다’고 느끼는 하나의 작업면을 만든다.
 선택된 기준 화면은 [`docs/design/monitoring-pulse-command-target.png`](docs/design/monitoring-pulse-command-target.png)다.
 
 ### Product context and register
@@ -54,7 +55,7 @@ components:
 - **Target market(s) and evidence:** 대한민국. `docs/PRODUCT.md`의 개인투자자 범위와 OpenDART·원화 재무정보 계약을 따른다.
 - **Locale(s) and language policy:** UI와 제품 카피는 한국어 우선이며 영문은 ISIN, 규칙 버전 등 식별자에만 쓴다. 최종 문구는 제품 책임자가 검토한다.
 - **Usage scene:** 데스크톱에서는 여러 채권을 비교하고, 모바일에서는 선택한 한 채권의 최근 변화와 근거를 빠르게 확인한다.
-- **Register:** 제품 화면은 전문적인 리서치 도구, 랜딩은 절제된 브랜드 소개다.
+- **Register:** 제품 화면은 전문적인 리서치 도구다. 랜딩도 추상적인 브랜드 소개보다 실제 추적 화면의 밀도와 작동 상태를 먼저 보여준다.
 - **Memorable signature:** 매수 시점부터 최근 확인까지 사건을 잇고 선택한 변화를 즉시 펼치는 `Credit Pulse`다.
 - **Restraint:** 입력, 대화상자, 검색, 오류 복구는 익숙한 패턴을 유지하고 장식적 표현을 쓰지 않는다.
 - **Anti-references:** 보라색 gradient SaaS hero, 모든 내용을 둥근 카드로 감싼 AI dashboard, 실제 계약에 없는 추세 그래프, 기관 terminal을 흉내 낸 과밀 화면.
@@ -88,6 +89,15 @@ monospace는 ISIN, source id, rule version에만 허용한다. 영문 대문자 
 selector로 바꾼다. 620px 이하에서는 44px icon utility와 하단 navigation을 사용하고
 safe-area를 보존한다. 중첩 세로 scroll은 금지하며 loading·empty 상태도 최종 geometry를
 유지한다.
+
+### Cross-route composition
+
+모든 route는 Ink 상단 chrome, 얇은 상태 band, Canvas 위 흰 작업면이라는 동일한
+순서를 사용한다. 랜딩 hero는 왼쪽에 제품 약속과 진입 동작, 오른쪽에 실제 추적
+상태·채권·사건 흐름을 담은 `Monitoring Now` 보드를 둔다. 상세, 공시 원문, 과거
+재현, 404는 route 목적을 한 줄로 알리는 `route-command` band 뒤에 본문을 둔다.
+모바일 하단 navigation은 page container 밖에서 viewport 양끝과 safe area까지
+차지하며, 본문 카드의 좌우 여백을 상속하지 않는다.
 
 ## Elevation & Depth
 

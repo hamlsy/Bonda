@@ -96,10 +96,11 @@ export default function HistoricalReplayPage() {
     }
   }
 
-  return (
-    <div className="app-shell replay-shell">
+  return <>
+    <div className="app-shell pulse-product-page replay-shell">
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
+        <section className="route-command" aria-label="과거 재현 안내"><div><span>HISTORICAL REPLAY</span><strong>선택한 날짜에 공개돼 있던 정보만 다시 계산합니다.</strong></div><small>현재 상태는 변경하지 않음</small></section>
         <section className="page-intro replay-intro">
           <p className="eyebrow">과거 시점 재현</p>
           <h1>그때까지 알 수 있던 것만 봅니다.</h1>
@@ -154,8 +155,8 @@ export default function HistoricalReplayPage() {
           </section>
         )}
       </main>
-      <MobileNav />
       <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
-  );
+    <MobileNav />
+  </>;
 }

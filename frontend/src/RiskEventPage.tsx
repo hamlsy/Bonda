@@ -58,10 +58,11 @@ export default function RiskEventPage() {
     return () => controller.abort();
   }, [numericId, retryKey]);
 
-  return (
-    <div className="app-shell evidence-page-shell">
+  return <>
+    <div className="app-shell pulse-product-page evidence-page-shell">
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
+        <section className="route-command" aria-label="공시 원문 확인 안내"><div><span>SOURCE CHECK</span><strong>확인된 변화가 원문의 어디에서 왔는지 봅니다.</strong></div><small>검증된 구간만 표시</small></section>
         {pageState === "loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true">
             <span className="spinner" aria-hidden="true" /><p>검증된 원문을 불러오고 있습니다.</p>
@@ -69,7 +70,7 @@ export default function RiskEventPage() {
         )}
         {pageState === "error" && (
           <section className="state-panel error-panel" role="alert">
-            <div><h1 className="state-title">원문 근거를 불러오지 못했습니다</h1><p>연결 상태를 확인한 뒤 다시 시도해 주세요.</p></div>
+            <div><h1 className="state-title">공시 원문을 불러오지 못했습니다</h1><p>연결 상태를 확인한 뒤 다시 시도해 주세요.</p></div>
             <button type="button" className="secondary-button" onClick={() => setRetryKey((value) => value + 1)}>다시 불러오기</button>
           </section>
         )}
@@ -80,7 +81,7 @@ export default function RiskEventPage() {
             <p className="evidence-page-meta">{formatDateTime(detail.publishedAt)} · 접수번호 {detail.sourceReceiptNo}</p>
             <div className="source-rule"><span>검증된 변화 유형</span><strong>{eventTypeLabel(detail.eventType)}</strong></div>
             {detail.evidence.length === 0 ? (
-              <div className="quiet-empty"><p>연결된 근거 구간이 없습니다.</p></div>
+              <div className="quiet-empty"><p>연결된 원문 구간이 없습니다.</p></div>
             ) : (
               <ol className="evidence-page-list">
                 {detail.evidence.map((evidence) => (
@@ -96,8 +97,8 @@ export default function RiskEventPage() {
           </article>
         )}
       </main>
-      <MobileNav />
       <footer><p>검증된 변화를 보고, 판단은 직접 합니다.</p></footer>
     </div>
-  );
+    <MobileNav />
+  </>;
 }

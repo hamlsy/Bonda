@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Activity, ArrowRight, BellRing, FileCheck2, Radar, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Dialog, KakaoDemo, LoginDemo, PricingDemo, RoadmapDialog, Toast } from "./Dialogs";
 import { demoBonds } from "./demo";
@@ -31,7 +32,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="landing-shell">
+    <div className="landing-shell pulse-landing">
       <header className="landing-header">
         <Link className="wordmark" to="/" aria-label="Bonda 홈"><span aria-hidden="true">B</span>Bonda</Link>
         <nav aria-label="소개 메뉴"><a href="#preview">리포트 체험</a><a href="#principles">작동 방식</a><button type="button" onClick={() => setModal("pricing")}>요금제</button></nav>
@@ -44,21 +45,29 @@ export default function LandingPage() {
       <main>
         <section className="landing-hero" aria-labelledby="landing-title">
           <div className="hero-copy">
-            <p className="context-label"><span />개인 회사채 모니터링</p>
-            <h1 id="landing-title">내가 산 뒤,<br /><em>무엇이 달라졌는지</em> 봅니다.</h1>
-            <p>공시 원문, 재현 가능한 계산, 제한적인 AI 해석을 분리해 보여드립니다. 투자 판단보다 먼저 확인할 사실을 놓치지 마세요.</p>
-            <div className="hero-actions"><Link className="primary-button" to="/monitoring">모니터링 열기 <span aria-hidden="true">→</span></Link><a className="secondary-button" href="#preview">예시 리포트 보기</a></div>
-            <dl className="hero-proof"><div><dt>판정 방식</dt><dd>규칙 기반</dd></div><div><dt>근거</dt><dd>DART 원문</dd></div><div><dt>AI 역할</dt><dd>참고 설명</dd></div></dl>
+            <p className="context-label"><Radar aria-hidden="true" />개인 회사채 신용 모니터링</p>
+            <h1 id="landing-title">사는 순간부터,<br /><em>내 채권은 계속 추적됩니다.</em></h1>
+            <p>새 공시, 재무 변화, 신용 상태를 한곳에서 확인하세요. Bonda가 달라진 순간을 찾아 시간순으로 보여드립니다.</p>
+            <div className="hero-actions"><Link className="primary-button" to="/monitoring">내 채권 확인하기 <ArrowRight aria-hidden="true" /></Link><a className="secondary-button" href="#preview">작동 화면 미리보기</a></div>
+            <dl className="hero-proof"><div><dt>확인 대상</dt><dd>공시·재무</dd></div><div><dt>상태 계산</dt><dd>규칙 기반</dd></div><div><dt>설명 역할</dt><dd>참고 요약</dd></div></dl>
           </div>
-          <div className="hero-report" aria-label="Bonda 리포트 구조 예시">
-            <div className="report-top"><div><small>{activeBond.issuer}</small><strong>{activeBond.name}</strong></div><span className={`state-tag state-${activeBond.state}`}>{activeBond.state}</span></div>
-            <div className="report-rail compact"><article data-layer="fact"><span>1</span><div><small>검증 원문</small><p>{activeBond.fact}</p></div></article><article data-layer="calc"><span>2</span><div><small>계산된 변화</small><p>{activeBond.calculation}</p></div></article><article data-layer="ai"><span>3</span><div><small>참고 해석</small><p>{activeBond.interpretation}</p></div></article></div>
-            <p className="demo-label">예시 데이터 · 실제 투자 판단 자료가 아닙니다.</p>
+          <div className="landing-command-card" aria-label="Bonda 모니터링 현황 예시">
+            <header><div><Activity aria-hidden="true" /><span>MONITORING NOW</span></div><small>[데모 데이터]</small></header>
+            <div className="landing-command-stats"><div><span>추적 중</span><strong>3개 발행사</strong><small>확인 정상</small></div><div><span>새 변화</span><strong>5건</strong><small>마지막 방문 이후</small></div><div><span>최근 확인</span><strong>10:24</strong><small>2026. 09. 14.</small></div></div>
+            <section><div className="landing-command-bond"><span>{activeBond.issuer}</span><strong>{activeBond.name}</strong><small>{activeBond.rating} · {activeBond.state}</small></div><BellRing aria-hidden="true" /></section>
+            <ol className="landing-mini-pulse"><li><span /><div><time>2025. 08.</time><strong>채권 매수</strong></div></li><li><span /><div><time>2026. 03.</time><strong>재무 변화</strong></div></li><li data-active="true"><span /><div><time>2026. 05.</time><strong>새 공시 확인</strong></div></li></ol>
+            <Link to="/monitoring">전체 변화 보기<ArrowRight aria-hidden="true" /></Link>
           </div>
         </section>
 
+        <section className="landing-trust-strip" aria-label="Bonda 확인 원칙">
+          <div><FileCheck2 aria-hidden="true" /><span>공시 원문</span><strong>출처로 다시 확인</strong></div>
+          <div><ShieldCheck aria-hidden="true" /><span>결정 규칙</span><strong>같은 입력, 같은 결과</strong></div>
+          <div><Activity aria-hidden="true" /><span>지속 추적</span><strong>매수 이후 변화 기록</strong></div>
+        </section>
+
         <section id="preview" className="preview-section" aria-labelledby="preview-title">
-          <div className="section-intro"><p className="context-label"><span />직접 눌러보는 예시</p><h2 id="preview-title">한 리포트 안에서도 정보의 권위는 다릅니다.</h2><p>채권을 선택해 원문, 계산, 해석이 어떻게 이어지는지 확인하세요.</p></div>
+          <div className="section-intro"><p className="context-label"><Radar aria-hidden="true" />작동 화면 미리보기</p><h2 id="preview-title">채권을 고르면, 달라진 순간부터 보입니다.</h2><p>공시 원문, 계산된 변화, 참고 설명을 구분해 확인하세요.</p></div>
           <div className="preview-workspace">
             <aside className="demo-bond-list" aria-label="예시 채권"><h3>예시 채권</h3>{demoBonds.map((bond) => <button type="button" key={bond.id} aria-pressed={bond.id === activeBond.id} onClick={() => setActiveBondId(bond.id)}><span><small>{bond.issuer}</small><strong>{bond.name}</strong></span><span className={`state-text state-${bond.state}`}>{bond.state}</span></button>)}</aside>
             <div className="demo-detail">
@@ -69,19 +78,19 @@ export default function LandingPage() {
         </section>
 
         <section id="principles" className="principles-section" aria-labelledby="principles-title">
-          <div className="section-intro"><p className="context-label"><span />Bonda의 기준</p><h2 id="principles-title">AI보다 먼저 확인할 세 가지</h2></div>
+          <div className="section-intro"><p className="context-label"><ShieldCheck aria-hidden="true" />Bonda의 확인 방식</p><h2 id="principles-title">AI보다 먼저 확인할 세 가지</h2></div>
           <ol><li><span>원문</span><h3>사실은 출처로 돌아갑니다.</h3><p>검증 과정에서 실제로 일치한 공시 구간을 함께 보여줍니다.</p></li><li><span>계산</span><h3>숫자는 같은 규칙으로 계산합니다.</h3><p>위험 상태와 변화는 version이 있는 deterministic policy가 정합니다.</p></li><li><span>해석</span><h3>AI는 설명만 보탭니다.</h3><p>검증된 데이터 밖의 인과나 투자 추천을 만들지 않습니다.</p></li></ol>
           <button type="button" className="text-link" onClick={() => setModal("principles")}>판정 구조 자세히 보기 →</button>
         </section>
 
         <section className="process-section" aria-labelledby="process-title">
-          <div className="section-intro"><p className="context-label"><span />사용 과정</p><h2 id="process-title">등록하고, 기다리고, 근거를 확인합니다.</h2></div>
-          <ol><li><span>1</span><div><h3>보유 채권 등록</h3><p>채권, 매수일, 매수금액을 기록합니다.</p></div></li><li><span>2</span><div><h3>새 공시와 변화 확인</h3><p>검증된 Event와 정책 계산이 내 채권에 연결됩니다.</p></div></li><li><span>3</span><div><h3>매수 이후 기록 읽기</h3><p>날짜순 변화와 원문 근거를 한 화면에서 확인합니다.</p></div></li></ol>
+          <div className="section-intro"><p className="context-label"><Activity aria-hidden="true" />사용 과정</p><h2 id="process-title">등록하면, 변화가 시간순으로 쌓입니다.</h2></div>
+          <ol><li><span>1</span><div><h3>보유 채권 등록</h3><p>채권, 매수일, 매수금액을 기록합니다.</p></div></li><li><span>2</span><div><h3>새 공시와 변화 확인</h3><p>검증된 Event와 정책 계산이 내 채권에 연결됩니다.</p></div></li><li><span>3</span><div><h3>매수 이후 기록 읽기</h3><p>날짜순 변화와 공시 원문을 한 화면에서 확인합니다.</p></div></li></ol>
         </section>
 
         <section className="comparison-section" aria-labelledby="comparison-title">
-          <div className="section-intro"><p className="context-label"><span />정보를 다루는 방식</p><h2 id="comparison-title">요약만 남기지 않고 검증 경로를 남깁니다.</h2></div>
-          <div className="comparison-table" role="table" aria-label="일반 요약과 Bonda 비교"><div role="row"><span role="columnheader">확인 항목</span><span role="columnheader">일반 요약</span><span role="columnheader">Bonda</span></div><div role="row"><span role="rowheader">공시 근거</span><span>요약문 중심</span><strong>일치한 원문 구간</strong></div><div role="row"><span role="rowheader">위험 상태</span><span>설명과 혼재</span><strong>versioned rule 계산</strong></div><div role="row"><span role="rowheader">AI 역할</span><span>결론처럼 노출</span><strong>참고 설명으로 제한</strong></div></div>
+          <div className="section-intro"><p className="context-label"><FileCheck2 aria-hidden="true" />정보를 다루는 방식</p><h2 id="comparison-title">요약보다 확인 경로를 먼저 남깁니다.</h2></div>
+          <div className="comparison-table" role="table" aria-label="일반 요약과 Bonda 비교"><div role="row"><span role="columnheader">확인 항목</span><span role="columnheader">일반 요약</span><span role="columnheader">Bonda</span></div><div role="row"><span role="rowheader">공시 확인</span><span>요약문 중심</span><strong>일치한 원문 구간</strong></div><div role="row"><span role="rowheader">위험 상태</span><span>설명과 혼재</span><strong>versioned rule 계산</strong></div><div role="row"><span role="rowheader">AI 역할</span><span>결론처럼 노출</span><strong>참고 설명으로 제한</strong></div></div>
         </section>
 
         <section className="quickstart-section" aria-labelledby="quickstart-title">
