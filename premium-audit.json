@@ -1,113 +1,13 @@
 {
-  "findings": [
-    {
-      "category": "unresolved",
-      "file": "frontend/mock/bonda_mock_onboarding/src/components/modals/RegisterBondModal.tsx",
-      "line": 106,
-      "message": "Native date/time input is used without an explicit ownership decision.",
-      "remediation": "Record Date as native or reuse the typed/authored canonical owner.",
-      "ruleId": "ownership.native-date-undecided",
-      "severity": "error"
-    },
-    {
-      "category": "unresolved",
-      "file": "frontend/src/HistoricalReplayPage.tsx",
-      "line": 119,
-      "message": "Native date/time input is used without an explicit ownership decision.",
-      "remediation": "Record Date as native or reuse the typed/authored canonical owner.",
-      "ruleId": "ownership.native-date-undecided",
-      "severity": "error"
-    },
-    {
-      "category": "unresolved",
-      "file": "frontend/src/LandingPage.tsx",
-      "line": 102,
-      "message": "Native date/time input is used without an explicit ownership decision.",
-      "remediation": "Record Date as native or reuse the typed/authored canonical owner.",
-      "ruleId": "ownership.native-date-undecided",
-      "severity": "error"
-    },
-    {
-      "category": "unresolved",
-      "file": "frontend/mock/bonda_mock_main/src/components/CustomBondModal.tsx",
-      "line": 253,
-      "message": "Native select is used without an explicit ownership decision.",
-      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
-      "ruleId": "ownership.native-select-undecided",
-      "severity": "error"
-    },
-    {
-      "category": "unresolved",
-      "file": "frontend/src/HistoricalReplayPage.tsx",
-      "line": 112,
-      "message": "Native select is used without an explicit ownership decision.",
-      "remediation": "Record Select/Listbox as native or reuse the authored canonical owner.",
-      "ruleId": "ownership.native-select-undecided",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_onboarding/src/components/Navbar.tsx",
-      "line": 40,
-      "message": "Empty hash links look actionable but have no destination.",
-      "remediation": "Use a real route/action or render non-interactive text.",
-      "ruleId": "affordance.empty-href",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_main/src/components/AiInsightsView.tsx",
-      "line": 234,
-      "message": "Application-owned form does not declare its validation owner.",
-      "remediation": "Add noValidate/novalidate and implement the canonical validation contract.",
-      "ruleId": "form.novalidate-missing",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_onboarding/src/components/QuickstartCtaSection.tsx",
-      "line": 56,
-      "message": "Application-owned form does not declare its validation owner.",
-      "remediation": "Add noValidate/novalidate and implement the canonical validation contract.",
-      "ruleId": "form.novalidate-missing",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_onboarding/src/components/modals/LoginModal.tsx",
-      "line": 97,
-      "message": "Application-owned form does not declare its validation owner.",
-      "remediation": "Add noValidate/novalidate and implement the canonical validation contract.",
-      "ruleId": "form.novalidate-missing",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_onboarding/src/components/modals/RegisterBondModal.tsx",
-      "line": 69,
-      "message": "Application-owned form does not declare its validation owner.",
-      "remediation": "Add noValidate/novalidate and implement the canonical validation contract.",
-      "ruleId": "form.novalidate-missing",
-      "severity": "error"
-    },
-    {
-      "category": "violation",
-      "file": "frontend/mock/bonda_mock_main/src/components/CustomBondModal.tsx",
-      "line": 348,
-      "message": "Literal product textarea does not show evidence of the canonical resize-none rule.",
-      "remediation": "Use the shared Textarea owner or apply resize-none/resize: none with adequate height or auto-grow behavior.",
-      "ruleId": "form.textarea-resize-missing",
-      "severity": "error"
-    }
-  ],
+  "findings": [],
   "mode": "strict",
   "projectRoot": "C:\\Bonda",
   "schemaVersion": 1,
   "summary": {
-    "errors": 11,
-    "total": 11,
-    "unresolved": 5,
-    "violations": 6,
+    "errors": 0,
+    "total": 0,
+    "unresolved": 0,
+    "violations": 0,
     "warnings": 0
   }
 }

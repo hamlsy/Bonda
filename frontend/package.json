@@ -7,17 +7,18 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "check:ui": "node scripts/check-monitoring-ui.mjs",
+    "test:ui": "playwright test",
+    "capture:ui": "playwright test --grep @capture",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.3.3",
     "lucide-react": "^1.45.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.18.0",
-    "tailwindcss": "^4.3.3"
+    "react-router-dom": "^7.18.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^6.0.0",

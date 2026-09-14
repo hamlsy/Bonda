@@ -1,0 +1,25 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["frontend/src"],
+  "locale": "ko-KR",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Date", "Form", "Scrollbar", "Toast", "CRUD"],
+  "ownership": {
+    "Select/Listbox": "native",
+    "Date": "native",
+    "Form": "authored",
+    "Scrollbar": "authored",
+    "Toast": "authored",
+    "CRUD": "authored"
+  },
+  "requiredCommands": ["guardrail", "build", "e2e"],
+  "commands": {
+    "guardrail": "npm --prefix frontend run check:ui",
+    "build": "npm --prefix frontend run build",
+    "e2e": "npm --prefix frontend run test:ui"
+  },
+  "evidence": {
+    "crudFullFlow": "frontend/tests/monitoring.spec.ts",
+    "failurePaths": "frontend/tests/monitoring.spec.ts"
+  }
+}
