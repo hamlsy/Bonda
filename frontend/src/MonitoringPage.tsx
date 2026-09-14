@@ -1,20 +1,24 @@
 import { FormEvent, KeyboardEvent as ReactKeyboardEvent, useMemo, useRef, useState } from "react";
 import {
+  Activity,
+  ArrowRight,
   Bell,
+  CalendarClock,
   ChevronDown,
   FileText,
   HelpCircle,
   Menu,
+  MoreHorizontal,
   Plus,
-  RefreshCw,
   Search,
+  ShieldCheck,
   X,
 } from "lucide-react";
 import { Dialog, Toast } from "./Dialogs";
 import { AppHeader, MobileNav } from "./Navigation";
 import { demoBonds, type DemoBond } from "./demo";
 
-type MonitoringTab = "overview" | "changes" | "evidence" | "more";
+type MonitoringTab = "overview" | "changes" | "financials" | "sources" | "more";
 type RiskState = "정상" | "관찰" | "주의";
 
 type MonitoringRecord = DemoBond & {
@@ -90,21 +94,28 @@ const monitoringRecords: MonitoringRecord[] = [
   },
 ];
 
+const riskStates: RiskState[] = ["정상", "관찰", "주의"];
+
 function StateLabel({ state }: { state: RiskState }) {
-  return <span className="evidence-state" data-state={state}><span aria-hidden="true" />{state}</span>;
+  return <span className="pulse-state" data-state={state}><span aria-hidden="true" />{state}</span>;
 }
 
 function MetricBar({ baseline, current, threshold }: { baseline: number; current: number; threshold?: number }) {
   const extent = Math.max(Math.abs(baseline), Math.abs(current), Math.abs(threshold ?? 0), 0.1);
-  const baselineWidth = Math.max(3, (Math.abs(baseline) / extent) * 100);
-  const currentWidth = Math.max(3, (Math.abs(current) / extent) * 100);
+  const baselineWidth = Math.max(4, (Math.abs(baseline) / extent) * 100);
+  const currentWidth = Math.max(4, (Math.abs(current) / extent) * 100);
   const exceeded = threshold !== undefined && (threshold >= 0 ? current >= threshold : current <= threshold);
   return (
-    <div className="metric-bars" aria-hidden="true">
-      <span className="metric-bar baseline" style={{ width: `${baselineWidth}%` }} />
-      <span className={`metric-bar current${exceeded ? " exceeded" : ""}`} style={{ width: `${currentWidth}%` }} />
+    <div className="pulse-metric-bars" aria-hidden="true">
+      <span className="pulse-metric-bar baseline" style={{ width: `${baselineWidth}%` }} />
+      <span className={`pulse-metric-bar current${exceeded ? " exceeded" : ""}`} style={{ width: `${currentWidth}%` }} />
     </div>
   );
+}
+
+function changeRate(baseline: number, current: number) {
+  if (baseline === 0) return null;
+  return ((current - baseline) / Math.abs(baseline)) * 100;
 }
 
 export default function MonitoringPage() {
@@ -125,6 +136,7 @@ export default function MonitoringPage() {
   }, [query]);
   const selected = filtered.find((bond) => bond.id === selectedId) ?? filtered[0] ?? null;
   const activeEvent = selected?.events.find((event) => event.id === eventId) ?? selected?.events.at(-1) ?? null;
+  const unreadTotal = monitoringRecords.reduce((total, bond) => total + bond.unread, 0);
 
   function selectBond(bond: MonitoringRecord) {
     setSelectedId(bond.id);
@@ -139,124 +151,130 @@ export default function MonitoringPage() {
   }
 
   function handleTabKeys(event: ReactKeyboardEvent<HTMLElement>) {
-    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
-    const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const tabs = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("[role=\"tab\"]"));
     const current = tabs.indexOf(document.activeElement as HTMLButtonElement);
-    const next = event.key === 'Home' ? 0 : event.key === 'End' ? tabs.length - 1 : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+    const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (current + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
     event.preventDefault();
     tabs[next]?.focus();
     tabs[next]?.click();
   }
 
-  return (
-    <div className="app-shell evidence-app">
+  return <>
+    <div className="app-shell pulse-app">
       <AppHeader status="2026. 09. 14. 기준" statusTone="normal" />
-      <main className="evidence-main">
-        <header className="evidence-toolbar">
-          <div>
-            <p className="evidence-context">보유 채권 신용 모니터링 <span>[데모 데이터]</span></p>
-            <h1>변화와 근거를 한 화면에서 확인하세요</h1>
-          </div>
-          <div className="evidence-tools">
-            <label className="evidence-search" htmlFor="bond-search">
-              <Search aria-hidden="true" size={18} />
-              <span className="sr-only">채권 검색</span>
-              <input ref={searchRef} id="bond-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="채권명, 발행사, 등급 검색" />
-              {query && <button type="button" onClick={() => { setQuery(""); searchRef.current?.focus(); }} aria-label="검색어 지우기"><X size={17} /></button>}
-            </label>
-            <button type="button" className="evidence-icon-button mobile-only" aria-expanded={mobileSearchOpen} onClick={() => { setMobileSearchOpen((open) => !open); window.requestAnimationFrame(() => mobileSearchRef.current?.focus()); }} aria-label="채권 검색"><Search size={19} /></button>
-            <button type="button" className="evidence-secondary desktop-only" onClick={() => setDialog("add")}><Plus size={17} />채권 추가</button>
-            <button type="button" className="evidence-icon-button mobile-only" onClick={() => setDialog("add")} aria-label="채권 추가"><Plus size={20} /></button>
-            <button type="button" className="evidence-icon-button" onClick={() => setDialog("help")} aria-label="분석 구조 도움말"><HelpCircle size={19} /></button>
-          </div>
+
+      <section className="pulse-overview" aria-labelledby="monitoring-title">
+        <div className="pulse-overview-lead">
+          <p><span>[데모 데이터]</span> 보유 채권 신용 모니터링</p>
+          <h1 id="monitoring-title">지금도, 당신의 채권을 지켜보고 있습니다.</h1>
+          <small>주요 공시와 재무 변화를 자동으로 확인합니다.</small>
+        </div>
+        <div className="pulse-health">
+          <Activity aria-hidden="true" />
+          <div><strong>{monitoringRecords.length}개 발행사</strong><span>추적 중 · 정상</span></div>
+        </div>
+        <div className="pulse-checked">
+          <CalendarClock aria-hidden="true" />
+          <div><span>마지막 확인</span><strong>2026. 09. 14. 10:24</strong><small>정상적으로 완료됐습니다.</small></div>
+        </div>
+        <button type="button" className="pulse-unread" onClick={() => setNotice(`읽지 않은 변화 ${unreadTotal}건을 확인했습니다.`)}>
+          <Bell aria-hidden="true" />
+          <span>마지막 방문 이후<strong>{unreadTotal}건</strong><small>새로 확인된 변화</small></span>
+          <ArrowRight aria-hidden="true" />
+        </button>
+      </section>
+
+      <main className="pulse-main">
+        <header className="pulse-mobile-tools">
+          <button type="button" aria-expanded={mobileSearchOpen} onClick={() => { setMobileSearchOpen((open) => !open); window.requestAnimationFrame(() => mobileSearchRef.current?.focus()); }} aria-label="채권 검색"><Search /></button>
+          <button type="button" onClick={() => setDialog("add")} aria-label="채권 추가"><Plus /></button>
+          <button type="button" onClick={() => setDialog("help")} aria-label="분석 구조 도움말"><HelpCircle /></button>
         </header>
 
-        {mobileSearchOpen && <label className="mobile-search-panel" htmlFor="mobile-bond-search"><Search aria-hidden="true" size={18} /><span className="sr-only">모바일 채권 검색</span><input ref={mobileSearchRef} id="mobile-bond-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="채권명, 발행사, 등급 검색" /><button type="button" onClick={() => { setQuery(""); setMobileSearchOpen(false); }} aria-label="검색 닫기"><X size={18} /></button></label>}
+        {mobileSearchOpen && <label className="pulse-mobile-search" htmlFor="mobile-bond-search"><Search aria-hidden="true" /><span className="sr-only">모바일 채권 검색</span><input ref={mobileSearchRef} id="mobile-bond-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="채권명, 발행사, 등급 검색" /><button type="button" onClick={() => { setQuery(""); setMobileSearchOpen(false); }} aria-label="검색 닫기"><X /></button></label>}
 
-        <div className="evidence-mobile-picker">
+        <div className="pulse-mobile-picker">
           <label htmlFor="mobile-bond-picker">확인할 채권</label>
-          <div><Menu aria-hidden="true" size={18} /><select id="mobile-bond-picker" value={selected?.id ?? ""} onChange={(event) => { const record = monitoringRecords.find((bond) => bond.id === event.target.value); if (record) selectBond(record); }}>{monitoringRecords.map((bond) => <option value={bond.id} key={bond.id}>{bond.name} · {bond.state}</option>)}</select><ChevronDown aria-hidden="true" size={18} /></div>
+          <div><Menu aria-hidden="true" /><select id="mobile-bond-picker" value={selected?.id ?? ""} onChange={(event) => { const record = monitoringRecords.find((bond) => bond.id === event.target.value); if (record) selectBond(record); }}>{monitoringRecords.map((bond) => <option value={bond.id} key={bond.id}>{bond.name} · {bond.state} · 새 변화 {bond.unread}</option>)}</select><ChevronDown aria-hidden="true" /></div>
         </div>
 
-        <div className="evidence-workspace">
-          <aside className="evidence-bond-list" aria-label="보유 채권 목록">
-            <header><strong>보유 채권</strong><span>{filtered.length}건</span></header>
-            {filtered.length ? filtered.map((bond) => (
-              <button type="button" key={bond.id} aria-pressed={selected?.id === bond.id} onClick={() => selectBond(bond)}>
-                <span className="bond-list-head"><strong>{bond.name}</strong>{bond.unread > 0 && <span aria-label={`읽지 않은 알림 ${bond.unread}건`}>{bond.unread}</span>}</span>
-                <span className="bond-list-meta"><span>{bond.rating}</span><StateLabel state={bond.state} /></span>
-                <span className="bond-list-change">{bond.changeDate} · {bond.events.at(-1)?.title}</span>
-              </button>
-            )) : <div className="evidence-no-results"><Search size={20} /><p>검색 조건에 맞는 채권이 없습니다.</p><button type="button" onClick={() => { setQuery(""); searchRef.current?.focus(); }}>검색 초기화</button></div>}
+        <div className="pulse-workspace">
+          <aside className="pulse-bond-list" aria-label="추적 중인 채권">
+            <header><div><strong>추적 중인 채권</strong><span>{filtered.length}</span></div><button type="button" onClick={() => setDialog("add")}><Plus />채권 추가</button></header>
+            <label className="pulse-search" htmlFor="bond-search"><Search aria-hidden="true" /><span className="sr-only">채권 검색</span><input ref={searchRef} id="bond-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="채권명 또는 발행사" />{query && <button type="button" onClick={() => { setQuery(""); searchRef.current?.focus(); }} aria-label="검색어 지우기"><X /></button>}</label>
+            {filtered.length ? filtered.map((bond) => <button type="button" className="pulse-bond-row" key={bond.id} aria-pressed={selected?.id === bond.id} onClick={() => selectBond(bond)}>
+              <span><strong>{bond.name}</strong>{bond.unread > 0 && <b aria-label={`읽지 않은 변화 ${bond.unread}건`}>{bond.unread}</b>}</span>
+              <span><small>{bond.rating}</small><StateLabel state={bond.state} /></span>
+              <time>{bond.changeDate} · {bond.events.at(-1)?.title}</time>
+            </button>) : <div className="pulse-no-results"><Search /><p>검색 조건에 맞는 채권이 없습니다.</p><button type="button" onClick={() => { setQuery(""); searchRef.current?.focus(); }}>검색 초기화</button></div>}
           </aside>
 
-          <section className="evidence-detail" aria-live="polite">
+          <section className="pulse-detail" aria-live="polite">
             {selected ? <>
-              <header className="evidence-identity">
-                <div>
-                  <p>{selected.issuer}</p>
-                  <h2>{selected.name}</h2>
-                  <dl><div><dt>등급</dt><dd>{selected.rating}</dd></div><div><dt>만기</dt><dd>{selected.maturity}</dd></div><div><dt>표면금리</dt><dd>{selected.coupon}</dd></div><div><dt>최근 확인</dt><dd>{selected.changeDate}</dd></div></dl>
-                </div>
-                <div className="identity-actions"><StateLabel state={selected.state} /><button type="button" className="evidence-icon-button" aria-label="데이터 다시 확인" onClick={() => setNotice("최신 데모 기준일을 다시 확인했습니다.")}><RefreshCw size={18} /></button><button type="button" className="evidence-icon-button" aria-label="알림 설정" onClick={() => setNotice("알림 조건 설정은 후속 API 연동 범위입니다.")}><Bell size={18} /></button></div>
+              <header className="pulse-identity">
+                <div className="pulse-identity-name"><p>{selected.issuer}</p><h2>{selected.name}</h2><span>[데모 데이터]</span><div><strong>{selected.rating}</strong><StateLabel state={selected.state} /></div></div>
+                <dl><div><dt>만기</dt><dd>{selected.maturity}</dd></div><div><dt>표면금리</dt><dd>{selected.coupon}</dd></div><div><dt>최근 확인</dt><dd>{selected.changeDate}</dd></div></dl>
+                <div className="pulse-actions"><button type="button" className="pulse-primary" onClick={() => setTab("sources")}><FileText />공시 원문 보기</button><button type="button" onClick={() => setDialog("help")}><ShieldCheck />계산 기준</button><button type="button" aria-label="더보기" onClick={() => setTab("more")}><MoreHorizontal /></button></div>
               </header>
 
-              <nav className="evidence-tabs" role="tablist" aria-label="채권 상세 구역" onKeyDown={handleTabKeys}>
-                {([["overview", "요약"], ["changes", "변화"], ["evidence", "근거"], ["more", "더보기"]] as Array<[MonitoringTab, string]>).map(([value, label]) => <button type="button" role="tab" aria-selected={tab === value} key={value} onClick={() => setTab(value)}>{label}</button>)}
+              <nav className="pulse-tabs" role="tablist" aria-label="채권 상세 구역" onKeyDown={handleTabKeys}>
+                {([ ["overview", "요약"], ["changes", "변화 기록"], ["financials", "재무 지표"], ["sources", "공시 원문"], ["more", "더보기"] ] as Array<[MonitoringTab, string]>).map(([value, label]) => <button type="button" role="tab" aria-selected={tab === value} key={value} onClick={() => setTab(value)}>{label}</button>)}
               </nav>
 
-              <div className="evidence-panel" role="tabpanel">
-                {(tab === "overview" || tab === "changes") && <>
-                  <section className="event-section" aria-labelledby="event-rail-title">
-                    <div className="evidence-section-heading"><div><p>매수일 이후</p><h3 id="event-rail-title">근거 연결형 사건 연대기</h3></div><span>사건 {selected.events.length - 1}건</span></div>
-                    <ol className="event-rail">
-                      {selected.events.map((event, index) => <li key={event.id} data-active={activeEvent?.id === event.id}><button type="button" onClick={() => setEventId(event.id)} aria-pressed={activeEvent?.id === event.id}><time>{event.date}</time><span className="event-marker" aria-hidden="true" /><small>{event.kind}</small><strong>{event.title}</strong></button>{index < selected.events.length - 1 && <span className="event-connector" aria-hidden="true" />}</li>)}
+              <div className="pulse-panel" role="tabpanel">
+                {(tab === "overview" || tab === "changes") && <section className="pulse-timeline" aria-labelledby="credit-pulse-title">
+                  <div className="pulse-section-heading"><div><h3 id="credit-pulse-title">Credit Pulse</h3><p>매수 후 변화 기록</p></div><span>마지막 방문 이후 <strong>{selected.unread}건</strong></span></div>
+                  <div className="pulse-timeline-layout">
+                    <ol>
+                      {selected.events.map((event, index) => <li key={event.id} data-active={activeEvent?.id === event.id}><button type="button" onClick={() => setEventId(event.id)} aria-pressed={activeEvent?.id === event.id}><time>{event.date}</time><span className="pulse-node" aria-hidden="true" /><small>{event.kind}</small><strong>{event.title}</strong></button>{index < selected.events.length - 1 && <span className="pulse-connector" aria-hidden="true" />}</li>)}
                     </ol>
-                    {activeEvent && <div className="event-explanation" key={activeEvent.id}><FileText aria-hidden="true" size={19} /><div><p>{activeEvent.summary}</p><span>{activeEvent.source}</span></div><button type="button" onClick={() => setTab("evidence")}>근거 행 보기</button></div>}
-                  </section>
-
-                  <div className="evidence-analysis-grid">
-                    <section className="risk-matrix" aria-labelledby="risk-matrix-title">
-                      <div className="evidence-section-heading"><div><p>RISK_POLICY_V1</p><h3 id="risk-matrix-title">현재 위험 상태</h3></div><StateLabel state={selected.state} /></div>
-                      <div className="risk-matrix-table" role="table" aria-label="위험 범주별 현재 상태">
-                        {selected.categories.map((category) => <div role="row" key={category.label}><strong role="rowheader">{category.label}</strong><StateLabel state={category.state} /><span role="cell">{category.note}</span></div>)}
-                      </div>
-                    </section>
-
-                    <section className="financial-chart" aria-labelledby="financial-chart-title">
-                      <div className="evidence-section-heading"><div><p>매수 기준점 대비</p><h3 id="financial-chart-title">재무 변화</h3></div><div className="chart-legend"><span>기준</span><span>현재</span></div></div>
-                      <div className="financial-rows">
-                        {selected.financials.map((metric) => <div className="financial-row" key={metric.label}><div><strong>{metric.label}</strong><span>{metric.baseline} → <b>{metric.current}</b> {metric.unit}</span></div><MetricBar baseline={metric.baseline} current={metric.current} threshold={metric.threshold} /></div>)}
-                      </div>
-                      <p className="chart-summary">회계 기준점과 최신 공개 재무 snapshot의 deterministic 비교입니다. 색상 표시만으로 상태를 판단하지 마세요.</p>
-                    </section>
-                  </div>
-                </>}
-
-                {(tab === "overview" || tab === "evidence") && <section className="evidence-table-section" aria-labelledby="evidence-table-title">
-                  <div className="evidence-section-heading"><div><p>검증된 공개 자료</p><h3 id="evidence-table-title">최근 변화와 원문 근거</h3></div><span>{selected.events.length - 1}건</span></div>
-                  <div className="evidence-data-table" role="table">
-                    <div role="row" className="evidence-table-head"><span role="columnheader">공개일</span><span role="columnheader">변화</span><span role="columnheader">계산·원문</span><span role="columnheader">상태</span></div>
-                    {selected.events.slice(1).reverse().map((event) => <button type="button" role="row" key={event.id} data-active={activeEvent?.id === event.id} onClick={() => setEventId(event.id)}><time role="cell">{event.date}</time><strong role="cell">{event.title}</strong><span role="cell"><span>{event.summary}</span><small>{event.source}</small></span><span role="cell">검증됨</span></button>)}
+                    {activeEvent && <article className="pulse-event-detail" key={activeEvent.id}><p>{activeEvent.date} · {activeEvent.kind}</p><h4>{activeEvent.title}</h4><span>{activeEvent.summary}</span><small>{activeEvent.source}</small><button type="button" onClick={() => setTab("sources")}>공시 원문 보기<ArrowRight /></button></article>}
                   </div>
                 </section>}
 
-                {tab === "more" && <section className="more-section"><h3>분석 범위와 참고 해석</h3><div className="method-grid"><div><span>데이터 범위</span><strong>보유 내역 · 검증 사건 · 재무 snapshot</strong></div><div><span>상태 결정</span><strong>RISK_POLICY_V1 deterministic logic</strong></div><div><span>최근 확인</span><strong>{selected.changeDate}</strong></div></div></section>}
+                {(tab === "overview" || tab === "financials") && <div className="pulse-analysis-grid">
+                  <section className="pulse-risk-panel" aria-labelledby="risk-map-title">
+                    <div className="pulse-section-heading"><div><h3 id="risk-map-title">현재 위험 상태</h3><p>5개 범주의 현재 신호</p></div><StateLabel state={selected.state} /></div>
+                    <div className="pulse-risk-map" role="table" aria-label="위험 범주별 현재 상태">
+                      <div className="pulse-risk-head" role="row"><span role="columnheader">범주</span>{riskStates.map((state) => <span role="columnheader" key={state}>{state}</span>)}<span role="columnheader">최근 변화</span></div>
+                      {selected.categories.map((category) => <div role="row" key={category.label}><strong role="rowheader">{category.label}</strong>{riskStates.map((state) => <span role="cell" className="pulse-risk-cell" data-active={category.state === state} data-state={state} key={state}><span className="sr-only">{category.state === state ? `현재 ${state}` : state}</span></span>)}<span role="cell">{category.note}</span></div>)}
+                    </div>
+                  </section>
 
-                <details className="ai-reference" open={tab === "more"}>
-                  <summary><span>AI 참고 해석</span><small>공식 위험 상태를 변경하지 않습니다.</small></summary>
-                  <div><p>{selected.interpretation}</p><span>검증 사건과 계산 결과만 입력한 데모 설명입니다. 투자 추천이나 부도 예측이 아닙니다.</span></div>
-                </details>
+                  <section className="pulse-financial-panel" aria-labelledby="financial-movers-title">
+                    <div className="pulse-section-heading"><div><h3 id="financial-movers-title">재무 변화</h3><p>매수 기준점 대비 현재</p></div><div className="pulse-chart-legend"><span>기준</span><span>현재</span></div></div>
+                    <div className="pulse-financial-rows">
+                      {selected.financials.map((metric) => {
+                        const rate = changeRate(metric.baseline, metric.current);
+                        return <div className="pulse-financial-row" key={metric.label}><div><strong>{metric.label}</strong><span>{metric.baseline} → <b>{metric.current}</b> {metric.unit}</span></div><MetricBar baseline={metric.baseline} current={metric.current} threshold={metric.threshold} /><em data-direction={(rate ?? 0) >= 0 ? "up" : "down"}>{rate === null ? "비교 불가" : `${rate >= 0 ? "+" : ""}${rate.toFixed(1)}%`}</em></div>;
+                      })}
+                    </div>
+                    <button type="button" className="pulse-text-action" onClick={() => setDialog("help")}>계산 기준 보기<ArrowRight /></button>
+                  </section>
+                </div>}
+
+                {(tab === "overview" || tab === "changes") && <section className="pulse-activity" aria-labelledby="activity-title">
+                  <div className="pulse-section-heading"><div><h3 id="activity-title">최근 확인 활동</h3><p>자동으로 확인한 주요 변화</p></div><button type="button" onClick={() => setTab("sources")}>전체 보기<ArrowRight /></button></div>
+                  <div className="pulse-activity-table" role="table">
+                    <div role="row"><span role="columnheader">확인일</span><span role="columnheader">구분</span><span role="columnheader">주요 내용</span><span role="columnheader">출처</span></div>
+                    {selected.events.slice().reverse().map((event) => <button type="button" role="row" key={event.id} onClick={() => { setEventId(event.id); setTab("sources"); }}><time role="cell">{event.date}</time><span role="cell">{event.kind}</span><strong role="cell">{event.title}</strong><span role="cell">{event.source}</span></button>)}
+                  </div>
+                </section>}
+
+                {tab === "sources" && <section className="pulse-sources" aria-labelledby="sources-title"><div className="pulse-section-heading"><div><h3 id="sources-title">최근 확인된 변화</h3><p>공시 원문과 확인 내용을 함께 봅니다.</p></div><span>{selected.events.length - 1}건</span></div><div className="pulse-source-list">{selected.events.slice(1).reverse().map((event) => <article key={event.id}><time>{event.date}</time><div><strong>{event.title}</strong><p>{event.summary}</p><small>{event.source}</small></div><button type="button" onClick={() => setNotice("데모에서는 실제 DART 원문으로 이동하지 않습니다.")}>공시 원문 보기<ArrowRight /></button></article>)}</div></section>}
+
+                {tab === "more" && <section className="pulse-method"><h3>분석 범위와 변화 요약</h3><div><span>데이터 범위</span><strong>보유 내역 · 확인된 사건 · 재무 정보</strong></div><div><span>상태 결정</span><strong>정해진 RISK_POLICY_V1 계산 규칙</strong></div><div><span>최근 확인</span><strong>{selected.changeDate}</strong></div><details><summary>변화 요약 <small>AI 생성 참고 정보</small></summary><p>{selected.interpretation}</p><span>확인된 사건과 계산 결과만 사용한 데모 설명입니다. 투자 추천이나 부도 예측이 아닙니다.</span></details></section>}
               </div>
-            </> : <div className="evidence-empty-detail"><h2>채권을 선택할 수 없습니다.</h2><p>검색을 초기화한 뒤 다시 확인해 주세요.</p></div>}
+            </> : <div className="pulse-empty"><Search /><h2>채권을 찾을 수 없습니다.</h2><p>검색을 초기화하면 추적 중인 채권을 다시 볼 수 있습니다.</p><button type="button" onClick={() => setQuery("")}>검색 초기화</button></div>}
           </section>
         </div>
       </main>
-
-      <MobileNav />
-      <Dialog open={dialog === "help"} onClose={() => setDialog(null)} title="Bonda 분석 구조" eyebrow="사실과 해석의 책임 분리"><div className="dialog-copy"><h3>검증 사건 → 계산 → 참고 해석</h3><p>공식 위험 상태는 검증된 사건과 deterministic 규칙으로만 결정됩니다. AI 설명은 사실을 추가하거나 상태를 바꾸지 않습니다.</p></div></Dialog>
-      <Dialog open={dialog === "add"} onClose={() => setDialog(null)} title="보유 채권 추가" eyebrow="저장되지 않는 데모"><form className="dialog-form" onSubmit={submitBond} noValidate><label htmlFor="bond-name">채권명</label><input id="bond-name" required placeholder="예: 롯데케미칼 59-1" /><label htmlFor="purchase-date">매수일</label><input id="purchase-date" type="date" required /><label htmlFor="portfolio-kind">등록 위치</label><select id="portfolio-kind" defaultValue="holding"><option value="holding">보유 채권</option><option value="watchlist">관심 채권</option></select><button type="submit" className="primary-button">등록 흐름 확인</button></form></Dialog>
-      {notice && <Toast message={notice} onDismiss={() => setNotice("")} />}
     </div>
-  );
+
+    <MobileNav />
+    <Dialog open={dialog === "help"} onClose={() => setDialog(null)} title="Bonda 계산 기준" eyebrow="사실과 해석의 책임 분리"><div className="dialog-copy"><h3>확인된 사건 → 계산 → 변화 요약</h3><p>공식 위험 상태는 확인된 사건과 정해진 규칙으로만 결정됩니다. AI 설명은 사실을 추가하거나 상태를 바꾸지 않습니다.</p></div></Dialog>
+    <Dialog open={dialog === "add"} onClose={() => setDialog(null)} title="보유 채권 추가" eyebrow="저장되지 않는 데모"><form className="dialog-form" onSubmit={submitBond} noValidate><label htmlFor="bond-name">채권명</label><input id="bond-name" required placeholder="예: 롯데케미칼 59-1" /><label htmlFor="purchase-date">매수일</label><input id="purchase-date" type="date" required /><label htmlFor="portfolio-kind">등록 위치</label><select id="portfolio-kind" defaultValue="holding"><option value="holding">보유 채권</option><option value="watchlist">관심 채권</option></select><button type="submit" className="primary-button">등록 흐름 확인</button></form></Dialog>
+    {notice && <Toast message={notice} onDismiss={() => setNotice("")} />}
+  </>;
 }

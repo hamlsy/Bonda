@@ -1,19 +1,20 @@
 ---
 version: alpha
-name: "Bonda Evidence Rail"
-description: "검증된 사건과 계산 근거를 먼저 보여주는 개인투자자용 회사채 신용 리서치 워크스테이션"
+name: "Bonda Pulse Command"
+description: "매수 후 변화를 시간·상태·재무 흐름으로 보여주는 개인투자자용 회사채 신용 모니터링 워크스테이션"
 colors:
-  ink: "#17212B"
-  muted: "#5D6975"
-  canvas: "#F5F7F8"
+  ink: "#0B1736"
+  muted: "#53627A"
+  canvas: "#F1F6FD"
   surface: "#FFFFFF"
-  rule: "#C9D0D6"
-  control: "#24559A"
-  control-soft: "#E9F0F8"
-  normal: "#34735A"
-  watch: "#B65A1B"
-  caution: "#A43A32"
-  unavailable: "#6F7780"
+  rule: "#D6E0EF"
+  control: "#2F6BFF"
+  control-soft: "#EAF1FF"
+  cyan: "#18A7C7"
+  normal: "#0B996E"
+  watch: "#E98216"
+  caution: "#D64545"
+  unavailable: "#78869A"
 typography:
   sans:
     fontFamily: "Pretendard, 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif"
@@ -37,15 +38,15 @@ components:
   status-label: { }
 ---
 
-# Bonda Evidence Rail Design System
+# Bonda Pulse Command Design System
 
 ## Overview
 
 ### Creative North Star
 
-증권사 리서치 노트의 정렬된 표와 사건 연표를, 개인투자자가 전문 용어를 외우지
-않아도 읽을 수 있는 조용한 디지털 작업면으로 옮긴다. 선택된 기준 화면은
-[`docs/design/evidence-rail-reference.png`](docs/design/evidence-rail-reference.png)다.
+포트폴리오 관제 화면의 빠른 상태 파악과 리서치 노트의 정렬된 숫자를 결합해,
+개인투자자가 보유 채권의 변화를 ‘계속 추적되고 있다’고 느끼는 작업면을 만든다.
+선택된 기준 화면은 [`docs/design/monitoring-pulse-command-target.png`](docs/design/monitoring-pulse-command-target.png)다.
 
 ### Product context and register
 
@@ -54,16 +55,17 @@ components:
 - **Locale(s) and language policy:** UI와 제품 카피는 한국어 우선이며 영문은 ISIN, 규칙 버전 등 식별자에만 쓴다. 최종 문구는 제품 책임자가 검토한다.
 - **Usage scene:** 데스크톱에서는 여러 채권을 비교하고, 모바일에서는 선택한 한 채권의 최근 변화와 근거를 빠르게 확인한다.
 - **Register:** 제품 화면은 전문적인 리서치 도구, 랜딩은 절제된 브랜드 소개다.
-- **Memorable signature:** 사건을 선택하면 같은 사건의 근거 행이 연결되어 강조되는 `근거 연결형 사건 연대기`다.
+- **Memorable signature:** 매수 시점부터 최근 확인까지 사건을 잇고 선택한 변화를 즉시 펼치는 `Credit Pulse`다.
 - **Restraint:** 입력, 대화상자, 검색, 오류 복구는 익숙한 패턴을 유지하고 장식적 표현을 쓰지 않는다.
 - **Anti-references:** 보라색 gradient SaaS hero, 모든 내용을 둥근 카드로 감싼 AI dashboard, 실제 계약에 없는 추세 그래프, 기관 terminal을 흉내 낸 과밀 화면.
 - **Token ownership/runtime mapping:** 이 문서는 승인된 규칙을 기록한다. 실제 token owner는 `frontend/src/styles.css`이며 `npm run check:ui`와 strict premium audit으로 drift를 막는다.
 
 ## Colors
 
-Canvas `#F5F7F8` 위에 실제 작업면 Surface `#FFFFFF`를 놓고 Ink `#17212B`로 정보
-위계를 만든다. Control `#24559A`는 선택, focus, 주 동작에만 쓴다. Watch
-`#B65A1B`와 Caution `#A43A32`는 검증된 위험 상태와 임계치 초과에만 쓴다.
+Canvas `#F1F6FD` 위에 실제 작업면 Surface `#FFFFFF`를 놓고 Ink `#0B1736`으로 정보
+위계를 만든다. 상단 추적 현황은 Ink를 넓게 써 모니터링의 존재감을 만들고 Control
+`#2F6BFF`는 선택, focus, 주 동작에만 쓴다. Cyan `#18A7C7`는 정상 작동 신호,
+Watch `#E98216`과 Caution `#D64545`는 검증된 위험 상태와 임계치 초과에만 쓴다.
 상태는 색만으로 전달하지 않고 텍스트, 기호, 선 모양을 함께 사용한다. chart의 비교
 기준은 Rule `#C9D0D6`, 현재값은 Ink, 임계치 초과는 위험색으로 구분한다. gradient는
 쓰지 않으며 forced-colors에서는 플랫폼 색을 따른다.
@@ -79,8 +81,8 @@ monospace는 ISIN, source id, rule version에만 허용한다. 영문 대문자 
 
 ## Layout
 
-데스크톱은 최대 1440px 작업면에서 `240px 목록 + 유동 상세` 2열을 사용한다. 첫
-1280×800 viewport에 목록, 선택 채권 identity, 사건 연대기, 상태 matrix, 근거 진입점이
+데스크톱은 최대 1440px 작업면에서 `252px 목록 + 유동 상세` 2열을 사용한다. 첫
+1280×800 viewport에 추적 현황 band, 목록, 선택 채권 identity, Credit Pulse, 상태 matrix, 원문 진입점이
 함께 보여야 한다. 기본 간격은 6/10/14/20/24px의 작은 rhythm을 쓰고 section 사이만
 24px을 허용한다. 820px 이하에서는 목록을 상세 위에 쌓지 않고 전환 가능한 compact
 selector로 바꾼다. 620px 이하에서는 44px icon utility와 하단 navigation을 사용하고
@@ -121,7 +123,7 @@ button은 항상 accessible name과 tooltip 또는 인접 문맥을 가진다.
 ### Navigation and data display
 
 상단 navigation은 제품 영역을 구분하고 현재 route를 underline으로 표시한다. 상세
-section은 `요약`, `변화`, `근거` 3개를 우선하고 부가 기능은 `더보기`로 모은다. 채권
+section은 `요약`, `변화 기록`, `재무 지표`, `공시 원문`을 우선하고 부가 기능은 `더보기`로 모은다. 채권
 목록 행은 이름, 등급, 상태, 최신 변화 날짜를 같은 column에 맞춘다. 연대기는 실제
 사건만 discrete marker로 그리며 사건 간격을 추세로 오해하게 만드는 spline을 쓰지
 않는다. 모든 chart는 같은 값을 담은 요약 또는 표를 함께 제공한다.

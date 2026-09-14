@@ -16,7 +16,7 @@ const source = sourceFiles.map(({ content }) => content).join('\n');
 const appSource = readFileSync(fileURLToPath(new URL('../src/App.tsx', import.meta.url)), 'utf8');
 const monitoringSource = readFileSync(fileURLToPath(new URL('../src/MonitoringPage.tsx', import.meta.url)), 'utf8');
 const stylesSource = readFileSync(fileURLToPath(new URL('../src/styles.css', import.meta.url)), 'utf8');
-const evidenceStyles = stylesSource.split('/* Evidence Rail — canonical monitoring workspace */')[1]?.split('/* Monitoring workspace inspired')[0] ?? '';
+const monitoringStyles = stylesSource.split('/* Pulse Command — canonical monitoring workspace */')[1] ?? '';
 const failures = [];
 
 const forbiddenPatterns = [
@@ -38,7 +38,7 @@ const clickableDivFiles = sourceFiles.filter(({ content }) => /<div[^>]*onClick=
 if (clickableDivFiles.length) failures.push(`clickable div without native button semantics (${clickableDivFiles.join(', ')})`);
 
 if (/bonda_mock_main/.test(appSource)) failures.push('monitoring route imports legacy mock source');
-if (/transition\s*:\s*all|transition-all|animate-pulse|linear-gradient\(/.test(`${monitoringSource}\n${evidenceStyles}`)) failures.push('monitoring contains decorative or catch-all motion');
+if (/transition\s*:\s*all|transition-all|animate-pulse|linear-gradient\(/.test(`${monitoringSource}\n${monitoringStyles}`)) failures.push('monitoring contains decorative or catch-all motion');
 if (/<form(?![^>]*noValidate)[^>]*>/s.test(monitoringSource)) failures.push('monitoring form without app-owned validation');
 
 if (failures.length) {

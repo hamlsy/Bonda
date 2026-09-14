@@ -17,7 +17,7 @@
 | 제품 범위와 금지 표현 | `docs/PRODUCT.md` | Product brief | 2026-09-14 |
 | 데이터 lifecycle와 API | `docs/IMPLEMENTATION_SPEC.md` | Domain/API spec | 2026-09-14 |
 | 삭제와 중복 처리 | `docs/IMPLEMENTATION_SPEC.md` Holding/Watchlist | Domain spec | 2026-09-14 |
-| 시각 개선 승인 범위 | `docs/FRONTEND_REFINEMENT_PLAN.md` | Approved plan | 2026-09-14 |
+| 시각 시스템과 승인 기준 | `DESIGN.md` | Design contract | 2026-09-14 |
 | 한국 금융 콘텐츠 관례 | `docs/PRODUCT.md` | Product brief | 2026-09-14 |
 
 ## Visual contract
@@ -123,7 +123,7 @@
 
 ## Migration status
 
-- Migration ledger location: `docs/FRONTEND_REFINEMENT_PLAN.md`
+- Migration status: Pulse Command 전환 완료. 최종 비교와 검증 기록은 `design-qa.md`에서 관리한다.
 - Canonical primitives and owners: `frontend/src`, `frontend/src/styles.css`, shared `Navigation.tsx` and `Dialogs.tsx`.
 - Current risk-prioritized slices: `/monitoring`, then mobile, then landing and preserved routes.
 - Legacy import/token enforcement: runtime routes must not import `frontend/mock`; broad class-string overrides are prohibited.
@@ -136,7 +136,7 @@
 - Accessibility checks: keyboard main task, visible focus, names/roles, target size, reflow, chart text alternative.
 - Native-language/domain review and target-user evidence: product owner reviews Korean risk and non-recommendation copy; task evidence is recorded in `design-qa.md`.
 - Component-state/visual regression coverage: default, selected, no-results, dialog, mobile detail, reduced-motion.
-- Canonical sibling flow used for comparison: selected design reference in `docs/design/evidence-rail-reference.png`.
+- Canonical sibling flow used for comparison: selected design reference in `docs/design/monitoring-pulse-command-target.png`.
 - Project audit command/result: recorded at completion in `design-qa.md`.
 - CRUD full-flow evidence: create/delete demo or API fixture flow when the backend is available.
 - Failure-path evidence: no-results and API read failure recovery are mandatory captures/tests.
