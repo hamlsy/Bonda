@@ -581,9 +581,8 @@
   .evidence-app .site-header { min-height: 3.45rem; }
   .evidence-app .header-status { font-size: 0.62rem; }
   .evidence-main { padding-top: 0.8rem; padding-bottom: calc(5.25rem + env(safe-area-inset-bottom)); }
-  .evidence-toolbar { align-items: center; gap: 0.7rem; margin-bottom: 0.7rem; }
-  .evidence-context { font-size: 0.65rem; }
-  .evidence-toolbar h1 { max-width: 15rem; font-size: 1.12rem; line-height: 1.25; }
+  .evidence-toolbar { align-items: center; justify-content: end; gap: 0.7rem; margin-bottom: 0.55rem; }
+  .evidence-toolbar > div:first-child { display: none; }
   .evidence-tools { gap: 0.35rem; }
   .evidence-search,
   .desktop-only { display: none; }
@@ -605,7 +604,7 @@
   .evidence-tabs button { min-width: 0; min-height: 2.9rem; flex: 1; }
   .evidence-panel { padding: 0.9rem; }
   .event-rail { display: block; overflow: visible; padding-top: 0; }
-  .event-rail li { position: relative; display: grid; min-height: 4.25rem; grid-template-columns: 1.1rem minmax(0, 1fr); }
+  .event-rail li { position: relative; display: grid; min-height: 3.65rem; grid-template-columns: 1.1rem minmax(0, 1fr); }
   .event-rail button { display: grid; min-width: 0; grid-column: 1 / -1; grid-template-columns: 1.1rem minmax(0, 1fr) auto; column-gap: 0.55rem; align-items: center; }
   .event-rail time { grid-column: 2; grid-row: 1; }
   .event-marker { grid-column: 1; grid-row: 1 / 4; }

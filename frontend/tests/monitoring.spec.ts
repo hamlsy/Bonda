@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page }, testInfo) => {
   await page.goto("/monitoring");
-  await expect(page.getByRole("heading", { name: "변화와 근거를 한 화면에서 확인하세요" })).toBeVisible();
+  const entryHeading = testInfo.project.name.startsWith("mobile") ? "롯데케미칼 59-1" : "변화와 근거를 한 화면에서 확인하세요";
+  await expect(page.getByRole("heading", { name: entryHeading })).toBeVisible();
 });
 
 test("채권 변화에서 원문 근거까지 이동한다", async ({ page }, testInfo) => {
