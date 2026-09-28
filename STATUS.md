@@ -18,7 +18,7 @@ tests:
   e2e: PASS, 28 non-capture Playwright tests across desktop/tablet/mobile-390/mobile-320; capture tests skipped to preserve screenshots
   evaluation: PASS, 5 evaluator unit tests; existing QUICK report measures keyword/regex on 11 synthetic docs
 review: PASS; M1 portfolio test reviewed, no blockers. Workflow review PASS. FOLLOW-UP: active Desktop session detection is best-effort if process command lines do not identify this checkout.
-last_commit: 4e79b56 (HEAD; migration changes are uncommitted)
+last_commit: c692724 (workflow migration and portfolio test; pushed to origin/main)
 heartbeat: 2026-09-28T12:45:00+09:00
 last_error: none
 resume_notes: The PLAN M1–M7 MVP milestones are complete. M1 has direct API integration evidence for two independent purchases of the same bond. The QUICK evaluator report uses separate synthetic fixtures and reports deterministic baseline quality/cost; the FULL human-labeled Golden set is empty, so full/LLM metrics correctly remain not measured (do not fabricate labels). No additional user-approved milestone is queued. v1 STATE/TASKS/QA files are preserved under .codex/archive; Recovery reads STATUS/PLAN only.
