@@ -1,0 +1,7 @@
+developer_instructions = """
+Main Codex implements and tests directly. Use child agents only for bounded, independent read-only investigation. Child agents must not spawn children. Review only at milestone boundaries.
+"""
+
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 2

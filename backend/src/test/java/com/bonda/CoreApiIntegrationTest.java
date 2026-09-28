@@ -54,11 +54,34 @@ class CoreApiIntegrationTest {
             .andExpect(jsonPath("$.bond.id").value(1))
             .andExpect(jsonPath("$.purchaseAmount").value(1000000.00));
 
+        mockMvc.perform(post("/api/holdings")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "bondId": 1,
+                      "purchaseDate": "2026-02-15",
+                      "purchaseAmount": "250000.50"
+                    }
+                    """))
+            .andExpect(status().isCreated())
+            .andExpect(header().string("Location", "/api/holdings/2"))
+            .andExpect(jsonPath("$.bond.id").value(1))
+            .andExpect(jsonPath("$.purchaseAmount").value(250000.50));
+
         mockMvc.perform(get("/api/holdings"))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1));
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].id").value(2))
+            .andExpect(jsonPath("$[0].purchaseDate").value("2026-02-15"))
+            .andExpect(jsonPath("$[0].purchaseAmount").value(250000.50))
+            .andExpect(jsonPath("$[1].id").value(1))
+            .andExpect(jsonPath("$[1].purchaseDate").value("2026-01-15"))
+            .andExpect(jsonPath("$[1].purchaseAmount").value(1000000.00));
 
         mockMvc.perform(delete("/api/holdings/1"))
+            .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/api/holdings/2"))
             .andExpect(status().isNoContent());
 
         mockMvc.perform(get("/api/holdings"))

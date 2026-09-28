@@ -25,6 +25,8 @@ Thumbs.db
 
 # Logs
 *.log
+!.codex/logs/recovery.log
+!.codex/logs/codex-resume-last.log
 
 # Evaluation runtime artifacts
 **/__pycache__/
