@@ -61,7 +61,7 @@ acceptance:
 - [x] 현금성자산 감소·영업현금흐름 감소가 개선을 뜻하는 초록색으로 보이지 않는다. 기존 수치·부호·단위·선택 동작은 같다.
 - [x] `npm run build`, `npm run check:ui`, 관련 `npm run test:ui`를 실제 실행하고 결과를 보고한다. 스크린샷만으로 동작 PASS를 주장하지 않는다.
 - [x] 변화 없는 대한항공 101의 390px·1440px 재캡처에서 변화 도트와 주황색 상태 암시가 없고, 새 변화가 있는 두 채권에는 도트와 건수가 유지된다.
-- [ ] Designer가 Stage 1 PASS를 알리면 Stage 1에 속한 파일만 commit 후 `origin/main`에 push하고 SHA와 원격 결과를 보고한다. 기존 미커밋 `.codex`, `PLAN.md`, `STATUS.md`, 다른 design 자료는 자동 stage하지 않는다. 이미 더러웠던 frontend 파일의 기존 hunks는 확인하여 승인된 이전 디자인 변경인지 분리·보고한다.
+- [x] Designer가 Stage 1 PASS를 알리면 Stage 1에 속한 파일만 commit 후 `origin/main`에 push하고 SHA와 원격 결과를 보고한다. 기존 미커밋 `.codex`, `PLAN.md`, `STATUS.md`, 다른 design 자료는 자동 stage하지 않는다. 이미 더러웠던 frontend 파일의 기존 hunks는 확인하여 승인된 이전 디자인 변경인지 분리·보고한다.
 
 ## Stage 2 — `/holdings/:holdingId/since-bought`: 채권 초보자의 상세 읽기
 
@@ -86,6 +86,7 @@ designer_notes:
 
 frontend_notes:
 
+2026-10-03 Stage 1 디자인 PASS 이후 승인된 구현·테스트·handoff·Stage 1 캡처 8장만 `e5d392fddf309b004a97e3c73e8d8e7eab7f9903`으로 커밋하고 `origin/main`에 push했다(`ee8ff8c..e5d392f`). 기존에 미커밋이던 `MonitoringPage.tsx`, `styles.css`, `monitoring.spec.ts`의 이전 승인 D1–D3 변경은 Stage 1 변경과 같은 파일에 공존해 포함됐다. 별도 M1–M2 모바일 시트 애니메이션 CSS hunk와 `Dialogs.tsx`·`routes.spec.ts` 등 다른 미커밋 변경은 stage하지 않았다. push 범위에는 로컬에 이미 있던 `3c6d5f1` 문서 커밋도 포함됐다. Stage 2/3은 시작하지 않았다.
 2026-10-03 S1-R1: `unread=0`인 대한항공 101의 모바일 selector·데스크톱 채권 행·사건 요약을 `새로 확인할 변화 없음` 중립 문구로 통일하고, 해당 영역의 변화 도트를 제거했다. 타임라인 선택 marker에는 상태색인 주황 대신 기존 선택 accent를 사용했다. 기본 롯데케미칼 2건과 CJ CGV 3건의 도트·건수는 유지된다. build/check:ui PASS, Stage 1 Playwright 2/2 PASS, monitoring E2E 36/36 PASS. 1440×900·390×844에서 기본 선택과 대한항공 선택을 각각 캡처하고 확인했다. 디자이너 재검수 전 commit/push하지 않았다.
 2026-10-03 Frontend Developer Stage 1 구현: `/monitoring`에서 변화 있는 채권을 목록 앞에 두고 변화 없는 채권은 접었다. 검색으로 변화 없는 채권을 찾으면 결과가 보이도록 그룹이 열린다. 기존 선택·검색·추가·탭 동작과 동일 데모 데이터를 유지했다. 모바일 첫 viewport에는 선택 채권, 사건 제목·날짜, Bonda 상태, 공시 원문 버튼이 보인다.
 신용등급·전망과 Bonda 계산 상태를 별도 줄로 분리했다. 사건에 이미 존재하는 범주를 연결해 표시하고 다섯 범주는 `전체 상태 보기`로 접었다. 재무 증감률은 부호와 무관하게 중립 잉크색으로 표시하며 기준·현재의 실제 값과 단위를 모두 남겼다. 두 점 비교의 0 기준은 음수 영업현금흐름에서도 유지하고, 기존 임계값이 있는 행에만 임계 tick을 표시한다. 변화 도트는 항상 `새 변화 N건` 텍스트와 함께 쓴다. Backend/API/RiskPolicy/계산 로직은 수정하지 않았다.
