@@ -4,10 +4,10 @@ status:
 READY_FOR_REVIEW
 
 review_round:
-1
+0
 
 target:
-Stage 1 — `/monitoring`의 새 변화 목록, 숫자 의미, 변화 아이콘. Stage 2와 3은 명세만 확정하며 Designer가 Stage 1 캡처와 push를 승인할 때까지 구현하지 않는다.
+Stage 2 — `/holdings/:holdingId/since-bought`의 채권 초보자용 상세 읽기. Stage 1은 디자인 PASS 후 `19bcdc2e6314f33d9b3ba6f957ce427e5d2c6fe8`까지 origin/main에 push됐다. Stage 3은 Stage 2 캡처 검수와 push 이후 시작한다.
 
 viewports:
 
@@ -21,12 +21,13 @@ screenshots:
 - Stage 1 full-page evidence: [desktop](design/audit/2026-10-02-redesign/stage-1/monitoring-desktop-full.png), [mobile](design/audit/2026-10-02-redesign/stage-1/monitoring-mobile-full.png). Before 파일은 갱신하지 않았다.
 - Stage 1 S1-R1 review: [desktop 기본 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-desktop-default-1440x900.png), [desktop 대한항공 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-desktop-quiet-1440x900.png), [mobile 기본 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-mobile-default-390x844.png), [mobile 대한항공 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-mobile-quiet-390x844.png).
 - Stage 2 Before: [holding desktop](design/audit/current/holding-desktop-1440.png), [holding mobile](design/audit/current/holding-mobile-390.png)
+- Stage 2 After: [holding desktop 1440×900](design/audit/2026-10-02-redesign/stage-2/holding-desktop-1440x900.png), [holding mobile 390×844](design/audit/2026-10-02-redesign/stage-2/holding-mobile-390x844.png), [desktop full-page](design/audit/2026-10-02-redesign/stage-2/holding-desktop-full.png), [mobile full-page](design/audit/2026-10-02-redesign/stage-2/holding-mobile-full.png). Before 파일은 갱신하지 않았다.
 - Stage 3 Before: [evidence desktop](design/audit/current/source-desktop-1440.png), [evidence mobile](design/audit/current/source-mobile-390.png), [Replay desktop](design/audit/current/replay-desktop-1440.png), [Replay mobile](design/audit/current/replay-mobile-390.png)
 - 각 Stage의 After 캡처는 `design/audit/2026-10-02-redesign/stage-N/`에 같은 fixture·viewport로 별도 저장한다. Before를 덮어쓰지 않는다.
 
 blockers:
 
-- Stage 1: 없음. S1-R1의 변화 도트·`0건`·주황색 marker 문제는 390px·1440px 재캡처와 QA 재검수에서 해소됐다. 채권 상세·Replay의 상단 정보 우선순위는 Stage 2/3 작업으로 남는다.
+- Stage 2: 없음. 사건별 위험 범주와 신용등급 전망은 응답에 없어 추정 표시하지 않았으며, 현재 상태와 전체 범주 펼침을 이번 단계의 수용 기준으로 확정했다.
 
 improvements:
 
@@ -65,11 +66,15 @@ acceptance:
 
 ## Stage 2 — `/holdings/:holdingId/since-bought`: 채권 초보자의 상세 읽기
 
-- [ ] **S2-1** 남색 `HOLDING PULSE` 안내 배너와 큰 질문 문장, 반복 `1개의 변화` 요약 보드를 제거한다. 모바일 상단은 채권명(최대 24px/32px) → 마지막 사건 제목·날짜 → 현재 확인 상태 → `원문에서 확인` 순서. 실제 사건이 없으면 `새 변화 없음`과 마지막 확인 시각을 보여 준다.
-- [ ] **S2-2** 다섯 범주를 일렬로 나열하기 전에 이번 사건과 관계된 범주를 본문으로 꺼낸다. 전체 상태는 펼침으로 제공한다. 신용등급 전망과 Bonda 계산 상태는 혼동되지 않게 별도 표기한다.
-- [ ] **S2-3** 타임라인은 실제 날짜를 가진 사건만 배치하고 매수 기준점은 유지한다. 균등 간격의 선을 연속 시간축처럼 보이게 하지 않는다. 선택 사건의 날짜·제목·근거가 한 덩어리로 읽히게 한다.
-- [ ] **S2-4** AI 설명이 `NOT_NEEDED`이면 빈 `Bonda의 해석` 카드를 렌더링하지 않는다. 설명이 있을 때만 사실·계산 뒤의 접힌 `참고 설명`으로 제공한다. 재무 비교는 실제 기준 기간을 값 옆에 적고 위험 결론을 임의로 추가하지 않는다.
-- [ ] Stage 2 1440/390 캡처 → Designer 검수 → build/check/UI test → Stage 2 파일만 commit/push 순서로 진행한다.
+- [x] **S2-1** 남색 `HOLDING PULSE` 안내 배너와 큰 질문 문장, 반복 `1개의 변화` 요약 보드를 제거한다. 모바일 상단은 채권명(최대 24px/32px) → 마지막 사건 제목·날짜 → 현재 확인 상태 → `원문에서 확인` 순서. 실제 사건이 없으면 `새 변화 없음`과 마지막 확인 시각을 보여 준다.
+- [x] **S2-2** 다섯 위험 범주를 첫 화면에 일렬로 나열하지 않고 `전체 상태 보기` 펼침에 둔다. 사건과 위험 범주의 명시적 연결 정보가 API에 있을 때만 해당 범주를 사건 옆에 표시한다. 현재 SinceBoughtResponse에는 그 필드가 없으므로 이번 Stage 2에서는 제공된 Bonda 현재 상태만 사건 옆에 두고, 범주를 제목·severity에서 추정하지 않는다. 신용등급·전망이 응답에 있는 경우에만 Bonda 상태와 별도 표기한다.
+- [x] **S2-3** 타임라인은 실제 날짜를 가진 사건만 배치하고 매수 기준점은 유지한다. 균등 간격의 선을 연속 시간축처럼 보이게 하지 않는다. 선택 사건의 날짜·제목·근거가 한 덩어리로 읽히게 한다.
+- [x] **S2-4** AI 설명이 `NOT_NEEDED`이면 빈 `Bonda의 해석` 카드를 렌더링하지 않는다. 설명이 있을 때만 사실·계산 뒤의 접힌 `참고 설명`으로 제공한다. 재무 비교는 실제 기준 기간을 값 옆에 적고 위험 결론을 임의로 추가하지 않는다.
+- [x] **S2-5** 현재 캡처의 `총차입금 2024 → 2025 +12.2%`처럼 정책상 악화·개선 의미가 별도 검증되지 않은 재무 증감은 빨간색과 상승 화살표로 경고처럼 표시하지 않는다. `2024년 값 → 2025년 값 · +12.2%`를 같은 행에서 중립 잉크색으로 보여 준다. 금액 단위·부호·정확한 기존 데이터는 유지한다. Stage 1의 두 점 비교를 재사용할 수 있을 때만 쓰고 연속 추세를 암시하는 선은 추가하지 않는다.
+- [x] **S2-6 첫 화면 구조:** 모바일에서 앱 헤더 아래 첫 섹션을 `채권명(최대 24/32) + 매수일`의 짧은 identity 줄로 만들고, 그 바로 다음에 `최근 변화 제목 + 실제 날짜 + 관련 Bonda 범주/현재 상태 + 원문에서 확인`을 한 묶음으로 둔다. 이 묶음의 제목·날짜·상태·원문 버튼이 390×844 첫 viewport에 모두 보여야 한다. 데스크톱에서도 `HOLDING PULSE` 및 큰 남색 요약판 자리에 이 사건 묶음을 우선 배치한다. 남은 매수금액·추적기간 등 메타는 사건 뒤의 보조 정보로 둔다. 페이지 전체를 새 카드 그리드로 채우지 않는다.
+- [x] Stage 2 1440/390 캡처와 build/check/UI test를 실행한다.
+- [ ] Designer가 Stage 2 캡처를 검수한 뒤 Stage 2 파일만 commit/push한다.
+- [x] Stage 2 After는 같은 `[데모] 한결산업 1회 회사채` 데이터로 1440×900·390×844 및 full-page를 `design/audit/2026-10-02-redesign/stage-2/`에 저장한다. Before를 덮어쓰지 않는다. 화면과 기능 검수 전에는 commit/push하지 않는다.
 
 ## Stage 3 — Evidence·Replay와 전체 흐름
 
@@ -83,9 +88,14 @@ designer_notes:
 2026-10-02 현재 렌더링을 데모 fixture와 Edge 1440/390에서 다시 확인했다. 실제 backend 데이터를 검증한 것은 아니다. 사용자가 3단계 구현과 각 단계 commit/push, 중간 Designer 캡처 검수를 명시적으로 승인했다. 본 Designer 세션은 프로덕션 frontend 코드를 수정하지 않는다. 과거 PASS 내역은 [이전 handoff 기록](design/audit/2026-10-01/handoff-history.md)에 보관했다. 거절된 ledger 시안의 코드·스크린샷은 복원하지 않는다.
 2026-10-03 Stage 1 데스크톱·모바일 Before/After를 직접 비교했다. 첫 viewport의 변화·채권·상태·원문 순서는 개선됐고 재무 감소의 오해 유발 색도 사라졌다. QA가 변화 없는 채권에서 아이콘 의미와 주황색 marker 충돌을 재현해 review_round 1의 CHANGES_REQUESTED로 돌린다. 수정 범위는 S1-R1 한 건이며 Stage 2/3은 아직 시작하지 않는다.
 2026-10-03 Stage 1 디자인 PASS. S1-R1 재캡처 네 장을 직접 확인했고 QA도 blocker 해소 및 모니터링 비캡처 E2E 36/36 통과를 확인했다. Stage 1에 속한 변경의 commit/push를 승인한다. push 결과를 확인한 뒤 Stage 2 handoff로 전환한다.
+2026-10-03 Stage 2 S2-2 해석: SinceBoughtResponse에 사건별 위험 범주 연결 필드가 없음을 확인했다. 이번 UI 개선에서 이를 추정 표시하도록 요구하지 않는다. 현재 상태와 전체 범주 펼침만으로 Stage 2를 검수하고, 데이터가 생기는 별도 제품/API 작업이 승인될 때 사건별 범주를 붙인다.
+2026-10-03 Stage 2 디자인 PASS. 동일 한결산업 fixture의 1440×900·390×844 Before/After와 full-page를 직접 비교했다. 모바일 첫 화면에 채권·매수일·최근 사건·실제 날짜·Bonda 현재 상태·원문 버튼이 보이고, 빈 AI 카드·중복 남색 요약판·의미가 검증되지 않은 빨간 증감률은 사라졌다. QA BLOCKER/FOLLOW-UP 없음, build/check:ui/관련 비캡처 E2E 24/24 PASS. Stage 2 변경의 commit/push를 승인한다. `총차입금` 같은 초보자에게 어려운 용어의 쉬운 설명은 Stage 3의 전체 문구 점검에서 다루며 이번 단계를 막지 않는다.
 
 frontend_notes:
 
+2026-10-03 Frontend Developer Stage 2 구현: 보유 채권의 짧은 identity와 실제 날짜가 있는 최신 사건·Bonda 현재 상태·원문 진입점을 첫 390×844 viewport에 배치했다. `HOLDING PULSE` 배너·큰 질문·중복 남색 요약판을 제거하고, 매수금액을 사건 뒤로 옮겼다. 현재 다섯 범주는 `전체 상태 보기`에 두고 날짜순 기록을 연속 시간축처럼 보이지 않는 목록으로 바꿨다. `NOT_NEEDED` 빈 AI 카드는 렌더링하지 않으며 설명이 있을 때만 접힌 참고 설명으로 제공한다. 재무 값은 기존 금액·부호·기간을 유지한 같은 행의 중립 잉크색 비교로 표시한다. API·backend·금융 계산은 변경하지 않았다.
+기존 `SinceBoughtResponse`에는 사건별 위험 범주와 신용등급 전망이 없어 본문에 특정 범주나 전망을 추정해 붙이지 않았다. `currentRiskState`의 현재 Bonda 상태를 최신 사건 옆에 표시하고 범주별 현재 상태는 펼침에 유지했다. Web Designer가 이를 이번 단계의 수용 기준으로 확정했다.
+검증: `npm run build` PASS, `npm run check:ui` PASS, Stage 2 Edge Playwright 기본·변화 없음·근거 열기·오류 재시도 3/3 PASS, 관련 route/Stage 2 비캡처 E2E 20/20 PASS. 1440×900·390×844 viewport와 full-page 캡처 네 장을 같은 fixture로 저장해 Before/After를 확인했다. 기존 screenshot baseline은 갱신하지 않았다. 다른 route의 local backend 미기동으로 proxy 경고가 있었으나 E2E는 통과했다. Web Designer의 중간 검수 전 commit/push하지 않았다.
 2026-10-03 Stage 1 디자인 PASS 이후 승인된 구현·테스트·handoff·Stage 1 캡처 8장만 `e5d392fddf309b004a97e3c73e8d8e7eab7f9903`으로 커밋하고 `origin/main`에 push했다(`ee8ff8c..e5d392f`). 기존에 미커밋이던 `MonitoringPage.tsx`, `styles.css`, `monitoring.spec.ts`의 이전 승인 D1–D3 변경은 Stage 1 변경과 같은 파일에 공존해 포함됐다. 별도 M1–M2 모바일 시트 애니메이션 CSS hunk와 `Dialogs.tsx`·`routes.spec.ts` 등 다른 미커밋 변경은 stage하지 않았다. push 범위에는 로컬에 이미 있던 `3c6d5f1` 문서 커밋도 포함됐다. Stage 2/3은 시작하지 않았다.
 2026-10-03 S1-R1: `unread=0`인 대한항공 101의 모바일 selector·데스크톱 채권 행·사건 요약을 `새로 확인할 변화 없음` 중립 문구로 통일하고, 해당 영역의 변화 도트를 제거했다. 타임라인 선택 marker에는 상태색인 주황 대신 기존 선택 accent를 사용했다. 기본 롯데케미칼 2건과 CJ CGV 3건의 도트·건수는 유지된다. build/check:ui PASS, Stage 1 Playwright 2/2 PASS, monitoring E2E 36/36 PASS. 1440×900·390×844에서 기본 선택과 대한항공 선택을 각각 캡처하고 확인했다. 디자이너 재검수 전 commit/push하지 않았다.
 2026-10-03 Frontend Developer Stage 1 구현: `/monitoring`에서 변화 있는 채권을 목록 앞에 두고 변화 없는 채권은 접었다. 검색으로 변화 없는 채권을 찾으면 결과가 보이도록 그룹이 열린다. 기존 선택·검색·추가·탭 동작과 동일 데모 데이터를 유지했다. 모바일 첫 viewport에는 선택 채권, 사건 제목·날짜, Bonda 상태, 공시 원문 버튼이 보인다.

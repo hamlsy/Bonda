@@ -2765,6 +2765,72 @@ footer { padding: 1.2rem 0 1.6rem; border-top: 1px solid var(--color-line); }
 .pulse-product-page .not-found > div { justify-content: center; }
 .pulse-product-page > footer { width: min(calc(100% - 2.5rem), 78rem); margin: 0 auto; }
 
+/* Since bought: the verified event leads, with history and calculations below. */
+.since-shell.pulse-product-page > main { padding-top: 0.5rem; }
+.since-identity { padding: 1.1rem 0 0.85rem; border-bottom: 1px solid var(--color-line); }
+.since-identity .since-issuer { margin-bottom: 0.25rem; }
+.since-identity h1 { max-width: 48rem; margin: 0; color: var(--page-navy); font-size: 1.5rem; font-weight: 750; line-height: 1.33; overflow-wrap: anywhere; }
+.since-identity > p:last-child { margin: 0.55rem 0 0; color: var(--color-muted); font-size: 0.75rem; }
+.since-identity time,
+.since-latest time { font-variant-numeric: tabular-nums; }
+.since-latest { padding: 1.2rem 0 1.35rem; border-bottom: 1px solid var(--color-line); }
+.since-latest .section-label { margin: 0 0 0.35rem; }
+.since-latest h2 { max-width: 50rem; margin: 0 0 0.4rem; font-size: 1.5rem; line-height: 1.35; }
+.since-latest > time,
+.since-latest > p:not(.section-label) { color: var(--color-muted); font-size: 0.875rem; line-height: 1.55; }
+.since-latest > p { margin: 0.5rem 0 0; }
+.since-latest .since-latest-state { color: var(--color-ink); }
+.since-latest .since-latest-state strong { font-weight: 750; }
+.since-latest .since-latest-summary { max-width: 54rem; color: var(--color-ink) !important; }
+.since-latest .evidence-disclosure { margin-top: 0.7rem; }
+.since-latest .evidence-toggle { min-height: 44px; padding: 0; border: 0; background: transparent; font-size: 0.875rem; font-weight: 750; }
+.since-purchase-amount { display: flex; gap: 0.6rem; margin: 0; padding: 0.8rem 0; border-bottom: 1px solid var(--color-line); color: var(--color-muted); font-size: 0.75rem; }
+.since-purchase-amount strong { color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.pulse-product-page .risk-state-section { margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.since-risk-details { border-bottom: 1px solid var(--color-line); }
+.since-risk-details summary { display: flex; min-height: 44px; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.875rem; font-weight: 750; cursor: pointer; }
+.since-risk-details summary span { color: var(--color-muted); }
+.since-risk-details > p { margin: 0.15rem 0 0.7rem; color: var(--color-muted); font-size: 0.75rem; }
+.since-risk-details .risk-state-grid { margin-bottom: 1rem; border: 0; border-radius: 0; }
+.since-risk-details .risk-state-grid > div { border-top: 1px solid var(--color-line); }
+.since-layout { grid-template-columns: minmax(0, 1.25fr) minmax(18rem, 0.75fr); gap: 2rem; padding-top: 1.5rem; }
+.pulse-product-page .timeline-section,
+.pulse-product-page .financial-section,
+.pulse-product-page .explanation-section { padding: 0; border: 0; border-radius: 0; background: transparent; }
+.since-shell .risk-timeline { display: grid; grid-auto-columns: auto; grid-auto-flow: row; gap: 0; overflow: visible; padding: 0; }
+.since-shell .risk-timeline > li { display: block; padding: 0.9rem 0; border-bottom: 1px solid var(--color-line); }
+.since-shell .risk-timeline > li::before,
+.since-shell .timeline-marker { display: none; }
+.since-shell .risk-timeline article { padding: 0; }
+.since-shell .risk-timeline h3 { margin-top: 0.3rem; }
+.since-shell .timeline-meta { font-size: 0.75rem; }
+.since-shell .risk-timeline article > p { font-size: 0.875rem; }
+.since-aside { display: block; }
+.since-shell .financial-list { padding: 0; list-style: none; }
+.since-shell .financial-list strong { color: var(--color-ink); font-size: 0.875rem; }
+.since-shell .financial-list p { color: var(--color-ink); font-size: 0.875rem; line-height: 1.5; }
+.since-shell .financial-list span { font-size: 0.875rem; }
+.since-shell .explanation-section { margin-top: 1.5rem; border-top: 1px solid var(--color-line); }
+.since-shell .explanation-section summary { min-height: 44px; align-content: center; font-weight: 750; cursor: pointer; }
+.since-shell .explanation-section summary small { margin-left: 0.5rem; font-weight: 400; }
+.since-explanation-error { color: var(--color-muted); font-size: 0.875rem; line-height: 1.5; }
+
+@media (max-width: 820px) {
+  .since-layout { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+}
+
+@media (max-width: 620px) {
+  .since-shell.pulse-product-page > main { padding-top: 0.25rem; }
+  .since-identity { padding: 0.7rem 0.4rem 0.65rem; }
+  .since-identity h1 { font-size: 1.375rem; line-height: 1.4; }
+  .since-latest { padding: 0.9rem 0.4rem 1rem; }
+  .since-latest h2 { font-size: 1.375rem; }
+  .since-purchase-amount,
+  .since-risk-details { padding-right: 0.4rem; padding-left: 0.4rem; }
+  .since-shell .risk-timeline > li { min-height: 0; }
+  .since-shell .financial-list li > div { align-items: baseline; }
+}
+
 @media (max-width: 820px) {
   .pulse-landing .landing-hero { min-height: 0; grid-template-columns: 1fr; padding-top: 3rem; }
   .pulse-landing .hero-copy { max-width: 44rem; }
@@ -2825,3 +2891,7 @@ footer { padding: 1.2rem 0 1.6rem; border-top: 1px solid var(--color-line); }
   .pulse-product-page .not-found { padding: 3.5rem 1rem; }
   .pulse-product-page .not-found > div { flex-direction: column; }
 }
+
+.since-shell.pulse-product-page .timeline-section,
+.since-shell.pulse-product-page .financial-section,
+.since-shell.pulse-product-page .explanation-section { padding: 0; }

@@ -74,6 +74,11 @@ function formatPercent(value: number | null) {
   return `${new Intl.NumberFormat("ko-KR", { maximumFractionDigits: 1 }).format(Math.abs(value) * 100)}%`;
 }
 
+function formatPeriod(value: string | undefined, fallback: string) {
+  if (!value) return fallback;
+  return /^\d{4}$/.test(value) ? `${value}년` : value;
+}
+
 function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<EvidenceState | null>(null);
@@ -105,7 +110,7 @@ function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
         onClick={toggleEvidence}
         aria-expanded={open}
       >
-        {open ? "원문 접기" : "원문에서 확인하기"}
+        {open ? "원문 접기" : "원문에서 확인"}
         <span aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
       {open && (
@@ -147,12 +152,13 @@ function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
   );
 }
 
-function Timeline({ items }: { items: SinceBoughtTimelineItem[] }) {
-  const changeCount = items.filter((item) => item.type !== "PURCHASE").length;
+function Timeline({ items, featuredRiskEventId }: { items: SinceBoughtTimelineItem[]; featuredRiskEventId: number | null }) {
+  const datedItems = items.filter((item) => item.date);
+  const changeCount = datedItems.filter((item) => item.type !== "PURCHASE").length;
   return (
     <>
       <ol className="risk-timeline" aria-label={`매수 이후 ${changeCount}개의 변화`}>
-        {items.map((item, index) => (
+        {datedItems.map((item, index) => (
           <li key={`${item.type}-${item.date}-${item.riskEventId ?? item.riskChangeId ?? index}`} className={`timeline-${item.type.toLowerCase()}`}>
             <div className="timeline-marker" aria-hidden="true" />
             <article>
@@ -163,8 +169,8 @@ function Timeline({ items }: { items: SinceBoughtTimelineItem[] }) {
               </div>
               <h3>{item.title}</h3>
               <p>{item.summary}</p>
-              {item.riskEventId && item.evidenceAvailable && <EvidenceDisclosure riskEventId={item.riskEventId} />}
-              {item.riskEventId && !item.evidenceAvailable && <p className="evidence-unavailable">연결된 공시 원문이 없습니다.</p>}
+              {item.riskEventId !== featuredRiskEventId && item.riskEventId && item.evidenceAvailable && <EvidenceDisclosure riskEventId={item.riskEventId} />}
+              {item.riskEventId !== featuredRiskEventId && item.riskEventId && !item.evidenceAvailable && <p className="evidence-unavailable">연결된 공시 원문이 없습니다.</p>}
             </article>
           </li>
         ))}
@@ -197,11 +203,9 @@ function FinancialChangeList({ changes, data }: { changes: FinancialChange[]; da
         <li key={change.metric}>
           <div>
             <span>{change.label}</span>
-            <strong className={change.direction === "INCREASE" ? "trend-up" : "trend-down"}>
-              {change.direction === "INCREASE" ? "↑" : "↓"} {formatPercent(change.changeRate)}
-            </strong>
+            <strong>{change.changeRate === null ? formatPercent(null) : `${change.direction === "INCREASE" ? "+" : "−"}${formatPercent(change.changeRate)}`}</strong>
           </div>
-          <p>{formatMoney(change.baselineValue)} → {formatMoney(change.currentValue)}</p>
+          <p>{formatPeriod(data.financialContext.baseline?.period, "기준")} {formatMoney(change.baselineValue)} → {formatPeriod(data.financialContext.current?.period, "현재")} {formatMoney(change.currentValue)}</p>
         </li>
       ))}
     </ul>
@@ -214,6 +218,8 @@ export default function SinceBoughtPage() {
   const [pageState, setPageState] = useState<PageState>("loading");
   const [data, setData] = useState<SinceBoughtResponse | null>(null);
   const [retryKey, setRetryKey] = useState(0);
+  const latestChange = data?.timeline.filter((item) => item.type !== "PURCHASE" && item.date).sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+  const currentOverall = data ? overallState(data.currentRiskState) : null;
 
   useEffect(() => {
     document.title = "매수 이후 변화 | Bonda";
@@ -241,7 +247,6 @@ export default function SinceBoughtPage() {
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
 
       <main>
-        <section className="route-command" aria-label="매수 이후 추적 안내"><div><span>HOLDING PULSE</span><strong>매수 이후의 변화만 이어서 봅니다.</strong></div><small>공시 · 상태 · 재무</small></section>
         {pageState === "loading" && (
           <section className="state-panel since-loading" aria-live="polite" aria-busy="true">
             <span className="spinner" aria-hidden="true" />
@@ -257,32 +262,33 @@ export default function SinceBoughtPage() {
         )}
         {pageState === "ready" && data && (
           <>
-            <section className="since-hero" aria-labelledby="since-title">
-              <div className="since-hero-copy">
-                <p className="eyebrow">매수 이후 변화</p>
-                <p className="since-issuer">{data.holding.issuerName}</p>
-                <h1 id="since-title">{data.holding.bondName}</h1>
-                <p className="since-question">내가 산 뒤, 회사에 무엇이 달라졌을까요?</p>
-                <p className="change-count">
-                  매수 이후 <strong>{data.timeline.filter((item) => item.type !== "PURCHASE").length}개의 변화</strong>가 있었어요.
-                </p>
-                <dl className="since-purchase-facts">
-                  <div><dt>매수일</dt><dd>{formatDate(data.holding.purchaseDate)}</dd></div>
-                  <div><dt>매수금액</dt><dd>{formatMoney(data.holding.purchaseAmount)}</dd></div>
-                </dl>
-              </div>
-              <div className="since-hero-visual pulse-summary-board" aria-label="매수 이후 추적 요약">
-                <div><span>추적 기간</span><strong>{formatDate(data.holding.purchaseDate)}부터</strong></div>
-                <div><span>확인된 변화</span><strong>{data.timeline.filter((item) => item.type !== "PURCHASE").length}건</strong></div>
-                <div><span>현재 상태</span><strong>{overallState(data.currentRiskState) ? stateLabels[overallState(data.currentRiskState)!] : "계산 전"}</strong></div>
-              </div>
+            <header className="since-identity" aria-labelledby="since-title">
+              <p className="since-issuer">{data.holding.issuerName}</p>
+              <h1 id="since-title">{data.holding.bondName}</h1>
+              <p>매수일 <time dateTime={data.holding.purchaseDate}>{formatDate(data.holding.purchaseDate)}</time></p>
+            </header>
+
+            <section className="since-latest" aria-labelledby="since-latest-title">
+              {latestChange ? <>
+                <p className="section-label">최근 확인된 변화</p>
+                <h2 id="since-latest-title">{latestChange.title}</h2>
+                <time dateTime={latestChange.date}>{formatDate(latestChange.date)}</time>
+                <p className="since-latest-state">Bonda 현재 상태 · <strong className={currentOverall ? `state-${currentOverall.toLowerCase()}` : undefined}>{currentOverall ? stateLabels[currentOverall] : "계산 전"}</strong></p>
+                <p className="since-latest-summary">{latestChange.summary}</p>
+                {latestChange.riskEventId && latestChange.evidenceAvailable && <EvidenceDisclosure riskEventId={latestChange.riskEventId} />}
+                {latestChange.riskEventId && !latestChange.evidenceAvailable && <p className="evidence-unavailable">연결된 공시 원문이 없습니다.</p>}
+              </> : <>
+                <h2 id="since-latest-title">새 변화 없음</h2>
+                <p>마지막 확인 <time dateTime={data.updatedAt}>{formatDateTime(data.updatedAt)}</time></p>
+                <p className="since-latest-state">Bonda 현재 상태 · <strong>{currentOverall ? stateLabels[currentOverall] : "계산 전"}</strong></p>
+              </>}
             </section>
 
-            <section className="risk-state-section" aria-labelledby="current-state-title">
-              <div className="section-heading compact-heading">
-                <div><p className="section-label">정책 계산 결과</p><h2 id="current-state-title">현재 확인 상태</h2></div>
-                {data.currentRiskState && <p>{formatDate(data.currentRiskState.snapshotDate)} 기준</p>}
-              </div>
+            <p className="since-purchase-amount">매수금액 <strong>{formatMoney(data.holding.purchaseAmount)}</strong></p>
+
+            <section className="risk-state-section" aria-label="Bonda 현재 상태 상세">
+              <details className="since-risk-details"><summary>전체 상태 보기 <span>{currentOverall ? stateLabels[currentOverall] : "계산 전"}</span></summary>
+              {data.currentRiskState && <p>{formatDate(data.currentRiskState.snapshotDate)} 기준</p>}
               {data.currentRiskState ? (
                 <dl className="risk-state-grid">
                   {(Object.keys(riskLabels) as Array<keyof typeof riskLabels>).map((key) => {
@@ -291,6 +297,7 @@ export default function SinceBoughtPage() {
                   })}
                 </dl>
               ) : <div className="quiet-empty"><p>계산된 현재 위험 상태가 아직 없습니다.</p></div>}
+              </details>
             </section>
 
             <div className="since-layout">
@@ -299,19 +306,10 @@ export default function SinceBoughtPage() {
                   <div><p className="section-label">날짜순 검증 기록</p><h2 id="timeline-title">매수 이후 변화</h2></div>
                   <p>매수일부터 날짜순</p>
                 </div>
-                <Timeline items={data.timeline} />
+                <Timeline items={data.timeline} featuredRiskEventId={latestChange?.riskEventId ?? null} />
               </section>
 
               <aside className="since-aside">
-                <section className="explanation-section" aria-labelledby="explanation-title">
-                  <p className="section-label">참고 해석</p>
-                  <h2 id="explanation-title">Bonda의 해석</h2>
-                  {data.explanation.status === "AVAILABLE" && <p className="explanation-copy">{data.explanation.summary}</p>}
-                  {data.explanation.status === "NOT_NEEDED" && <p className="muted-copy">설명할 새로운 변화가 아직 없습니다.</p>}
-                  {data.explanation.status === "FAILED" && <p className="muted-copy">변화 요약을 만들지 못했어요. 위의 검증된 기록은 그대로 확인할 수 있습니다.</p>}
-                  <small>검증된 변화만 짧게 정리하며, 위험 상태 결정에는 사용하지 않습니다.</small>
-                </section>
-
                 <section className="financial-section" aria-labelledby="financial-title">
                   <p className="section-label">계산된 변화</p>
                   <h2 id="financial-title">재무 기준점 비교</h2>
@@ -320,6 +318,8 @@ export default function SinceBoughtPage() {
                   )}
                   <FinancialChangeList changes={data.financialChanges} data={data} />
                 </section>
+                {data.explanation.status === "AVAILABLE" && data.explanation.summary && <details className="explanation-section"><summary>참고 설명 <small>AI 생성 참고 정보</small></summary><p className="explanation-copy">{data.explanation.summary}</p><small>검증된 변화만 정리하며, 위험 상태 결정에는 사용하지 않습니다.</small></details>}
+                {data.explanation.status === "FAILED" && <p className="since-explanation-error">참고 설명을 만들지 못했습니다. 검증된 기록은 그대로 확인할 수 있습니다.</p>}
               </aside>
             </div>
           </>

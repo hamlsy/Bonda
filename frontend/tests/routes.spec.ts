@@ -28,9 +28,10 @@ test("존재하지 않는 경로도 공통 제품 셸 안에서 복구할 수 �
 });
 
 test("상세와 공시 route도 Pulse Command 셸을 유지한다", async ({ page }) => {
-  for (const [route, label] of [["/holdings/1/since-bought", "HOLDING PULSE"], ["/risk-events/1", "SOURCE CHECK"]] as const) {
+  for (const [route, label] of [["/holdings/1/since-bought", "since-shell"], ["/risk-events/1", "SOURCE CHECK"]] as const) {
     await page.goto(route);
-    await expect(page.getByText(label)).toBeVisible();
+    if (label === "since-shell") await expect(page.locator(".since-shell")).toBeVisible();
+    else await expect(page.getByText(label)).toBeVisible();
     const widths = await page.evaluate(() => ({ client: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
     expect(widths.scroll).toBeLessThanOrEqual(widths.client);
   }
