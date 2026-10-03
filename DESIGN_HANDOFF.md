@@ -73,7 +73,7 @@ acceptance:
 - [x] **S2-5** 현재 캡처의 `총차입금 2024 → 2025 +12.2%`처럼 정책상 악화·개선 의미가 별도 검증되지 않은 재무 증감은 빨간색과 상승 화살표로 경고처럼 표시하지 않는다. `2024년 값 → 2025년 값 · +12.2%`를 같은 행에서 중립 잉크색으로 보여 준다. 금액 단위·부호·정확한 기존 데이터는 유지한다. Stage 1의 두 점 비교를 재사용할 수 있을 때만 쓰고 연속 추세를 암시하는 선은 추가하지 않는다.
 - [x] **S2-6 첫 화면 구조:** 모바일에서 앱 헤더 아래 첫 섹션을 `채권명(최대 24/32) + 매수일`의 짧은 identity 줄로 만들고, 그 바로 다음에 `최근 변화 제목 + 실제 날짜 + 관련 Bonda 범주/현재 상태 + 원문에서 확인`을 한 묶음으로 둔다. 이 묶음의 제목·날짜·상태·원문 버튼이 390×844 첫 viewport에 모두 보여야 한다. 데스크톱에서도 `HOLDING PULSE` 및 큰 남색 요약판 자리에 이 사건 묶음을 우선 배치한다. 남은 매수금액·추적기간 등 메타는 사건 뒤의 보조 정보로 둔다. 페이지 전체를 새 카드 그리드로 채우지 않는다.
 - [x] Stage 2 1440/390 캡처와 build/check/UI test를 실행한다.
-- [ ] Designer가 Stage 2 캡처를 검수한 뒤 Stage 2 파일만 commit/push한다.
+- [x] Designer가 Stage 2 캡처를 검수한 뒤 Stage 2 파일만 commit/push한다.
 - [x] Stage 2 After는 같은 `[데모] 한결산업 1회 회사채` 데이터로 1440×900·390×844 및 full-page를 `design/audit/2026-10-02-redesign/stage-2/`에 저장한다. Before를 덮어쓰지 않는다. 화면과 기능 검수 전에는 commit/push하지 않는다.
 
 ## Stage 3 — Evidence·Replay와 전체 흐름
@@ -93,6 +93,7 @@ designer_notes:
 
 frontend_notes:
 
+2026-10-03 Stage 2 디자인 PASS 이후 승인된 구현·테스트·handoff·Stage 2 캡처 네 장만 `3c27b73e5dc5695a1502e323efa609de28ceff57`으로 커밋하고 `origin/main`에 push했다(`19bcdc2..3c27b73`). 기존 M1–M2 모바일 시트 motion CSS hunk와 앞선 모니터링 route test hunk는 unstaged로 남겼고, `.codex`·`PLAN.md`·`STATUS.md` 및 다른 design 자료도 stage하지 않았다. Stage 3은 시작하지 않았다.
 2026-10-03 Frontend Developer Stage 2 구현: 보유 채권의 짧은 identity와 실제 날짜가 있는 최신 사건·Bonda 현재 상태·원문 진입점을 첫 390×844 viewport에 배치했다. `HOLDING PULSE` 배너·큰 질문·중복 남색 요약판을 제거하고, 매수금액을 사건 뒤로 옮겼다. 현재 다섯 범주는 `전체 상태 보기`에 두고 날짜순 기록을 연속 시간축처럼 보이지 않는 목록으로 바꿨다. `NOT_NEEDED` 빈 AI 카드는 렌더링하지 않으며 설명이 있을 때만 접힌 참고 설명으로 제공한다. 재무 값은 기존 금액·부호·기간을 유지한 같은 행의 중립 잉크색 비교로 표시한다. API·backend·금융 계산은 변경하지 않았다.
 기존 `SinceBoughtResponse`에는 사건별 위험 범주와 신용등급 전망이 없어 본문에 특정 범주나 전망을 추정해 붙이지 않았다. `currentRiskState`의 현재 Bonda 상태를 최신 사건 옆에 표시하고 범주별 현재 상태는 펼침에 유지했다. Web Designer가 이를 이번 단계의 수용 기준으로 확정했다.
 검증: `npm run build` PASS, `npm run check:ui` PASS, Stage 2 Edge Playwright 기본·변화 없음·근거 열기·오류 재시도 3/3 PASS, 관련 route/Stage 2 비캡처 E2E 20/20 PASS. 1440×900·390×844 viewport와 full-page 캡처 네 장을 같은 fixture로 저장해 Before/After를 확인했다. 기존 screenshot baseline은 갱신하지 않았다. 다른 route의 local backend 미기동으로 proxy 경고가 있었으나 E2E는 통과했다. Web Designer의 중간 검수 전 commit/push하지 않았다.
