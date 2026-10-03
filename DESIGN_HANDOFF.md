@@ -7,7 +7,7 @@ review_round:
 0
 
 target:
-Stage 2 — `/holdings/:holdingId/since-bought`의 채권 초보자용 상세 읽기. Stage 1은 디자인 PASS 후 `19bcdc2e6314f33d9b3ba6f957ce427e5d2c6fe8`까지 origin/main에 push됐다. Stage 3은 Stage 2 캡처 검수와 push 이후 시작한다.
+Stage 3 — Evidence(`/sources/...`)와 Historical Replay(`/replay`)의 첫 화면 정보 우선순위 및 경로 간 쉬운 문구 정리. Stage 1·2는 디자인 PASS 후 `33d0d2ca949e94a96ab1fa301512b14b477a70ec`까지 origin/main에 push됐다.
 
 viewports:
 
@@ -20,20 +20,21 @@ screenshots:
 - Stage 1 After: [monitoring desktop 1440×900](design/audit/2026-10-02-redesign/stage-1/monitoring-desktop-1440x900.png), [monitoring mobile 390×844](design/audit/2026-10-02-redesign/stage-1/monitoring-mobile-390x844.png)
 - Stage 1 full-page evidence: [desktop](design/audit/2026-10-02-redesign/stage-1/monitoring-desktop-full.png), [mobile](design/audit/2026-10-02-redesign/stage-1/monitoring-mobile-full.png). Before 파일은 갱신하지 않았다.
 - Stage 1 S1-R1 review: [desktop 기본 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-desktop-default-1440x900.png), [desktop 대한항공 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-desktop-quiet-1440x900.png), [mobile 기본 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-mobile-default-390x844.png), [mobile 대한항공 선택](design/audit/2026-10-02-redesign/stage-1/monitoring-r1-mobile-quiet-390x844.png).
-- Stage 2 Before: [holding desktop](design/audit/current/holding-desktop-1440.png), [holding mobile](design/audit/current/holding-mobile-390.png)
+- Stage 2 Before: [holding desktop](design/audit/current/holding-desktop-1440.png). 원래 mobile Before는 Designer가 2026-10-03 직접 검수했으나 untracked `design/audit/current/holding-mobile-390.png`가 이후 과거 캡처 테스트로 덮여 현재 파일은 Before 근거가 아니다. 원본 bytes를 복구할 수 없어 이 경로를 Before 비교에 사용하지 않는다.
 - Stage 2 After: [holding desktop 1440×900](design/audit/2026-10-02-redesign/stage-2/holding-desktop-1440x900.png), [holding mobile 390×844](design/audit/2026-10-02-redesign/stage-2/holding-mobile-390x844.png), [desktop full-page](design/audit/2026-10-02-redesign/stage-2/holding-desktop-full.png), [mobile full-page](design/audit/2026-10-02-redesign/stage-2/holding-mobile-full.png). Before 파일은 갱신하지 않았다.
 - Stage 3 Before: [evidence desktop](design/audit/current/source-desktop-1440.png), [evidence mobile](design/audit/current/source-mobile-390.png), [Replay desktop](design/audit/current/replay-desktop-1440.png), [Replay mobile](design/audit/current/replay-mobile-390.png)
+- Stage 3 Evidence After (중간 검수): [desktop 1440×900](design/audit/2026-10-02-redesign/stage-3/evidence-desktop-1440x900.png), [mobile 390×844](design/audit/2026-10-02-redesign/stage-3/evidence-mobile-390x844.png), [desktop full-page](design/audit/2026-10-02-redesign/stage-3/evidence-desktop-full.png), [mobile full-page](design/audit/2026-10-02-redesign/stage-3/evidence-mobile-full.png). Before 파일은 갱신하지 않았다.
+- Stage 3 Replay After: [desktop 1440×900](design/audit/2026-10-02-redesign/stage-3/replay-desktop-1440x900.png), [mobile 390×844](design/audit/2026-10-02-redesign/stage-3/replay-mobile-390x844.png), [desktop full-page](design/audit/2026-10-02-redesign/stage-3/replay-desktop-full.png), [mobile full-page](design/audit/2026-10-02-redesign/stage-3/replay-mobile-full.png). `선택한 날짜까지 공개된 정보`로 cutoff 의미를 바로잡은 뒤 다시 캡처했다.
 - 각 Stage의 After 캡처는 `design/audit/2026-10-02-redesign/stage-N/`에 같은 fixture·viewport로 별도 저장한다. Before를 덮어쓰지 않는다.
 
 blockers:
 
-- Stage 2: 없음. 사건별 위험 범주와 신용등급 전망은 응답에 없어 추정 표시하지 않았으며, 현재 상태와 전체 범주 펼침을 이번 단계의 수용 기준으로 확정했다.
+- Stage 3: 없음. Evidence·Replay의 1440×900·390×844 최종 캡처와 QA에서 정보 우선순위·cutoff 문구·근거 연결을 확인했다.
 
 improvements:
 
-- 공통 남색 route-command 배너, 영어 eyebrow, 동일한 흰 카드 구성을 경로마다 반복한다. 실제 기록·원문·Replay의 고유 목적이 약하다.
-- `Credit Pulse`의 균등 간격 marker는 날짜 간격을 표현하는 시간축으로 오해될 수 있다.
-- 원문 패널은 문서 제목과 중첩 박스가 주장에 대응하는 인용문보다 강하다.
+- 짧은 데모 데이터 때문에 Evidence·Replay의 데스크톱 하단에는 큰 빈 공간이 남는다. 현재 출시를 막지는 않으며 임의의 장식이나 가짜 데이터를 채우지 않는다.
+- Stage 2 원래 mobile Before의 untracked 파일이 과거 캡처 테스트로 덮였다. Stage 3 Evidence·Replay Before/After는 온전하며, 손상된 Holding 경로를 Before 근거로 사용하지 않는다.
 
 ## 제품·사용자 기준
 
@@ -78,10 +79,11 @@ acceptance:
 
 ## Stage 3 — Evidence·Replay와 전체 흐름
 
-- [ ] **S3-1 Evidence** 보고서 제목보다 사건과 일치하는 인용문을 먼저 보여 준다. 원문 문서명·공개일·접수번호·Version은 인용문의 출처 줄에 둔다. 중첩된 테두리 박스를 줄이고, 주장과 원문의 연결을 텍스트와 하이라이트로 확인 가능하게 한다.
-- [ ] **S3-2 Replay** 큰 선언 hero와 공통 route-command를 제거한다. 기준일 선택과 당시 상태·당시 공개 근거가 데스크톱/모바일 첫 viewport에서 읽히게 한다. 현재 데이터는 명시적으로 분리하며 당시 영역에 미래 정보를 섞지 않는다. Replay의 정책 계산·cutoff logic은 변경하지 않는다.
-- [ ] **S3-3 Cross-route** 공통 서체·간격·focus·하단 navigation을 통일하되 모든 경로에 동일한 카드+배너 조합을 강제하지 않는다. `/monitoring`은 변화 목록, Holding은 기록, Evidence는 문서, Replay는 시점 비교로 구성한다. 새 용어는 한국어 우선이며 `Credit Pulse` 등 내부 브랜드 설명은 사용자 행동에 필요한 경우만 남긴다.
-- [ ] Stage 3 1440/390 캡처 → Designer 검수 → build/check/UI test → Stage 3 파일만 commit/push. 최종적으로 이 디자인 작업에 속한 변경의 미커밋 여부와 원격 SHA를 확인한다.
+- [x] **S3-1 Evidence 첫 화면:** `SOURCE CHECK` 남색 배너와 거대한 `[데모] 2025 사업보고서` 제목을 제거한다. 화면 본문의 첫 정보는 기존 API가 제공한 사건과 일치하는 원문 인용문이다. 원문 텍스트를 새로 생성하거나 요약으로 대체하지 않는다. 인용문은 모바일 390×844 첫 viewport에 보이고, 문서명·공개일·접수번호는 인용문 바로 아래 또는 위의 작은 출처 줄에 둔다. Version은 응답에 실제 값이 있을 때만 표기한다. 현재 Evidence 응답에는 Version 번호가 없으므로 만들어 표시하지 않는다. 바깥 패널 → 파란 박스 → 안쪽 회색 박스 중첩을 하나의 문서 면과 1개 강조선 수준으로 단순화한다. 기존 하이라이트·원문 이동·검증 메타 기능은 유지한다.
+- [x] **S3-2 Replay 첫 화면:** `HISTORICAL REPLAY` 배너와 `그때까지 알 수 있던 것만 봅니다` 거대 hero를 제거한다. 모바일은 짧은 화면 제목 → 발행사·기준일 입력과 실행 버튼 → `2026-03-14 당시 상태: 관찰`(데모 값) → 당시 공개된 사건 순서로 배치한다. 당시 상태와 첫 사건 제목이 390×844 첫 viewport에 함께 보여야 한다. 데스크톱에서도 폼 바로 아래에 당시 상태·공개 근거를 둔다. 현재 데이터가 따로 표시될 때는 `현재` 라벨과 분리 영역을 명시하며, 당시 영역에 cutoff 이후 데이터를 섞지 않는다. 정책 계산·cutoff logic·폼 동작은 변경하지 않는다.
+- [x] **S3-3 Cross-route:** 동일한 남색 배너·영어 eyebrow·흰 카드 외곽을 Evidence/Replay에 반복하지 않는다. `/monitoring`은 변화 목록, Holding은 기록, Evidence는 원문, Replay는 날짜별 결과라는 구성을 유지한다. 공통 서체·간격·focus·모바일 하단 navigation은 유지한다. 새 장식·그림자·기능 없는 아이콘을 추가하지 않는다.
+- [x] **S3-4 초보자 문구:** 처음 나오는 `총차입금`에는 `빌린 돈`이라는 쉬운 뜻을 같은 줄에 한 번만 붙인다(예: `총차입금(빌린 돈)`). `Risk State`, `Historical Replay`, `SOURCE CHECK` 같은 내부 용어를 주요 제목으로 쓰지 않고 `현재 확인 상태`, `선택한 날짜까지 공개된 정보`, `공시 원문`처럼 행동·정보가 읽히는 한국어를 쓴다. Replay 제목의 `까지`는 cutoff 이전 자료를 포함한다는 의미이므로 반드시 유지한다. 사실·금액·위험 판단을 새로 만들어 설명하지 않는다. AI 자체를 정보보다 먼저 놓지 않는다.
+- [x] Evidence와 Replay의 1440×900·390×844 및 full-page After를 같은 demo fixture로 `design/audit/2026-10-02-redesign/stage-3/`에 저장한다. Before 파일은 덮어쓰지 않는다. Evidence 캡처를 먼저 공유해 Designer의 중간 의견을 받은 뒤 Replay를 마무리한다. build/check:ui/관련 E2E와 원문·재생 동작을 확인해 READY_FOR_REVIEW로 넘긴다. Designer 검수 전 commit/push하지 않는다. PASS 후 Stage 3 변경만 commit/push하고 원격 SHA와 이 디자인 작업에 속한 미커밋 변경 여부를 보고한다.
 
 designer_notes:
 
@@ -90,8 +92,15 @@ designer_notes:
 2026-10-03 Stage 1 디자인 PASS. S1-R1 재캡처 네 장을 직접 확인했고 QA도 blocker 해소 및 모니터링 비캡처 E2E 36/36 통과를 확인했다. Stage 1에 속한 변경의 commit/push를 승인한다. push 결과를 확인한 뒤 Stage 2 handoff로 전환한다.
 2026-10-03 Stage 2 S2-2 해석: SinceBoughtResponse에 사건별 위험 범주 연결 필드가 없음을 확인했다. 이번 UI 개선에서 이를 추정 표시하도록 요구하지 않는다. 현재 상태와 전체 범주 펼침만으로 Stage 2를 검수하고, 데이터가 생기는 별도 제품/API 작업이 승인될 때 사건별 범주를 붙인다.
 2026-10-03 Stage 2 디자인 PASS. 동일 한결산업 fixture의 1440×900·390×844 Before/After와 full-page를 직접 비교했다. 모바일 첫 화면에 채권·매수일·최근 사건·실제 날짜·Bonda 현재 상태·원문 버튼이 보이고, 빈 AI 카드·중복 남색 요약판·의미가 검증되지 않은 빨간 증감률은 사라졌다. QA BLOCKER/FOLLOW-UP 없음, build/check:ui/관련 비캡처 E2E 24/24 PASS. Stage 2 변경의 commit/push를 승인한다. `총차입금` 같은 초보자에게 어려운 용어의 쉬운 설명은 Stage 3의 전체 문구 점검에서 다루며 이번 단계를 막지 않는다.
+2026-10-03 Stage 3 디자인 PASS. Evidence와 Replay의 1440×900·390×844 및 full-page Before/After를 직접 비교했다. Evidence에서 API 원문 인용이 첫 정보이고, Replay에서 기준일 당시 상태와 첫 사건이 390px 첫 화면에 있다. `선택한 날짜까지` 제목으로 시점 범위가 명확해졌고 총차입금의 첫 노출에는 `빌린 돈`을 덧붙였다. QA BLOCKER 없음, FOLLOW-UP은 이전 Holding mobile Before 파일 손상 1건이다. build/check:ui, Evidence·Replay·route 비캡처 E2E 24/24, Replay cutoff backend 통합 테스트 1/1을 확인했다. Stage 3에 속한 변경의 commit/push를 승인한다.
 
 frontend_notes:
+
+2026-10-03 Stage 3 구현 완료·마일스톤 재검토 BLOCKER/FOLLOW-UP 없음. Evidence 중간 검수 PASS 후 Replay의 배너·거대 hero를 제거하고 발행기업/기준일 폼 → API가 돌려준 기준일 당시 상태 → 당시 사건을 우선 배치했다. 디자이너 중간 의견에 따라 제목은 cutoff의 포함 범위를 정확히 전하는 `선택한 날짜까지 공개된 정보`로 수정했다. 390×844 첫 viewport에서 상태와 첫 사건을 직접 확인했고 1440×900 및 full-page와 함께 Stage 3 Replay After 네 장을 저장했다. 총차입금은 Holding·Monitoring·Replay의 첫 노출에만 `(빌린 돈)`을 붙이고 원본 API 텍스트·숫자·위험 계산은 바꾸지 않았다. `DESIGN.md`의 이전 route-command 공통 규칙은 이번 승인된 `DESIGN_HANDOFF.md`의 Evidence/Replay 배너 제거 지시와 충돌하므로 두 경로에 한해 handoff를 적용했다.
+검증: 최종 `npm run build` PASS, `npm run check:ui` PASS, Replay 390/1440 캡처·폼/빈 결과 2/2 PASS, 관련 E2E 33 PASS·3 기존 캡처 skip 및 수정 후 route E2E 16/16 PASS, Monitoring/Holding 비캡처 E2E 44 PASS·4 과거 캡처 skip, S3-4 모바일 집중 검증 3/3 PASS, strict premium UI audit 위반 0, `git diff --check` PASS. 기존 screenshot baseline은 자동 갱신하지 않도록 과거 캡처 테스트에 명시적 실행 조건을 추가했다. Reviewer가 첫 검토에서 두 BLOCKER를 지적했고 수정 후 한 번의 재검토에서 모두 해소·FOLLOW-UP 없음으로 확인했다. 최종 Web Designer 검수 전 commit/push하지 않았다.
+캡처 검토 과정에서 이전부터 untracked였던 `design/audit/current/holding-mobile-390.png`가 과거 캡처 테스트 실행으로 한 번 덮였다. 추적 중인 `docs/design/` 및 Stage 2 캡처는 원본 blob으로 복원했고 Stage 3 Evidence/Replay Before는 갱신되지 않았다. 해당 untracked Holding 파일의 이전 bytes는 저장소에서 복원할 수 없어 현재 파일을 원본 Before 근거로 사용하지 않는다.
+
+2026-10-03 Stage 3 S3-1 Evidence 중간 재검수 대기: API의 evidenceText를 화면 본문 첫 정보로 배치하고 문서명·공개일·접수번호를 인용문 바로 아래에 두었다. SOURCE CHECK 배너와 큰 문서 제목·중첩 박스를 제거했고 원문 링크·인용문 강조선·검증 메타는 유지했다. 현재 API에 Version 값이 없어 표시하지 않았으며 Web Designer의 지침과 일치한다. 첫 중간 검수 의견에 따라 데스크톱 문서 면을 약 760px 읽기 열로 줄이고 인용문을 18px/28px로 조정했으며 인용 아래 구분선은 한 줄만 남겼다. 390×844의 정보 순서는 유지했다. 1440×900·390×844 viewport 및 full-page 캡처 네 장을 같은 경로에 다시 저장했다. `npm run build`, `npm run check:ui`, Evidence Playwright 2/2 PASS(첫 캡처); 수정 후 Evidence Playwright 2/2 PASS. Replay는 Evidence 재검수 이후 시작한다. Stage 3 전체 테스트 및 READY_FOR_REVIEW는 아직 아니다. commit/push하지 않았다.
 
 2026-10-03 Stage 2 디자인 PASS 이후 승인된 구현·테스트·handoff·Stage 2 캡처 네 장만 `3c27b73e5dc5695a1502e323efa609de28ceff57`으로 커밋하고 `origin/main`에 push했다(`19bcdc2..3c27b73`). 기존 M1–M2 모바일 시트 motion CSS hunk와 앞선 모니터링 route test hunk는 unstaged로 남겼고, `.codex`·`PLAN.md`·`STATUS.md` 및 다른 design 자료도 stage하지 않았다. Stage 3은 시작하지 않았다.
 2026-10-03 Frontend Developer Stage 2 구현: 보유 채권의 짧은 identity와 실제 날짜가 있는 최신 사건·Bonda 현재 상태·원문 진입점을 첫 390×844 viewport에 배치했다. `HOLDING PULSE` 배너·큰 질문·중복 남색 요약판을 제거하고, 매수금액을 사건 뒤로 옮겼다. 현재 다섯 범주는 `전체 상태 보기`에 두고 날짜순 기록을 연속 시간축처럼 보이지 않는 목록으로 바꿨다. `NOT_NEEDED` 빈 AI 카드는 렌더링하지 않으며 설명이 있을 때만 접힌 참고 설명으로 제공한다. 재무 값은 기존 금액·부호·기간을 유지한 같은 행의 중립 잉크색 비교로 표시한다. API·backend·금융 계산은 변경하지 않았다.

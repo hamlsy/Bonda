@@ -62,7 +62,6 @@ export default function RiskEventPage() {
     <div className="app-shell pulse-product-page evidence-page-shell">
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
-        <section className="route-command" aria-label="공시 원문 확인 안내"><div><span>SOURCE CHECK</span><strong>확인된 변화가 원문의 어디에서 왔는지 봅니다.</strong></div><small>검증된 구간만 표시</small></section>
         {pageState === "loading" && (
           <section className="state-panel" aria-live="polite" aria-busy="true">
             <span className="spinner" aria-hidden="true" /><p>검증된 원문을 불러오고 있습니다.</p>
@@ -76,23 +75,25 @@ export default function RiskEventPage() {
         )}
         {pageState === "ready" && detail && (
           <article className="evidence-page">
-            <p className="eyebrow">검증 원문</p>
-            <h1>{detail.disclosureTitle}</h1>
-            <p className="evidence-page-meta">{formatDateTime(detail.publishedAt)} · 접수번호 {detail.sourceReceiptNo}</p>
-            <div className="source-rule"><span>검증된 변화 유형</span><strong>{eventTypeLabel(detail.eventType)}</strong></div>
+            <h1 className="sr-only">공시 원문</h1>
             {detail.evidence.length === 0 ? (
-              <div className="quiet-empty"><p>연결된 원문 구간이 없습니다.</p></div>
+              <div className="quiet-empty"><p>연결된 원문 구간이 없습니다.</p><small>{detail.disclosureTitle} · {formatDateTime(detail.publishedAt)} · 접수번호 {detail.sourceReceiptNo}</small></div>
             ) : (
-              <ol className="evidence-page-list">
+              <ol className="evidence-page-list" aria-label="검증된 공시 원문 구간">
                 {detail.evidence.map((evidence) => (
                   <li key={evidence.id}>
-                    {evidence.section && <p>{evidence.section}</p>}
                     <blockquote>{evidence.evidenceText}</blockquote>
+                    <div className="evidence-citation">
+                      {evidence.section && <span>{evidence.section}</span>}
+                      <strong>{detail.disclosureTitle}</strong>
+                      <small>{formatDateTime(detail.publishedAt)} · 접수번호 {detail.sourceReceiptNo}</small>
+                    </div>
                     {evidence.sourceUrl && <a href={evidence.sourceUrl} target="_blank" rel="noreferrer">원문에서 확인하기 ↗</a>}
                   </li>
                 ))}
               </ol>
             )}
+            <div className="source-rule"><span>검증된 변화 유형</span><strong>{eventTypeLabel(detail.eventType)}</strong></div>
             <p className="source-note">이 화면은 검증 과정에서 원문과 일치한 구간만 보여줍니다.</p>
           </article>
         )}

@@ -2895,3 +2895,59 @@ footer { padding: 1.2rem 0 1.6rem; border-top: 1px solid var(--color-line); }
 .since-shell.pulse-product-page .timeline-section,
 .since-shell.pulse-product-page .financial-section,
 .since-shell.pulse-product-page .explanation-section { padding: 0; }
+
+/* Evidence: put the verified quotation ahead of document metadata. */
+.evidence-page-shell.pulse-product-page > main { padding-top: 0.5rem; }
+.evidence-page-shell.pulse-product-page .evidence-page { width: min(100%, 47.5rem); max-width: none; margin: 0; padding: 1.4rem; border: 0; border-radius: 0; background: #fff; }
+.evidence-page-shell .evidence-page-list { margin: 0; padding: 0; list-style: none; }
+.evidence-page-shell.pulse-product-page .evidence-page-list li { padding: 0 0 1.2rem; border: 0; background: transparent; }
+.evidence-page-shell .evidence-page-list li + li { padding-top: 1.5rem; }
+.evidence-page-shell .evidence-page-list blockquote { margin: 0; padding: 0.1rem 0 0.1rem 1rem; border-left: 3px solid var(--color-primary); background: transparent; color: var(--color-ink); font-size: 1.125rem; font-weight: 650; line-height: 1.55; }
+.evidence-citation { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.7rem; margin: 0.9rem 0 0 1.2rem; color: var(--color-muted); font-size: 0.75rem; line-height: 1.5; }
+.evidence-citation span { color: var(--color-primary); font-weight: 750; }
+.evidence-citation strong { color: var(--color-ink); font-weight: 700; }
+.evidence-citation small { flex-basis: 100%; font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.evidence-page-shell .evidence-page-list a { display: inline-flex; min-height: 44px; align-items: center; margin: 0.25rem 0 0 1.2rem; font-size: 0.875rem; }
+.evidence-page-shell .source-rule { margin-top: 1.1rem; border-top: 1px solid var(--color-line); border-bottom: 0; }
+.evidence-page-shell .source-rule strong { border-radius: 0; background: transparent; color: var(--color-ink); }
+
+@media (max-width: 620px) {
+  .evidence-page-shell.pulse-product-page .evidence-page { padding: 0.9rem 0.8rem 1.2rem; }
+  .evidence-page-shell .evidence-page-list blockquote { font-size: 1.0625rem; line-height: 1.7; }
+}
+
+/* Replay: date input, then the state and records known at that date. */
+.replay-shell.pulse-product-page > main { padding-top: 0.5rem; }
+.replay-shell .replay-intro { margin: 0 0 1rem; }
+.replay-shell .replay-intro h1 { margin: 0; color: var(--color-ink); font-size: 1.5rem; font-weight: 750; line-height: 1.35; }
+.replay-shell.pulse-product-page .replay-form { max-width: 54rem; padding: 0 0 1.2rem; border: 0; border-bottom: 1px solid var(--color-line); border-radius: 0; background: transparent; }
+.replay-shell .replay-form label { margin-bottom: 0.35rem; font-size: 0.875rem; }
+.replay-shell .replay-form select,
+.replay-shell .replay-form input,
+.replay-shell .replay-form button { min-height: 44px; }
+.replay-shell .replay-form .form-message { min-height: 0; }
+.replay-shell .replay-form .form-message:empty { display: none; }
+.replay-shell.pulse-product-page .replay-result { max-width: 54rem; margin-top: 1.5rem; padding: 0; border: 0; border-radius: 0; background: transparent; }
+.replay-shell .replay-summary { display: block; padding-bottom: 1rem; border-bottom: 1px solid var(--color-line); }
+.replay-shell .replay-summary p { margin: 0 0 0.3rem; color: var(--color-muted); font-size: 0.875rem; }
+.replay-shell .replay-summary h2 { margin: 0; color: var(--color-ink); font-size: 1.5rem; font-weight: 750; line-height: 1.35; }
+.replay-shell .replay-summary h2 strong { font-weight: 800; }
+.replay-shell .replay-timeline-heading { margin: 1.1rem 0 0.4rem; }
+.replay-shell .replay-timeline-heading h3 { margin: 0; font-size: 1rem; }
+.replay-shell .replay-timeline { border-top: 0; }
+.replay-shell .replay-timeline > li { padding: 0.75rem 0; }
+.replay-shell .replay-timeline time,
+.replay-shell .replay-timeline span { font-size: 0.75rem; }
+.replay-shell .replay-timeline h3 { font-size: 1rem; }
+.replay-shell .replay-timeline p { font-size: 0.875rem; }
+.replay-shell .replay-source-count { margin-top: 1.5rem; font-size: 0.75rem; }
+.replay-shell .replay-state-list { margin-top: 0.8rem; border-radius: 0; }
+
+@media (max-width: 620px) {
+  .replay-shell .replay-intro { margin-bottom: 0.8rem; }
+  .replay-shell .replay-intro h1 { font-size: 1.375rem; }
+  .replay-shell .replay-form { gap: 0.65rem; }
+  .replay-shell .replay-form button { width: 100%; }
+  .replay-shell.pulse-product-page .replay-result { margin-top: 1.1rem; }
+  .replay-shell .replay-summary h2 { font-size: 1.25rem; }
+}

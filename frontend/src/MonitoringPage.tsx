@@ -142,6 +142,8 @@ export default function MonitoringPage() {
   }, [query]);
   const selected = filtered.find((bond) => bond.id === selectedId) ?? filtered[0] ?? null;
   const activeEvent = selected?.events.find((event) => event.id === eventId) ?? selected?.events.at(-1) ?? null;
+  const debtExplainedInHeading = activeEvent?.title.includes("총차입금") ?? false;
+  const firstDebtEventId = selected?.events.find((event) => event.title.includes("총차입금"))?.id;
   const relatedCategory = selected?.categories.find((category) => category.label === activeEvent?.categoryLabel);
   const withChanges = filtered.filter((bond) => bond.unread > 0);
   const withoutChanges = filtered.filter((bond) => bond.unread === 0);
@@ -222,7 +224,7 @@ export default function MonitoringPage() {
 
               {activeEvent && tab !== "sources" && <section className="pulse-latest-change" aria-labelledby="selected-event-title">
                 <p className={`pulse-change-kicker${selected.unread === 0 ? " is-quiet" : ""}`}>{selected.unread > 0 ? <><ChangeDots />새 변화 {selected.unread}건</> : "새로 확인할 변화 없음"}</p>
-                <h1 id="selected-event-title">{activeEvent.title}</h1>
+                <h1 id="selected-event-title">{debtExplainedInHeading ? `${activeEvent.title} (빌린 돈)` : activeEvent.title}</h1>
                 <p className="pulse-latest-meta"><time>{activeEvent.date}</time><span>{activeEvent.source}</span></p>
                 {relatedCategory && <p className="pulse-related-state">관련 범주 · {relatedCategory.label} <StateLabel state={relatedCategory.state} /></p>}
                 <p className="pulse-latest-summary">{activeEvent.summary}</p>
@@ -238,7 +240,7 @@ export default function MonitoringPage() {
                   <div className="pulse-section-heading"><div><h3 id="credit-pulse-title">변화 기록</h3><p>매수 후 확인된 사건</p></div></div>
                   <div className="pulse-timeline-layout">
                     <ol>
-                      {selected.events.map((event, index) => <li key={event.id} data-active={activeEvent?.id === event.id}><button type="button" onClick={() => setEventId(event.id)} aria-pressed={activeEvent?.id === event.id}><time>{event.date}</time><span className="pulse-node" aria-hidden="true" /><small>{event.kind}</small><strong>{event.title}</strong></button>{index < selected.events.length - 1 && <span className="pulse-connector" aria-hidden="true" />}</li>)}
+                      {selected.events.map((event, index) => <li key={event.id} data-active={activeEvent?.id === event.id}><button type="button" onClick={() => setEventId(event.id)} aria-pressed={activeEvent?.id === event.id}><time>{event.date}</time><span className="pulse-node" aria-hidden="true" /><small>{event.kind}</small><strong>{!debtExplainedInHeading && event.id === firstDebtEventId ? `${event.title} (빌린 돈)` : event.title}</strong></button>{index < selected.events.length - 1 && <span className="pulse-connector" aria-hidden="true" />}</li>)}
                     </ol>
                   </div>
                 </section>}
@@ -258,7 +260,7 @@ export default function MonitoringPage() {
                     <div className="pulse-financial-rows">
                       {selected.financials.map((metric) => {
                         const rate = changeRate(metric.baseline, metric.current);
-                        return <div className="pulse-financial-row" key={metric.label}><div><strong>{metric.label}</strong><span>{metric.baseline} {metric.unit} → <b>{metric.current} {metric.unit}</b></span></div><MetricComparison baseline={metric.baseline} current={metric.current} threshold={metric.threshold} /><em>{rate === null ? "비교 불가" : `${rate >= 0 ? "+" : ""}${rate.toFixed(1)}%`}</em></div>;
+                        return <div className="pulse-financial-row" key={metric.label}><div><strong>{tab === "financials" && !debtExplainedInHeading && metric.label === "총차입금" ? "총차입금(빌린 돈)" : metric.label}</strong><span>{metric.baseline} {metric.unit} → <b>{metric.current} {metric.unit}</b></span></div><MetricComparison baseline={metric.baseline} current={metric.current} threshold={metric.threshold} /><em>{rate === null ? "비교 불가" : `${rate >= 0 ? "+" : ""}${rate.toFixed(1)}%`}</em></div>;
                       })}
                     </div>
                   </section>
@@ -272,7 +274,7 @@ export default function MonitoringPage() {
                   </div>
                 </section>}
 
-                {tab === "sources" && <section className="pulse-sources" aria-labelledby="sources-title"><div className="pulse-section-heading"><div><h3 id="sources-title">최근 확인된 변화</h3><p>공시 원문과 확인 내용을 함께 봅니다.</p></div><span>{selected.events.length - 1}건</span></div><div className="pulse-source-list">{selected.events.slice(1).reverse().map((event) => <article key={event.id}><time>{event.date}</time><div><strong>{event.title}</strong><p>{event.summary}</p><small>{event.source}</small></div><button type="button" onClick={() => setNotice("데모에서는 실제 DART 원문으로 이동하지 않습니다.")}>공시 원문 보기<ArrowRight /></button></article>)}</div></section>}
+                {tab === "sources" && <section className="pulse-sources" aria-labelledby="sources-title"><div className="pulse-section-heading"><div><h3 id="sources-title">최근 확인된 변화</h3><p>공시 원문과 확인 내용을 함께 봅니다.</p></div><span>{selected.events.length - 1}건</span></div><div className="pulse-source-list">{selected.events.slice(1).reverse().map((event) => <article key={event.id}><time>{event.date}</time><div><strong>{event.id === firstDebtEventId ? `${event.title} (빌린 돈)` : event.title}</strong><p>{event.summary}</p><small>{event.source}</small></div><button type="button" onClick={() => setNotice("데모에서는 실제 DART 원문으로 이동하지 않습니다.")}>공시 원문 보기<ArrowRight /></button></article>)}</div></section>}
 
                 {tab === "more" && <section className="pulse-method"><h3>분석 범위와 변화 요약</h3><button type="button" onClick={() => setDialog("help")}>계산 기준<ArrowRight aria-hidden="true" /></button><div><span>데이터 범위</span><strong>보유 내역 · 확인된 사건 · 재무 정보</strong></div><div><span>상태 결정</span><strong>정해진 RISK_POLICY_V1 계산 규칙</strong></div><div><span>최근 확인</span><strong>{selected.changeDate}</strong></div><details><summary>변화 요약 <small>AI 생성 참고 정보</small></summary><p>{selected.interpretation}</p><span>확인된 사건과 계산 결과만 사용한 데모 설명입니다. 투자 추천이나 부도 예측이 아닙니다.</span></details></section>}
               </div>

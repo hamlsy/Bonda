@@ -13,7 +13,7 @@ const categoryLabels = {
 } as const;
 const timelineLabels = {
   DISCLOSURE: "공시",
-  RISK_EVENT: "검증 Event",
+  RISK_EVENT: "검증된 변화",
   FINANCIAL_SNAPSHOT: "재무",
   RISK_CHANGE: "상태 변화",
 } as const;
@@ -37,6 +37,7 @@ export default function HistoricalReplayPage() {
   const issuers = useMemo(() => Array.from(new Map(
     bonds.map((bond) => [bond.issuer.id, bond.issuer]),
   ).values()), [bonds]);
+  const firstDebtEventIndex = result?.timeline.findIndex((item) => item.title.includes("총차입금")) ?? -1;
 
   useEffect(() => {
     document.title = "과거 위험 재현 | Bonda";
@@ -100,12 +101,7 @@ export default function HistoricalReplayPage() {
     <div className="app-shell pulse-product-page replay-shell">
       <AppHeader backLabel="내 채권으로" backTo="/monitoring" />
       <main>
-        <section className="route-command" aria-label="과거 재현 안내"><div><span>HISTORICAL REPLAY</span><strong>선택한 날짜에 공개돼 있던 정보만 다시 계산합니다.</strong></div><small>현재 상태는 변경하지 않음</small></section>
-        <section className="page-intro replay-intro">
-          <p className="eyebrow">과거 시점 재현</p>
-          <h1>그때까지 알 수 있던 것만 봅니다.</h1>
-          <p>기준일 이후 공개된 공시와 재무정보를 제외하고 당시 Risk State를 다시 계산합니다.</p>
-        </section>
+        <header className="replay-intro"><h1>선택한 날짜까지 공개된 정보</h1></header>
 
         <form className="replay-form" onSubmit={handleSubmit} noValidate>
           <div>
@@ -129,16 +125,10 @@ export default function HistoricalReplayPage() {
         {result && (
           <section className="replay-result" aria-labelledby="replay-result-title">
             <div className="replay-summary">
-              <div><p className="section-label">{result.cutoffDate} 기준</p><h2 id="replay-result-title">{result.issuer.name}</h2></div>
-              <div className={`replay-overall state-${result.riskSnapshot.overall.toLowerCase()}`}><span>당시 종합 상태</span><strong>{stateLabels[result.riskSnapshot.overall]}</strong></div>
+              <p>{result.issuer.name}</p>
+              <h2 id="replay-result-title">{result.cutoffDate} 당시 상태: <strong className={`state-${result.riskSnapshot.overall.toLowerCase()}`}>{stateLabels[result.riskSnapshot.overall]}</strong></h2>
             </div>
-            <p className="replay-source-count">공시 Version {result.disclosuresUsed.length}개 · 검증 Event {result.riskEvents.length}개 · 재무 {result.financialSnapshot?.period ?? "없음"}</p>
-            <dl className="replay-state-list">
-              {(Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).map((category) => (
-                <div key={category}><dt>{categoryLabels[category]}</dt><dd>{stateLabels[result.riskSnapshot[category]]}</dd></div>
-              ))}
-            </dl>
-            <div className="section-heading replay-timeline-heading"><div><p className="section-label">당시 공개된 정보</p><h2>그때의 변화 기록</h2></div></div>
+            <div className="section-heading replay-timeline-heading"><h3>당시 공개된 사건</h3></div>
             {result.timeline.length === 0 ? (
               <div className="quiet-empty"><p>기준일까지 사용할 수 있었던 공시·재무 변화가 없습니다.</p></div>
             ) : (
@@ -146,11 +136,17 @@ export default function HistoricalReplayPage() {
                 {result.timeline.map((item, index) => (
                   <li key={`${item.type}-${item.sourceId ?? index}-${item.date}`}>
                     <time dateTime={item.date}>{item.date}</time>
-                    <div><span>{timelineLabels[item.type]}</span><h3>{item.title}</h3><p>{item.summary}</p></div>
+                    <div><span>{timelineLabels[item.type]}</span><h3>{index === firstDebtEventIndex ? `${item.title} (빌린 돈)` : item.title}</h3><p>{item.summary}</p></div>
                   </li>
                 ))}
               </ol>
             )}
+            <p className="replay-source-count">사용한 공시 {result.disclosuresUsed.length}개 · 검증된 변화 {result.riskEvents.length}개 · 재무 {result.financialSnapshot?.period ?? "없음"}</p>
+            <dl className="replay-state-list">
+              {(Object.keys(categoryLabels) as Array<keyof typeof categoryLabels>).map((category) => (
+                <div key={category}><dt>{categoryLabels[category]}</dt><dd>{stateLabels[result.riskSnapshot[category]]}</dd></div>
+              ))}
+            </dl>
             <p className="replay-fingerprint">재현 입력 {result.metadata.inputFingerprint.slice(0, 12)} · {result.metadata.riskRuleVersion}</p>
           </section>
         )}

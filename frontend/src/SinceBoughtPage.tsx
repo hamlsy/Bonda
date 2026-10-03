@@ -152,9 +152,10 @@ function EvidenceDisclosure({ riskEventId }: { riskEventId: number }) {
   );
 }
 
-function Timeline({ items, featuredRiskEventId }: { items: SinceBoughtTimelineItem[]; featuredRiskEventId: number | null }) {
+function Timeline({ items, featuredRiskEventId, explainDebt }: { items: SinceBoughtTimelineItem[]; featuredRiskEventId: number | null; explainDebt: boolean }) {
   const datedItems = items.filter((item) => item.date);
   const changeCount = datedItems.filter((item) => item.type !== "PURCHASE").length;
+  const firstDebtIndex = explainDebt ? datedItems.findIndex((item) => item.title.includes("총차입금")) : -1;
   return (
     <>
       <ol className="risk-timeline" aria-label={`매수 이후 ${changeCount}개의 변화`}>
@@ -167,7 +168,7 @@ function Timeline({ items, featuredRiskEventId }: { items: SinceBoughtTimelineIt
                 <span>{timelineLabels[item.type]}</span>
                 {item.severity && <span className={`state-tag state-${item.severity.toLowerCase()}`}>{stateLabels[item.severity]}</span>}
               </div>
-              <h3>{item.title}</h3>
+              <h3>{index === firstDebtIndex ? `${item.title} (빌린 돈)` : item.title}</h3>
               <p>{item.summary}</p>
               {item.riskEventId !== featuredRiskEventId && item.riskEventId && item.evidenceAvailable && <EvidenceDisclosure riskEventId={item.riskEventId} />}
               {item.riskEventId !== featuredRiskEventId && item.riskEventId && !item.evidenceAvailable && <p className="evidence-unavailable">연결된 공시 원문이 없습니다.</p>}
@@ -188,7 +189,7 @@ function Timeline({ items, featuredRiskEventId }: { items: SinceBoughtTimelineIt
   );
 }
 
-function FinancialChangeList({ changes, data }: { changes: FinancialChange[]; data: SinceBoughtResponse }) {
+function FinancialChangeList({ changes, data, explainDebt }: { changes: FinancialChange[]; data: SinceBoughtResponse; explainDebt: boolean }) {
   if (changes.length === 0) {
     return (
       <div className="quiet-empty">
@@ -202,7 +203,7 @@ function FinancialChangeList({ changes, data }: { changes: FinancialChange[]; da
       {changes.map((change) => (
         <li key={change.metric}>
           <div>
-            <span>{change.label}</span>
+            <span>{explainDebt && change.metric === "TOTAL_DEBT" ? `${change.label}(빌린 돈)` : change.label}</span>
             <strong>{change.changeRate === null ? formatPercent(null) : `${change.direction === "INCREASE" ? "+" : "−"}${formatPercent(change.changeRate)}`}</strong>
           </div>
           <p>{formatPeriod(data.financialContext.baseline?.period, "기준")} {formatMoney(change.baselineValue)} → {formatPeriod(data.financialContext.current?.period, "현재")} {formatMoney(change.currentValue)}</p>
@@ -219,6 +220,8 @@ export default function SinceBoughtPage() {
   const [data, setData] = useState<SinceBoughtResponse | null>(null);
   const [retryKey, setRetryKey] = useState(0);
   const latestChange = data?.timeline.filter((item) => item.type !== "PURCHASE" && item.date).sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
+  const debtExplainedInLatest = latestChange?.title.includes("총차입금") ?? false;
+  const debtAppearsInTimeline = data?.timeline.some((item) => item.title.includes("총차입금")) ?? false;
   const currentOverall = data ? overallState(data.currentRiskState) : null;
 
   useEffect(() => {
@@ -271,7 +274,7 @@ export default function SinceBoughtPage() {
             <section className="since-latest" aria-labelledby="since-latest-title">
               {latestChange ? <>
                 <p className="section-label">최근 확인된 변화</p>
-                <h2 id="since-latest-title">{latestChange.title}</h2>
+                <h2 id="since-latest-title">{debtExplainedInLatest ? `${latestChange.title} (빌린 돈)` : latestChange.title}</h2>
                 <time dateTime={latestChange.date}>{formatDate(latestChange.date)}</time>
                 <p className="since-latest-state">Bonda 현재 상태 · <strong className={currentOverall ? `state-${currentOverall.toLowerCase()}` : undefined}>{currentOverall ? stateLabels[currentOverall] : "계산 전"}</strong></p>
                 <p className="since-latest-summary">{latestChange.summary}</p>
@@ -306,7 +309,7 @@ export default function SinceBoughtPage() {
                   <div><p className="section-label">날짜순 검증 기록</p><h2 id="timeline-title">매수 이후 변화</h2></div>
                   <p>매수일부터 날짜순</p>
                 </div>
-                <Timeline items={data.timeline} featuredRiskEventId={latestChange?.riskEventId ?? null} />
+                <Timeline items={data.timeline} featuredRiskEventId={latestChange?.riskEventId ?? null} explainDebt={!debtExplainedInLatest} />
               </section>
 
               <aside className="since-aside">
@@ -316,7 +319,7 @@ export default function SinceBoughtPage() {
                   {data.financialContext.baseline && data.financialContext.current && (
                     <p className="period-comparison">{data.financialContext.baseline.period} → {data.financialContext.current.period}</p>
                   )}
-                  <FinancialChangeList changes={data.financialChanges} data={data} />
+                  <FinancialChangeList changes={data.financialChanges} data={data} explainDebt={!debtExplainedInLatest && !debtAppearsInTimeline} />
                 </section>
                 {data.explanation.status === "AVAILABLE" && data.explanation.summary && <details className="explanation-section"><summary>참고 설명 <small>AI 생성 참고 정보</small></summary><p className="explanation-copy">{data.explanation.summary}</p><small>검증된 변화만 정리하며, 위험 상태 결정에는 사용하지 않습니다.</small></details>}
                 {data.explanation.status === "FAILED" && <p className="since-explanation-error">참고 설명을 만들지 못했습니다. 검증된 기록은 그대로 확인할 수 있습니다.</p>}

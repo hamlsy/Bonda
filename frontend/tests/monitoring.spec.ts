@@ -105,6 +105,8 @@ test("선택 사건은 한 번 설명되고 전체 기록과 계산 기준에 �
   await expect(page.getByText("연결 기준 순차입금 증가가 분기보고서에서 확인되었습니다.")).toHaveCount(1);
   await page.locator(".pulse-timeline li").filter({ hasText: "총차입금 증가" }).getByRole("button").click();
   await expect(summary).toContainText("총차입금 증가");
+  await expect(summary).toContainText("총차입금 증가 (빌린 돈)");
+  expect((await page.locator("main").innerText()).match(/빌린 돈/g)).toHaveLength(1);
   await expect(summary).toContainText("2026. 03. 14.");
   await expect(page.locator(".pulse-timeline li[data-active='true']")).toContainText("총차입금 증가");
   await page.getByRole("tab", { name: "변화 기록" }).click();
@@ -149,6 +151,7 @@ test("390px 마지막 재무 행은 하단 navigation에 가리지 않는다", a
 });
 
 test("시각 검증용 고정 화면을 캡처한다", { tag: "@capture" }, async ({ page }, testInfo) => {
+  test.skip(!process.env.BONDA_CAPTURE_DOCS, "기존 docs/design 캡처는 명시적으로 요청할 때만 갱신합니다.");
   const captureName = `monitoring-${testInfo.project.name}.png`;
   await page.screenshot({ path: `../docs/design/${captureName}`, fullPage: false, animations: "disabled" });
 });

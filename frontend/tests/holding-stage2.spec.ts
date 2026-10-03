@@ -35,7 +35,7 @@ test("Stage 2 default holding captures and evidence behavior @stage2-capture", a
     await page.goto("/holdings/1/since-bought");
     await expect(page.getByRole("heading", { name: holding.holding.bondName })).toBeVisible();
     const latest = page.locator(".since-latest");
-    await expect(latest.getByRole("heading", { name: "총차입금 증가" })).toBeVisible();
+    await expect(latest.getByRole("heading", { name: "총차입금 증가 (빌린 돈)" })).toBeVisible();
     await expect(latest).toContainText("2026년 3월 14일");
     await expect(latest).toContainText("Bonda 현재 상태 · 관찰");
     await expect(latest.getByRole("button", { name: "원문에서 확인" })).toBeVisible();
@@ -69,6 +69,13 @@ test("Stage 2 no-change response keeps a dated neutral summary", async ({ page }
   await expect(page.locator(".since-latest")).toContainText("마지막 확인");
   await expect(page.locator(".since-latest").getByRole("button", { name: "원문에서 확인" })).toHaveCount(0);
   await expect(page.getByText("비교 가능한 재무 변화가 아직 없습니다.")).toBeVisible();
+});
+
+test("S3-4 explains total debt at its first holding appearance once", async ({ page }) => {
+  await page.goto("/holdings/1/since-bought");
+  await expect(page.locator(".since-latest h2")).toHaveText("총차입금 증가 (빌린 돈)");
+  const copy = await page.locator("main").innerText();
+  expect(copy.match(/빌린 돈/g)).toHaveLength(1);
 });
 
 test("Stage 2 featured source recovers from an API error", async ({ page }) => {
