@@ -1,13 +1,13 @@
 # DESIGN HANDOFF
 
 status:
-READY_FOR_REVIEW
+PASS
 
 review_round:
 0
 
 target:
-Stage 3 — Evidence(`/sources/...`)와 Historical Replay(`/replay`)의 첫 화면 정보 우선순위 및 경로 간 쉬운 문구 정리. Stage 1·2는 디자인 PASS 후 `33d0d2ca949e94a96ab1fa301512b14b477a70ec`까지 origin/main에 push됐다.
+Stage 1–3 디자인 개선 완료 — `/monitoring`, 보유 채권 상세, Evidence, Historical Replay. Stage 3 구현과 push 기록은 `b16f534990ac8c058a2ac003c7f652d23d627e46`까지 origin/main에 반영됐다.
 
 viewports:
 
@@ -93,6 +93,7 @@ designer_notes:
 2026-10-03 Stage 2 S2-2 해석: SinceBoughtResponse에 사건별 위험 범주 연결 필드가 없음을 확인했다. 이번 UI 개선에서 이를 추정 표시하도록 요구하지 않는다. 현재 상태와 전체 범주 펼침만으로 Stage 2를 검수하고, 데이터가 생기는 별도 제품/API 작업이 승인될 때 사건별 범주를 붙인다.
 2026-10-03 Stage 2 디자인 PASS. 동일 한결산업 fixture의 1440×900·390×844 Before/After와 full-page를 직접 비교했다. 모바일 첫 화면에 채권·매수일·최근 사건·실제 날짜·Bonda 현재 상태·원문 버튼이 보이고, 빈 AI 카드·중복 남색 요약판·의미가 검증되지 않은 빨간 증감률은 사라졌다. QA BLOCKER/FOLLOW-UP 없음, build/check:ui/관련 비캡처 E2E 24/24 PASS. Stage 2 변경의 commit/push를 승인한다. `총차입금` 같은 초보자에게 어려운 용어의 쉬운 설명은 Stage 3의 전체 문구 점검에서 다루며 이번 단계를 막지 않는다.
 2026-10-03 Stage 3 디자인 PASS. Evidence와 Replay의 1440×900·390×844 및 full-page Before/After를 직접 비교했다. Evidence에서 API 원문 인용이 첫 정보이고, Replay에서 기준일 당시 상태와 첫 사건이 390px 첫 화면에 있다. `선택한 날짜까지` 제목으로 시점 범위가 명확해졌고 총차입금의 첫 노출에는 `빌린 돈`을 덧붙였다. QA BLOCKER 없음, FOLLOW-UP은 이전 Holding mobile Before 파일 손상 1건이다. build/check:ui, Evidence·Replay·route 비캡처 E2E 24/24, Replay cutoff backend 통합 테스트 1/1을 확인했다. Stage 3에 속한 변경의 commit/push를 승인한다.
+2026-10-04 전체 handoff status PASS. origin/main과 로컬 HEAD가 `b16f534990ac8c058a2ac003c7f652d23d627e46`으로 일치함을 확인했다. Stage 1–3의 승인된 구현·After 캡처·테스트·handoff는 원격에 있다. 별도 M1–M2 motion CSS, 오래된 로컬 문서·감사 자료와 손상된 untracked Holding Before는 이 iteration 범위에서 제외돼 로컬에 남는다. Stage 2의 손상된 mobile Before 파일은 공식 비교 근거로 사용하지 않는다. 이 iteration의 추가 디자인 라운드는 시작하지 않는다.
 
 frontend_notes:
 
